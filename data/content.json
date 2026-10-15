@@ -1,0 +1,418 @@
+{
+  "meta": {
+    "title": "Mahfujur Rahman Joy — Water Resources Engineer & Researcher",
+    "description": "Portfolio of Mahfujur Rahman Joy: Research Consultant at CEGIS, M.Sc. (WRD) candidate at BUET. Hydrodynamic modeling, GIS & remote sensing, CMIP6 downscaling and machine learning for floods and droughts.",
+    "siteUrl": "",
+    "updated": "2026-10-15"
+  },
+  "settings": {
+    "showPhone": false,
+    "bootScreen": true,
+    "flowBackground": true,
+    "sections": {
+      "about": true,
+      "experience": true,
+      "map": true,
+      "research": true,
+      "skills": true,
+      "education": true,
+      "leadership": true,
+      "references": true,
+      "contact": true
+    }
+  },
+  "profile": {
+    "name": "Mahfujur Rahman Joy",
+    "shortName": "Joy",
+    "initials": "MRJ",
+    "status": "Research Consultant @ CEGIS · M.Sc. (WRD) @ BUET",
+    "roles": [
+      "Water Resources Engineer",
+      "Hydrodynamic Modeler (1D/2D)",
+      "GIS & Remote Sensing Analyst",
+      "Hydro-Climate Researcher",
+      "ML for Floods & Droughts"
+    ],
+    "bio": "Civil & Environmental Engineer working as a **Research Consultant at CEGIS**, a public trust under the Ministry of Water Resources, Bangladesh, while pursuing an **M.Sc. in Water Resources Development (WRD) at BUET**. I build river models, read the Earth from orbit, and use machine learning to understand floods and droughts in a changing climate.",
+    "location": "Dhaka, Bangladesh",
+    "currentQuest": "Integrated Water Resources Management — Sandhya-Baleshwar River Basin",
+    "availability": "Open to research collaboration & graduate opportunities",
+    "workEmail": "mrjoy@cegisbd.com",
+    "personalEmail": "mahfuj2sust@gmail.com",
+    "phone": "",
+    "office": "CEGIS Bhaban, F-14/E, Agargaon Administrative Area, Sher-e-Bangla Nagar, Dhaka-1207",
+    "cvUrl": ""
+  },
+  "links": [
+    { "label": "GitHub", "url": "https://github.com/meawman", "icon": "github" },
+    { "label": "LinkedIn", "url": "", "icon": "linkedin" },
+    { "label": "Google Scholar", "url": "", "icon": "scholar" },
+    { "label": "ResearchGate", "url": "", "icon": "researchgate" },
+    { "label": "ORCID", "url": "", "icon": "orcid" }
+  ],
+  "avatar": {
+    "lines": [
+      "Hi! I'm Joy 👋",
+      "Currently modeling the Sandhya-Baleshwar basin 🌊",
+      "Poke me — I react 👆",
+      "Hit ☔ Rain and watch the river flood",
+      "Press Ctrl + K to open the command palette",
+      "1D, 2D, CMIP6, GEE… I speak fluent hydrology",
+      "Watch the satellite — it's scanning for floods 🛰️"
+    ]
+  },
+  "buddy": {
+    "enabled": true,
+    "sections": {
+      "about": "This is what I nerd out about 🤓",
+      "experience": "My quest log — newest first ⚔️",
+      "map": "Hover a dot — each one is a place I've studied 📍",
+      "research": "12 papers and counting 📄 Try the Cite button!",
+      "skills": "My toolbox. GEE is my favourite 🛰️",
+      "education": "SUST → BUET. Still leveling up 🎓",
+      "leadership": "Teams I've helped run 🤝",
+      "contact": "Type 'help' in the terminal 👇"
+    }
+  },
+  "studyAreas": [
+    { "name": "Sandhya-Baleshwar River Basin", "lon": 90.05, "lat": 22.55, "current": true, "what": "Integrated water resources management feasibility study — 1D/2D hydrodynamic modeling", "org": "CEGIS", "year": "2026–" },
+    { "name": "Burishwar-Payra River Basin", "lon": 90.2, "lat": 22.2, "current": false, "what": "Integrated water resources management feasibility study — flood, erosion, polder and estuary management", "org": "BWDB IWRM study", "year": "" },
+    { "name": "Khulna Coastal Polders (5 polders)", "lon": 89.36, "lat": 22.55, "current": false, "what": "Five polders around the Kurulia and Shibsa rivers", "org": "ADB project", "year": "" },
+    { "name": "North Rajshahi Irrigation Project (NRIP)", "lon": 88.45, "lat": 24.58, "current": false, "what": "Irrigation development in the Barind tract of north Rajshahi", "org": "NRIP", "year": "" },
+    { "name": "Cox's Bazar Watersheds", "lon": 92.12, "lat": 21.2, "current": false, "what": "Watershed management for four watersheds: Rezu Khal, Hnila, Baruakhali and Palongkhali", "org": "FAO project", "year": "" },
+    { "name": "Sylhet Region", "lon": 91.87, "lat": 24.89, "current": false, "what": "Extreme floods and their impacts — remote sensing & deep learning", "org": "SUST Research Center", "year": "2025–26" },
+    { "name": "Feni & Southeast Floodplain", "lon": 91.4, "lat": 23.02, "current": false, "what": "Crop damage assessment for the Aug 2024 and Jul 2025 floods", "org": "BRRI Agromet Lab", "year": "2025" },
+    { "name": "Jamuna River (Sirajganj reach)", "lon": 89.7, "lat": 24.45, "current": false, "what": "Spatio-temporal erosion & accretion with satellite imagery and GEE", "org": "ICCEI 2025", "year": "2025" },
+    { "name": "Brahmaputra-Jamuna System", "lon": 89.75, "lat": 25.35, "current": false, "what": "Trends of rainfall and discharge", "org": "RRI Technical Journal", "year": "2025" },
+    { "name": "Ganges (Padma) River", "lon": 89.03, "lat": 24.07, "current": false, "what": "Multi-decadal planform dynamics & ML water-level prediction", "org": "ICCEI 2025 · preprint", "year": "2025" },
+    { "name": "Rajshahi District", "lon": 88.6, "lat": 24.4, "current": false, "what": "Landfill site suitability with GIS + MCDA", "org": "ICCEI 2025", "year": "2025" },
+    { "name": "Dhaka (Zones W3 & W4)", "lon": 90.41, "lat": 23.73, "current": false, "what": "Sewerage network design and GIS database", "org": "CCECC", "year": "2026" }
+  ],
+  "focusAreas": [
+    {
+      "icon": "wave",
+      "title": "Hydrodynamic Modeling",
+      "text": "1D & 2D hydrologic and hydrodynamic models (SOBEK, Delft3D, SWMM) for river basin planning and urban drainage."
+    },
+    {
+      "icon": "satellite",
+      "title": "GIS & Remote Sensing",
+      "text": "Flood inundation mapping, LULC classification, river planform and erosion–accretion analysis with ArcGIS Pro & Google Earth Engine."
+    },
+    {
+      "icon": "cloud",
+      "title": "Climate Projection",
+      "text": "CMIP6 statistical downscaling, bias correction (NBC, MBC, QBC), trend analysis and copula-based drought assessment."
+    },
+    {
+      "icon": "chip",
+      "title": "Machine & Deep Learning",
+      "text": "RF, SVM, KNN, LSTM and CNN models for flood susceptibility, precipitation and water-level prediction."
+    }
+  ],
+  "experience": [
+    {
+      "role": "Research Consultant",
+      "org": "Center for Environmental and Geographic Information Services (CEGIS)",
+      "orgNote": "Public Trust under the Ministry of Water Resources, Government of Bangladesh",
+      "location": "Dhaka",
+      "mode": "On-site",
+      "start": "2026-08",
+      "end": "",
+      "project": "Feasibility Study for Integrated Water Resources Management in the Sandhya-Baleshwar River Basin",
+      "people": "",
+      "bullets": [
+        "Field reconnaissance and hydro-morphological surveying across the basin.",
+        "Catchment delineation and spatial basin characterization with GIS and remote sensing data.",
+        "Developing, calibrating and validating 1D & 2D hydrologic and hydrodynamic mathematical models.",
+        "Preparing technical maps and feasibility reports."
+      ],
+      "tools": ["SOBEK", "Delft3D", "ArcGIS Pro", "GEE"]
+    },
+    {
+      "role": "Jr. Design Engineer",
+      "org": "CCECC — China Civil Engineering Construction Corporation",
+      "orgNote": "",
+      "location": "Dhaka",
+      "mode": "On-site",
+      "start": "2026-06",
+      "end": "2026-07",
+      "project": "Design & Build Contract for Reconstruction / New Construction / Rehabilitation of Sewerage Networks, Zone W3 & W4 (Arambagh, Paltan, Shahidbag, Motijheel) — Package WD5B",
+      "people": "",
+      "bullets": [
+        "Managed the GIS database for urban sewerage infrastructure.",
+        "Designed sewer networks and hydraulic alignments.",
+        "CAD operations, engineering maps and project reports."
+      ],
+      "tools": ["AutoCAD", "ArcGIS", "MS Office"]
+    },
+    {
+      "role": "GIS and Environmental Officer",
+      "org": "SUST Research Center, Shahjalal University of Science and Technology",
+      "orgNote": "",
+      "location": "Sylhet",
+      "mode": "Hybrid",
+      "start": "2025-12",
+      "end": "2026-05",
+      "project": "Understanding Extreme Floods and Their Impact in the Sylhet Region: A Probabilistic Deep Learning Approach (PS/2025/1/38)",
+      "people": "PI: Prof. Dr. Khalidur Rahman, Dept. of Statistics, SUST",
+      "bullets": [
+        "Satellite image acquisition, preprocessing and spatial data curation.",
+        "Computed indices including NDVI, NDWI, TWI and TPI.",
+        "Trained and tested RF, SVM, LSTM and CNN models for flood analysis.",
+        "Map generation and reporting."
+      ],
+      "tools": ["ArcGIS Pro", "GEE", "Google Colab", "Python"]
+    },
+    {
+      "role": "RS & GIS Analyst",
+      "org": "Agromet Lab, Bangladesh Rice Research Institute (BRRI)",
+      "orgNote": "",
+      "location": "Gazipur",
+      "mode": "Hybrid",
+      "start": "2025-07",
+      "end": "2025-11",
+      "project": "Damage Assessment of Crops using Remote Sensing and GIS during the August 2024 and July 2025 Floods",
+      "people": "PI: Dr. Niaz Md. Farhat Rahman, Agromet Lab, BRRI",
+      "bullets": [
+        "Field surveying, satellite image acquisition and preprocessing.",
+        "Flood inundation mapping and supervised LULC classification.",
+        "Trained ML classifiers on ground sample points (KNN, RF, SVR, MD, NB).",
+        "Crop damage maps, reports and a journal manuscript."
+      ],
+      "tools": ["ArcGIS Pro", "GEE", "Python", "Excel"]
+    },
+    {
+      "role": "Research Assistant",
+      "org": "Dept. of Civil & Environmental Engineering, SUST",
+      "orgNote": "Water Resource & Environment Division",
+      "location": "Sylhet",
+      "mode": "On-site",
+      "start": "2024-08",
+      "end": "2025-11",
+      "project": "Hydro-climatic modeling, CMIP6 statistical downscaling & copula-based drought analysis",
+      "people": "Supervisor: Prof. Dr. Ahmad Hasan Nury, Dept. of CEE, SUST",
+      "bullets": [
+        "Collected and preprocessed station, GCM and reanalysis data (missing values, outliers).",
+        "Statistical downscaling and bias correction (NBC, MBC, QBC).",
+        "Planform analysis, trend analysis and uni/bi/multivariate copulas.",
+        "Predictive modeling with machine and deep learning; reporting and journal publication."
+      ],
+      "tools": ["Python", "JavaScript", "QGIS", "SWMM", "GEE"]
+    }
+  ],
+  "education": [
+    {
+      "degree": "M.Sc. in Water Resources Development (WRD)",
+      "institution": "Bangladesh University of Engineering and Technology (BUET)",
+      "location": "Dhaka",
+      "period": "Ongoing",
+      "status": "ongoing",
+      "grade": "",
+      "note": "Integrated water resources management, river basin development and hydrodynamic modeling."
+    },
+    {
+      "degree": "B.Sc. (Engg.) in Civil & Environmental Engineering",
+      "institution": "Shahjalal University of Science and Technology (SUST)",
+      "location": "Sylhet",
+      "period": "Feb 2020 – Jul 2025",
+      "status": "completed",
+      "grade": "CGPA 3.18 / 4.00",
+      "note": "Water Resources & Environmental Engineering. Undergraduate research on CMIP6 downscaling, soil moisture projection and drought."
+    },
+    {
+      "degree": "Higher Secondary Certificate (Science)",
+      "institution": "Hamdard Public College",
+      "location": "Dhaka",
+      "period": "2017 – 2019",
+      "status": "completed",
+      "grade": "",
+      "note": ""
+    },
+    {
+      "degree": "Secondary School Certificate (Science)",
+      "institution": "Rajdhani High School",
+      "location": "Dhaka",
+      "period": "2017",
+      "status": "completed",
+      "grade": "",
+      "note": ""
+    }
+  ],
+  "publications": [
+    {
+      "type": "journal",
+      "status": "revision",
+      "featured": false,
+      "year": 2026,
+      "title": "Climate Change Impacts on Soil Moisture and SERDI-Based Drought Assessment Using the ML-NBC Framework",
+      "authors": ["Ahmad Hasan Nury", "Mahfujur Rahman Joy", "Rounak Afroz", "Abu Sadat Md. Saim"],
+      "venue": "Journal of Hydrologic Engineering (ASCE)",
+      "volume": "", "issue": "", "pages": "",
+      "doi": "", "url": "",
+      "tags": ["Soil moisture", "Drought", "Bias correction", "Machine learning"]
+    },
+    {
+      "type": "journal",
+      "status": "accepted",
+      "featured": true,
+      "year": 2026,
+      "title": "Understanding Extreme Floods and Their Impacts in the Northeastern Region in Bangladesh: Utilizing Remote Sensing Data and Deep Learning Models",
+      "authors": ["Khalidur Rahman", "Saiful Alam", "Md Sabbir Hossain", "Mahfujur Rahman Joy", "Nazmul Haque", "Md. Shihab Mostafa"],
+      "venue": "Heliyon",
+      "volume": "", "issue": "", "pages": "",
+      "doi": "", "url": "",
+      "tags": ["Floods", "Deep learning", "Remote sensing"]
+    },
+    {
+      "type": "journal",
+      "status": "published",
+      "featured": true,
+      "year": 2026,
+      "title": "Assessing the Reliability of Global Circulation Models in Predicting Monthly Precipitation Patterns in Bangladesh",
+      "authors": ["Ahmad Hasan Nury", "Abu Sadat Md. Saim", "Khairul Hasan", "Mahfujur Rahman Joy"],
+      "venue": "H2Open Journal",
+      "volume": "", "issue": "", "pages": "100021",
+      "doi": "10.1016/j.htopen.2026.100021", "url": "",
+      "tags": ["GCM", "Precipitation", "CMIP6"]
+    },
+    {
+      "type": "journal",
+      "status": "published",
+      "featured": true,
+      "year": 2025,
+      "title": "Drought prediction in Bangladesh under changing climate: Integrating SDAT-SPI and SDSM-DCBC with CMIP6 data",
+      "authors": ["Ahmad Hasan Nury", "Saiful Alam", "Rounak Afroz", "Saurov Nandi Majumdar", "Shawly Deb Anti", "Mahfujur Rahman Joy", "Gulam Md. Munna"],
+      "venue": "Environmental and Sustainability Indicators",
+      "volume": "28", "issue": "", "pages": "100878",
+      "doi": "10.1016/j.indic.2025.100878", "url": "",
+      "tags": ["Drought", "CMIP6", "Downscaling", "SPI"]
+    },
+    {
+      "type": "journal",
+      "status": "published",
+      "featured": false,
+      "year": 2025,
+      "title": "Investigating the Trends of Rainfall and Discharge along the Brahmaputra-Jamuna River System",
+      "authors": ["Raied Ahmed Nishat", "Mahfujur Rahman Joy"],
+      "venue": "Technical Journal, River Research Institute",
+      "volume": "17", "issue": "1", "pages": "",
+      "doi": "", "url": "",
+      "tags": ["Trend analysis", "Rainfall", "Discharge"]
+    },
+    {
+      "type": "journal",
+      "status": "preprint",
+      "featured": false,
+      "year": 2025,
+      "title": "Hydroclimatic Trend Analysis and Machine Learning-Based Water Level Prediction for The Ganges (Padma) River Basin",
+      "authors": ["Mahfujur Rahman Joy", "Raied Ahmed Nishat"],
+      "venue": "Hydrological Processes (Wiley) — preprint",
+      "volume": "", "issue": "", "pages": "",
+      "doi": "10.22541/au.175741407.71397410/v1", "url": "",
+      "tags": ["Machine learning", "Water level", "Ganges"]
+    },
+    {
+      "type": "conference",
+      "status": "published",
+      "featured": false,
+      "year": 2025,
+      "title": "Evaluation of Machine Learning Classifiers for LULC Classification Using Sentinel-2 Imagery on Google Earth Engine",
+      "authors": ["Mahfujur Rahman Joy", "Saifullah Mansur Akil"],
+      "venue": "Proc. International Conference on Civil Engineering Research & Innovations (ICCEI), RUET, Rajshahi — Paper 514",
+      "volume": "", "issue": "", "pages": "",
+      "doi": "", "url": "",
+      "tags": ["LULC", "Sentinel-2", "GEE"]
+    },
+    {
+      "type": "conference",
+      "status": "published",
+      "featured": false,
+      "year": 2025,
+      "title": "Multi-Decadal Planform Dynamics of the Transboundary Ganges River Using Landsat Imagery and GIS",
+      "authors": ["Mahfujur Rahman Joy", "Saifullah Mansur Akil"],
+      "venue": "Proc. International Conference on Civil Engineering Research & Innovations (ICCEI), RUET, Rajshahi — Paper 518",
+      "volume": "", "issue": "", "pages": "",
+      "doi": "", "url": "",
+      "tags": ["River planform", "Landsat", "GIS"]
+    },
+    {
+      "type": "conference",
+      "status": "published",
+      "featured": false,
+      "year": 2025,
+      "title": "Integrating Geospatial Techniques and the MCDA Approach for Landfill Site Suitability Mapping in Rajshahi District, Bangladesh",
+      "authors": ["Saifullah Mansur Akil", "Mahfujur Rahman Joy", "Gulam Md. Munna"],
+      "venue": "Proc. International Conference on Civil Engineering Research & Innovations (ICCEI), RUET, Rajshahi — Paper 1011",
+      "volume": "", "issue": "", "pages": "",
+      "doi": "", "url": "",
+      "tags": ["MCDA", "Site suitability", "GIS"]
+    },
+    {
+      "type": "conference",
+      "status": "published",
+      "featured": false,
+      "year": 2025,
+      "title": "Clustering Earthquake Activity in South Asia Using Advanced Techniques",
+      "authors": ["Mahfujur Rahman Joy"],
+      "venue": "Proc. International Conference on Civil Engineering Research & Innovations (ICCEI), RUET, Rajshahi — Paper 266",
+      "volume": "", "issue": "", "pages": "",
+      "doi": "", "url": "",
+      "tags": ["Earthquakes", "Clustering"]
+    },
+    {
+      "type": "conference",
+      "status": "published",
+      "featured": false,
+      "year": 2025,
+      "title": "Bivariate GIS-Based Risk Mapping of Earthquake Hazard and Population Vulnerability in Bangladesh",
+      "authors": ["Mahfujur Rahman Joy"],
+      "venue": "Proc. International Conference on Civil Engineering Research & Innovations (ICCEI), RUET, Rajshahi — Paper 268",
+      "volume": "", "issue": "", "pages": "",
+      "doi": "", "url": "",
+      "tags": ["Earthquakes", "Risk mapping", "GIS"]
+    },
+    {
+      "type": "conference",
+      "status": "published",
+      "featured": false,
+      "year": 2025,
+      "title": "Spatio-Temporal Dynamics of Erosion and Accretion in the Jamuna River System Using Satellite Imagery and GEE",
+      "authors": ["Saifullah Mansur Akil", "Mahfujur Rahman Joy", "Gulam Md. Munna"],
+      "venue": "Proc. International Conference on Civil Engineering Research & Innovations (ICCEI), RUET, Rajshahi — Paper 1014",
+      "volume": "", "issue": "", "pages": "",
+      "doi": "", "url": "",
+      "tags": ["Erosion", "Accretion", "GEE"]
+    }
+  ],
+  "skills": [
+    { "group": "GIS & Remote Sensing", "items": ["ArcGIS Pro", "QGIS", "Google Earth Engine", "Google Earth Pro"] },
+    { "group": "Hydrologic Modeling", "items": ["SOBEK (1D/2D)", "Delft3D", "SWMM", "CMIP6 Downscaling", "Bias Correction", "Copulas"] },
+    { "group": "Programming & ML", "items": ["Python", "JavaScript (GEE)", "C", "RF / SVM / KNN", "LSTM / CNN", "Google Colab"] },
+    { "group": "Design & Office", "items": ["AutoCAD", "ETABS", "MS Word", "Excel", "PowerPoint"] }
+  ],
+  "certifications": [
+    { "title": "Geospatial Data Analysis and Management (Intermediate)", "issuer": "Esri & EDGE", "date": "Apr – May 2026", "credentialId": "", "url": "" },
+    { "title": "Big Data Analysis for Water Related Applications", "issuer": "UNU-INWEH", "date": "Mar 2026", "credentialId": "eda202eb1db04a99b01c6b6c66801e5a", "url": "" },
+    { "title": "Remote Sensing and GIS in Climate and Water Management", "issuer": "BUET", "date": "May 2025", "credentialId": "", "url": "" },
+    { "title": "Getting Started with Imagery and Remote Sensing", "issuer": "Esri", "date": "Apr – May 2025", "credentialId": "6834612eb653abf18e3a67b5", "url": "" },
+    { "title": "Python Programming and Basic Data Science", "issuer": "ICT Division, Bangladesh", "date": "Dec 2024 – May 2025", "credentialId": "EDGE-DSTS-126-8826-00016", "url": "" },
+    { "title": "Going Places with Spatial Analysis", "issuer": "Esri", "date": "Jan – Mar 2025", "credentialId": "6754afca58d5e000133f6ef3", "url": "" },
+    { "title": "Data Analysis with Python", "issuer": "freeCodeCamp", "date": "May – Jun 2024", "credentialId": "mahfujurrahmanjoy-dawp", "url": "" },
+    { "title": "Geospatial Data Analysis with ChatGPT and Google Earth Engine", "issuer": "UNU-INWEH", "date": "Apr – May 2024", "credentialId": "ce28690d389c48a6ba3845560d75d44c", "url": "" }
+  ],
+  "leadership": [
+    { "role": "IT Secretary", "org": "Association of Civil & Environmental Engineering (ACEE), SUST", "location": "Sylhet", "period": "Mar 2024 – Jul 2025" },
+    { "role": "Assistant IT Secretary", "org": "ACEE, SUST", "location": "Sylhet", "period": "Apr 2023 – Mar 2024" },
+    { "role": "Campus Leader", "org": "BongoDev", "location": "Remote", "period": "Jan 2023 – Jun 2024" },
+    { "role": "Campus Ambassador", "org": "Construct Carnival 1.0, KUET", "location": "Remote", "period": "May 2024" },
+    { "role": "Publication & IT Management", "org": "ExCEEd 2.0", "location": "Sylhet", "period": "Mar 2023" },
+    { "role": "Management", "org": "CEE SUST Silver Jubilee Celebration & Reunion", "location": "Sylhet", "period": "Mar 2023" },
+    { "role": "Vice President", "org": "HPC Science Club, Hamdard Public College", "location": "Dhaka", "period": "Mar 2018 – Mar 2019" }
+  ],
+  "references": [
+    { "name": "Dr. Ahmad Hasan Nury", "title": "Professor, Dept. of Civil & Environmental Engineering", "org": "Shahjalal University of Science and Technology", "email": "hasan-cee@sust.edu" },
+    { "name": "Dr. Khalidur Rahman", "title": "Professor, Dept. of Statistics", "org": "Shahjalal University of Science and Technology", "email": "khalid-sta@sust.edu" },
+    { "name": "Dr. Niaz Md. Farhat Rahman", "title": "Principal Scientific Officer, Agromet Lab", "org": "Bangladesh Rice Research Institute", "email": "niaz.sust@gmail.com" }
+  ]
+}

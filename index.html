@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mahfujur Rahman Joy — Water Resources Engineer & Researcher</title>
+  <meta name="description" content="Portfolio of Mahfujur Rahman Joy: Research Consultant at CEGIS, M.Sc. (WRD) candidate at BUET. Hydrodynamic modeling, GIS & remote sensing, CMIP6 downscaling and machine learning for floods and droughts." />
+  <meta name="author" content="Mahfujur Rahman Joy" />
+  <meta property="og:type" content="profile" />
+  <meta property="og:title" content="Mahfujur Rahman Joy — Water Resources Engineer & Researcher" />
+  <meta property="og:description" content="Hydrodynamic modeling · GIS & remote sensing · climate projection · ML for floods and droughts." />
+  <meta property="og:image" content="assets/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="assets/og-image.png" />
+  <meta name="theme-color" content="#06080f" />
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="assets/favicon-32.png" sizes="32x32" type="image/png" />
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <script>
+    // Apply theme before paint to avoid a flash
+    (function () {
+      var t = null;
+      try { t = localStorage.getItem('mrj_theme'); } catch (e) {}
+      if (!t) t = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <!-- Boot screen -->
+  <div id="boot" class="boot" aria-hidden="true">
+    <div class="boot-inner">
+      <pre id="bootLog"></pre>
+      <div class="boot-bar"><span id="bootFill"></span></div>
+      <p class="boot-hint">click or press any key to skip</p>
+    </div>
+  </div>
+
+  <canvas id="flow" aria-hidden="true"></canvas>
+  <div class="grid-bg" aria-hidden="true"></div>
+  <div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="xp" aria-hidden="true"><span id="xpFill"></span><em id="xpLabel">XP 0%</em></div>
+
+  <header class="nav" id="nav">
+    <a href="#home" class="logo" aria-label="Home">
+      <span class="logo-mark" aria-hidden="true"><img src="assets/favicon.svg" alt="" width="40" height="40" /></span>
+      <span class="logo-text"><b id="navName">Mahfujur Rahman Joy</b><small id="navSub">CEGIS · BUET · SUST</small></span>
+    </a>
+    <nav class="nav-links" id="navLinks" aria-label="Sections"></nav>
+    <div class="nav-actions">
+      <button class="btn-icon cmdk" id="cmdBtn" title="Command palette (Ctrl+K)" aria-label="Open command palette">
+        <svg viewBox="0 0 24 24" width="16" height="16"><path fill="none" stroke="currentColor" stroke-width="2" d="M21 21l-5-5m2-6a8 8 0 1 1-16 0 8 8 0 0 1 16 0z"/></svg>
+        <kbd>Ctrl K</kbd>
+      </button>
+      <button class="btn-icon" id="themeBtn" title="Toggle theme" aria-label="Toggle light or dark theme">
+        <svg class="i-sun" viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M11 1h2v3h-2zM11 20h2v3h-2zM1 11h3v2H1zM20 11h3v2h-3zM4.2 5.6l1.4-1.4 2.1 2.1-1.4 1.4zM16.3 17.7l1.4-1.4 2.1 2.1-1.4 1.4zM4.2 18.4l2.1-2.1 1.4 1.4-2.1 2.1zM16.3 6.3l2.1-2.1 1.4 1.4-2.1 2.1zM7 9h2V7h6v2h2v6h-2v2H9v-2H7z"/></svg>
+        <svg class="i-moon" viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M9 2h6v2h-4v2H9v4H7v4h2v4h2v2h4v-2h4v-2h2v-4h-2v2h-2v2h-6v-2H9v-4H7v-2h2V6h2V4H9z"/></svg>
+      </button>
+      <button class="btn-icon menu" id="menuBtn" aria-label="Open menu" aria-expanded="false">
+        <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M3 5h18v2H3zM3 11h18v2H3zM3 17h18v2H3z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- HERO -->
+    <section id="home" class="hero">
+      <div class="hero-text">
+        <div class="chip live"><span class="dot"></span><span id="heroStatus"></span></div>
+        <p class="eyebrow pixel">PLAYER_01 // <span id="heroLocation"></span></p>
+        <h1 class="hero-name" id="heroName" aria-label=""></h1>
+        <p class="typed mono"><span class="prompt">&gt;</span> <span id="typed"></span><span class="caret"></span></p>
+        <p class="hero-bio" id="heroBio"></p>
+        <div class="cta">
+          <a class="btn primary" href="#research"><span>View research</span><svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M4 11h12l-4-4 1.4-1.4L20 12l-6.6 6.4L12 17l4-4H4z"/></svg></a>
+          <a class="btn" href="#contact">Get in touch</a>
+          <a class="btn ghost" id="cvBtn" href="#" target="_blank" rel="noopener" hidden>Download CV</a>
+        </div>
+        <div class="socials" id="socials"></div>
+      </div>
+
+      <div class="hero-avatar">
+        <div class="avatar-card tilt" id="avatarCard">
+          <div class="card-bar mono">
+            <span><i class="led"></i>JOY.EXE</span>
+            <span class="muted" id="sceneMode">LVL 26 · HYDRO CLASS</span>
+          </div>
+          <div class="scene-wrap">
+            <div class="bubble mono" id="bubble" role="status" aria-live="polite"></div>
+            <canvas id="scene" width="160" height="96" aria-label="Pixel-art avatar of Joy standing in front of a river. Click to make it rain." role="img"></canvas>
+            <div class="scanline" aria-hidden="true"></div>
+          </div>
+          <div class="card-controls">
+            <button class="mini" id="rainBtn" aria-pressed="false">☔ Rain</button>
+            <button class="mini" id="sayBtn">💬 Talk</button>
+            <button class="mini" id="shadesBtn" aria-pressed="false">😎 Style</button>
+          </div>
+          <p class="card-hint mono">tip: poke him · leave him alone and he naps</p>
+          <div class="quest">
+            <span class="pixel q-label">CURRENT QUEST</span>
+            <span id="heroQuest"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats" id="stats"></div>
+    </section>
+
+    <div class="marquee" aria-hidden="true"><div class="marquee-track" id="marquee"></div></div>
+
+    <section id="about" class="section">
+      <header class="sec-head">
+        <span class="pixel sec-idx">01</span>
+        <div><p class="pixel sec-kicker">CHARACTER SHEET</p><h2>What I work on</h2></div>
+      </header>
+      <div class="focus-grid" id="focusGrid"></div>
+    </section>
+
+    <section id="experience" class="section">
+      <header class="sec-head">
+        <span class="pixel sec-idx">02</span>
+        <div><p class="pixel sec-kicker">QUEST LOG</p><h2>Experience</h2></div>
+        <p class="sec-note mono" id="expNote"></p>
+      </header>
+      <div class="card gantt-card reveal">
+        <div class="gantt-head"><p class="pixel sec-kicker">TIMELINE</p><div class="gantt-legend mono" id="ganttLegend"></div></div>
+        <div class="gantt" id="gantt" role="img" aria-label="Timeline of roles and degrees"></div>
+      </div>
+      <ol class="timeline" id="timeline"></ol>
+    </section>
+
+    <section id="map" class="section">
+      <header class="sec-head">
+        <span class="pixel sec-idx">03</span>
+        <div><p class="pixel sec-kicker">FIELD MAP</p><h2>Where my research flows</h2></div>
+        <p class="sec-note mono">Study areas across Bangladesh · hover or tap a site</p>
+      </header>
+      <div class="map-wrap">
+        <div class="card map-card">
+          <svg id="bdMap" viewBox="0 0 400 480" role="img" aria-label="Dot map of Bangladesh with study sites and major rivers"></svg>
+          <div class="map-legend mono"><span><i class="lg-river"></i>Major rivers</span><span><i class="lg-site"></i>Study site</span><span><i class="lg-now"></i>Current project</span></div>
+        </div>
+        <div class="map-side" id="mapSide"></div>
+      </div>
+    </section>
+
+    <section id="research" class="section">
+      <header class="sec-head">
+        <span class="pixel sec-idx">04</span>
+        <div><p class="pixel sec-kicker">RESEARCH ARCHIVE</p><h2>Publications</h2></div>
+        <p class="sec-note mono" id="pubNote"></p>
+      </header>
+      <div class="pub-tools">
+        <div class="seg" id="pubTypes" role="tablist" aria-label="Publication type"></div>
+        <label class="search">
+          <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" d="M21 21l-5-5m2-6a8 8 0 1 1-16 0 8 8 0 0 1 16 0z"/></svg>
+          <input id="pubSearch" type="search" placeholder="Search title, co-author, venue, method…" aria-label="Search publications" />
+        </label>
+      </div>
+      <div class="pub-list" id="pubList"></div>
+    </section>
+
+    <section id="skills" class="section">
+      <header class="sec-head">
+        <span class="pixel sec-idx">05</span>
+        <div><p class="pixel sec-kicker">INVENTORY</p><h2>Skills &amp; tools</h2></div>
+      </header>
+      <div class="inventory" id="inventory"></div>
+      <h3 class="sub-head"><span class="pixel">ACHIEVEMENTS UNLOCKED</span> <span class="muted mono" id="certCount"></span></h3>
+      <div class="achievements" id="achievements"></div>
+    </section>
+
+    <section id="education" class="section">
+      <header class="sec-head">
+        <span class="pixel sec-idx">06</span>
+        <div><p class="pixel sec-kicker">SAVE POINTS</p><h2>Education</h2></div>
+      </header>
+      <div class="edu-grid" id="eduGrid"></div>
+    </section>
+
+    <section id="leadership" class="section">
+      <header class="sec-head">
+        <span class="pixel sec-idx">07</span>
+        <div><p class="pixel sec-kicker">GUILDS &amp; ALLIES</p><h2>Leadership &amp; references</h2></div>
+      </header>
+      <div class="two-col">
+        <ul class="guilds" id="guilds"></ul>
+        <div class="refs" id="refs"></div>
+      </div>
+    </section>
+
+    <section id="contact" class="section">
+      <div class="contact-card">
+        <div class="contact-text">
+          <p class="pixel sec-kicker">NEW MESSAGE</p>
+          <h2>Let’s build something that floats.</h2>
+          <p class="muted" id="contactAvail"></p>
+          <div class="cta">
+            <a class="btn primary" id="mailBtn" href="#">Email me</a>
+            <button class="btn" id="copyMailBtn">Copy email</button>
+          </div>
+        </div>
+        <div class="terminal mono" id="terminal" aria-label="Contact details">
+          <div class="term-bar"><i></i><i></i><i></i><span>joy@portfolio:~</span></div>
+          <div class="term-body" id="termBody"></div>
+          <form class="term-input" id="termForm" autocomplete="off">
+            <span class="prompt">$</span>
+            <input id="termIn" aria-label="Terminal command" placeholder="type 'help'" spellcheck="false" />
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer mono">
+    <span>© <span id="year"></span> <span id="footName"></span> · built pixel by pixel</span>
+    <span class="muted">Last updated <span id="updated"></span> · <a href="#" id="topLink">back to top ↑</a></span>
+  </footer>
+
+  <!-- Command palette -->
+  <div class="overlay" id="palette" hidden>
+    <div class="palette" role="dialog" aria-modal="true" aria-label="Command palette">
+      <input id="palIn" placeholder="Type a command or search…" aria-label="Command" />
+      <ul id="palList" role="listbox"></ul>
+      <div class="pal-foot mono"><span>↑↓ navigate</span><span>↵ select</span><span>esc close</span></div>
+    </div>
+  </div>
+
+  <!-- Citation modal -->
+  <div class="overlay" id="citeModal" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="citeTitle">
+      <div class="modal-head"><h3 id="citeTitle">Cite this work</h3><button class="btn-icon" data-close aria-label="Close">✕</button></div>
+      <p class="pixel label">APA</p>
+      <pre id="apaBox" class="cite"></pre>
+      <p class="pixel label">BIBTEX</p>
+      <pre id="bibBox" class="cite code"></pre>
+      <div class="modal-actions">
+        <button class="btn" data-copy="apaBox">Copy APA</button>
+        <button class="btn primary" data-copy="bibBox">Copy BibTeX</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Companion: mini avatar that follows you down the page -->
+  <div class="buddy" id="buddy" aria-live="polite">
+    <div class="buddy-bubble mono" id="buddyBubble"></div>
+    <button class="buddy-btn" id="buddyBtn" aria-label="Pixel Joy — click for a reaction, double-click to open the command palette">
+      <canvas id="buddyCanvas" width="56" height="48"></canvas>
+    </button>
+  </div>
+
+  <div class="toast mono" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="assets/js/avatar.js"></script>
+  <script src="assets/js/flow.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

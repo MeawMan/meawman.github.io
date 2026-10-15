@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Portfolio Control Room</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="assets/favicon-32.png" sizes="32x32" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Silkscreen&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/admin.css" />
+  <script>
+    (function () {
+      var t = null;
+      try { t = localStorage.getItem('mrj_theme'); } catch (e) {}
+      if (!t) t = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+</head>
+<body>
+  <header class="top">
+    <a class="brand" href="index.html" title="Open site">
+      <img class="mark" src="assets/favicon.svg" alt="" width="36" height="36" />
+      <span><b>Control Room</b><small>edit · preview · publish</small></span>
+    </a>
+    <div class="status mono" id="status">Loading…</div>
+    <div class="actions">
+      <button class="lock mono" id="lockState" type="button"></button>
+      <button class="btn" id="previewBtn" title="Open the site with your unsaved draft">Preview</button>
+      <button class="btn" id="downloadBtn" title="Download content.json">Download JSON</button>
+      <button class="btn primary" id="publishBtn">Publish to GitHub</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav class="side" id="side" aria-label="Sections"></nav>
+    <main class="editor" id="editor"></main>
+  </div>
+
+  <div class="toast mono" id="toast" role="status" aria-live="polite"></div>
+  <input type="file" id="importFile" accept="application/json,.json" hidden />
+  <script src="assets/js/admin.js"></script>
+</body>
+</html>
