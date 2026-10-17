@@ -7,11 +7,12 @@
   const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const md = (s) => esc(s).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-  const safeUrl = (u) => (/^(https?:|mailto:|tel:|#|\.?\/|[\w-]+\.)/i.test(u || '') && !/^javascript:/i.test(u) ? u : '#');
+  // Allow normal web, mail, phone and relative links; block script/data URLs
+  const safeUrl = (u) => (u && !/^\s*(javascript|data|vbscript):/i.test(u) ? u : '#');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const SECTIONS = [
-    ['about', 'About'], ['experience', 'Experience'], ['map', 'Map'], ['research', 'Research'],
+    ['about', 'About'], ['tools', 'Tools'], ['experience', 'Experience'], ['map', 'Map'], ['research', 'Research'],
     ['skills', 'Skills'], ['education', 'Education'], ['leadership', 'Leadership'], ['contact', 'Contact'],
   ];
 
@@ -154,11 +155,101 @@
       .map(([id, label]) => '<a href="#' + id + '" data-sec="' + id + '">' + label + '</a>').join('');
     SECTIONS.forEach(([id]) => { const el = document.getElementById(id); if (el && on[id] === false) el.hidden = true; });
     if (on.references === false) $('#refs').hidden = true;
+    // Number the visible sections 01, 02, … so hiding/adding sections never needs renumbering
+    let n = 0;
+    SECTIONS.forEach(([id]) => {
+      const el = document.getElementById(id);
+      const idx = el && !el.hidden && el.querySelector('.sec-idx');
+      if (idx) idx.textContent = String(++n).padStart(2, '0');
+    });
+  }
+
+  // ------------------------------------------------------------ tools
+  const TOOL_COLORS = { cyan: 'var(--accent)', violet: 'var(--violet)', amber: 'var(--accent-2)', lime: 'var(--accent-3)', pink: 'var(--pink)' };
+  const TOOL_ICONS = {
+    band: '<path d="M3 15c2-3 4-6 7-4s4 4 7 1 3-5 4-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M3 19c2-2 4-4 7-3s4 2 7 0 3-3 4-4M3 11c2-4 4-7 7-6s4 3 7 0 3-5 4-6" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".55"/>',
+    extend: '<path d="M3 16c1.5-2 3-5 5-4s3 3 4 1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M12 13c2-3 3-6 5-4s2 3 4 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="2 2.5"/><path d="M12 4v16" stroke="currentColor" stroke-width="1" opacity=".5"/>',
+    chart: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+    ml: '<path d="M5 6l7 6-7 6M12 12h7M19 5l0 0M19 19l0 0" fill="none" stroke="currentColor" stroke-width="1.3" opacity=".55"/><circle cx="5" cy="6" r="2.2" fill="currentColor"/><circle cx="5" cy="18" r="2.2" fill="currentColor"/><circle cx="12" cy="12" r="2.6" fill="currentColor"/><circle cx="19" cy="6" r="2.2" fill="currentColor"/><circle cx="19" cy="18" r="2.2" fill="currentColor"/><path d="M12 12l7-6M12 12l7 6" fill="none" stroke="currentColor" stroke-width="1.3" opacity=".55"/>',
+    map: '<path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="10" r="2.5" fill="currentColor"/>',
+    wave: '<path d="M2 9c2.5 0 2.5-3 5-3s2.5 3 5 3 2.5-3 5-3 2.5 3 5 3M2 16c2.5 0 2.5-3 5-3s2.5 3 5 3 2.5-3 5-3 2.5 3 5 3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+  };
+  // Small decorative preview drawn from a seeded pseudo-random series
+  function toolArt(kind) {
+    let s = 7;
+    const rnd = () => ((s = (s * 9301 + 49297) % 233280) / 233280);
+    const N = 48, W = 320, H = 150, pad = 12;
+    const pts = Array.from({ length: N }, (_, i) => 0.5 + 0.28 * Math.sin(i / 5.5) + 0.12 * Math.sin(i / 1.7) + (rnd() - 0.5) * 0.08);
+    const x = (i) => (pad + (i / (N - 1)) * (W - 2 * pad)).toFixed(1);
+    const y = (v) => (H - pad - v * (H - 2 * pad)).toFixed(1);
+    const line = (arr, from, to) => arr.slice(from, to).map((v, k) => (k ? 'L' : 'M') + x(from + k) + ' ' + y(v)).join(' ');
+    let g = '';
+    for (let i = 1; i < 4; i++) g += '<line x1="' + pad + '" x2="' + (W - pad) + '" y1="' + (pad + i * (H - 2 * pad) / 4) + '" y2="' + (pad + i * (H - 2 * pad) / 4) + '" class="ta-grid"/>';
+    if (kind === 'ml') {
+      // observed series with a model prediction tracking it, plus a train/test divider
+      const pred = pts.map((v, i) => v + Math.sin(i * 1.3) * 0.025 + (rnd() - 0.5) * 0.05);
+      const cut = 30;
+      return '<svg viewBox="0 0 ' + W + ' ' + H + '" aria-hidden="true">' + g +
+        '<rect x="' + pad + '" y="' + pad + '" width="' + (x(cut) - pad) + '" height="' + (H - 2 * pad) + '" class="ta-train"/>' +
+        '<text x="' + (pad + 6) + '" y="' + (pad + 12) + '" class="ta-lbl2">train</text><text x="' + (+x(cut) + 6) + '" y="' + (pad + 12) + '" class="ta-lbl2">test</text>' +
+        '<path d="' + line(pts, 0, N) + '" class="ta-obs"/><path d="' + line(pred, 0, N) + '" class="ta-avg"/></svg>';
+    }
+    if (kind === 'extend') {
+      const cut = 18;
+      return '<svg viewBox="0 0 ' + W + ' ' + H + '" aria-hidden="true">' + g +
+        '<rect x="' + x(cut) + '" y="' + pad + '" width="' + (W - pad - x(cut)) + '" height="' + (H - 2 * pad) + '" class="ta-fill"/>' +
+        '<line x1="' + x(cut) + '" x2="' + x(cut) + '" y1="' + pad + '" y2="' + (H - pad) + '" class="ta-div"/>' +
+        '<path d="' + line(pts, 0, cut + 1) + '" class="ta-real"/><path d="' + line(pts, cut, N) + '" class="ta-gen"/>' +
+        '<text x="' + (+x(cut) + 6) + '" y="' + (pad + 12) + '" class="ta-lbl">generated →</text></svg>';
+    }
+    const hi = pts.map((v) => Math.min(1, v + 0.1 + rnd() * 0.06)), lo = pts.map((v) => Math.max(0, v - 0.1 - rnd() * 0.06));
+    const band = hi.map((v, i) => (i ? 'L' : 'M') + x(i) + ' ' + y(v)).join(' ') + ' ' + lo.map((v, i) => 'L' + x(N - 1 - i) + ' ' + y(lo[N - 1 - i])).join(' ') + ' Z';
+    return '<svg viewBox="0 0 ' + W + ' ' + H + '" aria-hidden="true">' + g + '<path d="' + band + '" class="ta-band"/><path d="' + line(pts, 0, N) + '" class="ta-avg"/></svg>';
+  }
+
+  function renderTools() {
+    const tools = (DATA.tools || []).filter((t) => t.name);
+    const box = $('#toolbox');
+    if (!tools.length) { $('#tools').hidden = true; return; }
+    const STATUS_T = { live: 'LIVE', beta: 'BETA', soon: 'SOON' };
+    box.innerHTML = '<div class="tb-tabs" role="tablist" aria-label="Tools">' + tools.map((t, i) =>
+      '<button class="tb-tab" role="tab" id="tbt-' + i + '" aria-controls="tbp" aria-selected="' + (i === 0) + '" tabindex="' + (i === 0 ? 0 : -1) + '" data-i="' + i + '" style="--tc:' + (TOOL_COLORS[t.accent] || TOOL_COLORS.cyan) + '">' +
+      '<span class="tb-ico">' + svg(TOOL_ICONS[t.icon] || TOOL_ICONS.chart, 20) + '</span>' +
+      '<span class="tb-txt"><b>' + esc(t.name) + '</b><small>' + esc(t.tagline || '') + '</small></span></button>').join('') +
+      '<div class="tb-more mono">+ more tools coming</div></div>' +
+      '<div class="tb-panel" id="tbp" role="tabpanel"></div>';
+    const panel = $('#tbp');
+    const show = (i) => {
+      const t = tools[i];
+      $$('.tb-tab', box).forEach((b) => { const on = +b.dataset.i === i; b.setAttribute('aria-selected', on); b.tabIndex = on ? 0 : -1; });
+      panel.setAttribute('aria-labelledby', 'tbt-' + i);
+      panel.style.setProperty('--tc', TOOL_COLORS[t.accent] || TOOL_COLORS.cyan);
+      const st = t.status || 'live', live = st !== 'soon' && t.url;
+      panel.innerHTML = '<div class="tb-info">' +
+        '<p class="pixel tb-kicker">TOOL ' + String(i + 1).padStart(2, '0') + ' · <span class="tb-st ' + st + '">' + (STATUS_T[st] || st.toUpperCase()) + '</span></p>' +
+        '<h3>' + esc(t.name) + '</h3><p class="tb-desc">' + esc(t.description || '') + '</p>' +
+        ((t.features || []).length ? '<ul class="tb-feat">' + t.features.map((f) => '<li>' + esc(f) + '</li>').join('') + '</ul>' : '') +
+        '<div class="tb-foot"><div class="tags">' + (t.tags || []).map((g) => '<span class="tag">' + esc(g) + '</span>').join('') + '</div>' +
+        '<div class="tb-actions">' + (live ? '<a class="btn primary tb-launch" href="' + esc(safeUrl(t.url)) + '">Launch tool <span aria-hidden="true">→</span></a>' +
+          '<a class="mini" href="' + esc(safeUrl(t.url)) + '" target="_blank" rel="noopener" title="Open in a new tab">↗</a>' : '<span class="mini">Coming soon</span>') + '</div></div></div>' +
+        '<div class="tb-art">' + toolArt(t.icon) + '<span class="tb-art-cap mono">preview</span></div>';
+    };
+    box.addEventListener('click', (e) => { const b = e.target.closest('.tb-tab'); if (b) show(+b.dataset.i); });
+    box.addEventListener('keydown', (e) => {
+      const b = e.target.closest('.tb-tab'); if (!b) return;
+      const k = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[e.key]; if (!k) return;
+      e.preventDefault();
+      const n = (+b.dataset.i + k + tools.length) % tools.length;
+      show(n); $('#tbt-' + n).focus();
+    });
+    show(0);
   }
 
   function renderHero() {
     const p = DATA.profile;
-    $('#navName').textContent = p.name;
+    // full name, plus a shorter "Mahfujur R. Joy" form that phones show instead of a cut-off name
+    const nw = p.name.split(' '), short = nw.length > 2 ? nw[0] + ' ' + nw.slice(1, -1).map((w) => w[0] + '.').join(' ') + ' ' + nw[nw.length - 1] : p.name;
+    $('#navName').innerHTML = '<span class="nm-full">' + esc(p.name) + '</span><span class="nm-short">' + esc(short) + '</span>';
     $('#heroStatus').textContent = p.status;
     $('#heroLocation').textContent = (p.location || '').toUpperCase();
     $('#heroBio').innerHTML = md(p.bio);
@@ -192,8 +283,7 @@
       years = Math.max(1, Math.round(((now.getFullYear() - y) * 12 + now.getMonth() + 1 - m) / 12));
     }
     const stats = [
-      [pubs.length, 'Publications'], [journals, 'Journal articles'],
-      [DATA.experience.length, 'Research & eng. roles'], [DATA.certifications.length, 'Certifications'],
+      [pubs.length, 'Publications'], [journals, 'Journal articles'], [DATA.certifications.length, 'Certifications'],
     ];
     if (years) stats.push([years, 'Years in research']);
     $('#stats').innerHTML = stats.map(([n, l]) =>
@@ -246,7 +336,7 @@
       state.pubType = b.dataset.type; renderPubTabs(); renderPubs();
     }));
     const pub = pubs.filter((p) => p.status === 'published').length;
-    $('#pubNote').textContent = pub + ' published · ' + (pubs.length - pub) + ' accepted / in pipeline';
+    $('#pubNote').textContent = pub + ' published' + (pubs.length > pub ? ' · ' + (pubs.length - pub) + ' accepted / in pipeline' : '');
   }
 
   function renderPubs() {
@@ -263,7 +353,7 @@
       const st = STATUS[p.status] || [p.status, 'pre'];
       const link = p.doi ? 'https://doi.org/' + p.doi : p.url;
       const head = p.year !== lastYear ? '<h3 class="year-head pixel"><span>' + esc(p.year) + '</span><i></i><small class="mono">' +
-        list.filter((q) => q.year === p.year).length + ' papers</small></h3>' : '';
+        (() => { const n = list.filter((q) => q.year === p.year).length; return n + (n === 1 ? ' paper' : ' papers'); })() + '</small></h3>' : '';
       lastYear = p.year;
       return head + '<article class="card pub reveal in">' +
         '<div class="pub-meta mono"><span class="year">' + esc(p.year) + '</span>' +
@@ -274,7 +364,7 @@
         '<p class="authors">' + p.authors.map(highlightSelf).join(', ') + '</p>' +
         '<p class="venue mono">' + esc(p.venue) + (p.volume ? ', Vol. ' + esc(p.volume) : '') + (p.issue ? '(' + esc(p.issue) + ')' : '') + (p.pages ? ', ' + esc(p.pages) : '') + '</p>' +
         '<div class="pub-foot"><div class="tags">' + (p.tags || []).map((t) => '<button class="tag" data-tag="' + esc(t) + '">' + esc(t) + '</button>').join('') + '</div>' +
-        '<div class="pub-actions">' + (link ? '<a class="mini" href="' + esc(safeUrl(link)) + '" target="_blank" rel="noopener">' + (p.doi ? 'DOI' : 'Link') + ' ↗</a>' : '') +
+        '<div class="pub-actions">' + (link ? '<a class="mini" href="' + esc(safeUrl(link)) + '" target="_blank" rel="noopener">' + (p.doi ? 'DOI' : /researchgate\.net/.test(link) ? 'ResearchGate' : 'Link') + ' ↗</a>' : '') +
         '<button class="mini" data-cite="' + p._i + '">Cite</button></div></div></article>';
     }).join('');
   }
@@ -596,6 +686,7 @@
         { k: 'Say hi to Joy', h: 'avatar', f: () => { go('home')(); setTimeout(actions.poke, 400); } },
         { k: 'Print / save as PDF', h: 'cv', f: () => window.print() },
       ])
+      .concat((DATA.tools || []).filter((t) => t.url && t.status !== 'soon').map((t) => ({ k: 'Open tool: ' + t.name, h: 'tool', f: () => { location.href = t.url; } })))
       .concat(DATA.links.filter((l) => l.url).map((l) => ({ k: 'Open ' + l.label, h: 'link', f: () => window.open(l.url, '_blank', 'noopener') })))
       .concat(DATA.publications.map((p) => ({ k: p.title, h: 'paper · ' + p.year, f: () => { go('research')(); state.query = p.title.split(' ').slice(0, 4).join(' '); $('#pubSearch').value = state.query; renderPubs(); } })));
     let sel = 0, shown = [];
@@ -746,10 +837,12 @@
       return;
     }
     const settings = DATA.settings || (DATA.settings = {});
+    // accepted / in-revision / preprint papers stay in the data but are only shown when switched on in admin
+    if (!settings.showUnpublished) DATA.publications = (DATA.publications || []).filter((p) => p.status === 'published');
     boot(settings.bootScreen !== false);
     if (settings.flowBackground === false) document.body.classList.add('no-flow');
     $('#updated').textContent = (DATA.meta && DATA.meta.updated) || '';
-    renderMeta(); renderNav(); renderHero(); renderStats(); renderMarquee(); renderFocus(); renderExperience(); renderGantt(); renderMap();
+    renderMeta(); renderNav(); renderHero(); renderStats(); renderMarquee(); renderFocus(); renderTools(); renderExperience(); renderGantt(); renderMap();
     renderPubTabs(); renderPubs(); renderSkills(); renderEducation(); renderLeadership(); renderContact();
     const actions = initAvatar();
     bindGlobal(); initPalette(actions); initBuddy(actions); initModal(); initTerminal(actions); konami(actions);

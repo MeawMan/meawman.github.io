@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en" data-tool-tab="data">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Hydro ML Studio &mdash; machine learning for water level, discharge &amp; rainfall &middot; Mahfujur Rahman Joy</title>
+  <meta name="description" content="Train and compare machine-learning models (linear / Lasso, KNN, SVR, decision tree, random forest, extra trees, gradient boosting, neural network) to simulate or forecast hydrological time series in your browser. Cross-validation, grid/random/Bayesian tuning, NSE, KGE, PBIAS. Files never leave your computer." />
+  <meta property="og:title" content="Hydro ML Studio &middot; Mahfujur Rahman Joy" />
+  <meta property="og:description" content="Machine learning for hydrological time series, in the browser: lag features, 8 models, cross-validation, auto-tuning, hydrology metrics and Excel export." />
+  <meta property="og:image" content="https://meawman.github.io/assets/og-image.png" />
+  <link rel="canonical" href="https://meawman.github.io/tools/hydro-ml/" />
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="../../assets/favicon-32.png" sizes="32x32" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Silkscreen&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="hml.css" />
+  <link rel="stylesheet" href="../../assets/css/tool-shell.css" />
+  <script>
+    (function () {
+      var t = null; try { t = localStorage.getItem('mrj_theme'); } catch (e) {}
+      if (!t) t = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', t);
+      var h = (location.hash || '').replace('#', '');
+      if (['data', 'features', 'train', 'results', 'predict'].indexOf(h) >= 0) document.documentElement.setAttribute('data-tool-tab', h);
+    })();
+  </script>
+</head>
+<body>
+  <header class="ts-bar">
+    <div class="ts-brand">
+      <a class="ts-logo" href="../../" title="Back to the portfolio"><img src="../../assets/favicon.svg" alt="Mahfujur Rahman Joy &mdash; portfolio" width="34" height="34" /></a>
+      <span class="ts-crumb"><a href="../../"><b>Joy</b></a><span aria-hidden="true">/</span><a href="../../#tools">Tools</a><span aria-hidden="true">/</span><em>Hydro ML Studio</em></span>
+    </div>
+    <nav class="ts-tabs" role="tablist" aria-label="Workflow steps">
+      <a class="ts-tab" role="tab" href="#data" data-tab="data"><i class="num">1</i>Data</a>
+      <a class="ts-tab" role="tab" href="#features" data-tab="features"><i class="num">2</i>Features</a>
+      <a class="ts-tab" role="tab" href="#train" data-tab="train"><i class="num">3</i>Train</a>
+      <a class="ts-tab" role="tab" href="#results" data-tab="results"><i class="num">4</i>Results</a>
+      <a class="ts-tab" role="tab" href="#predict" data-tab="predict"><i class="num">5</i>Predict</a>
+    </nav>
+    <div class="ts-actions">
+      <a class="ts-btn" href="../../#tools">All tools</a>
+      <button class="ts-btn icon" id="tsTheme" type="button" aria-label="Toggle light or dark theme" title="Toggle theme">
+        <svg class="i-sun" viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M11 1h2v3h-2zM11 20h2v3h-2zM1 11h3v2H1zM20 11h3v2h-3zM4.2 5.6l1.4-1.4 2.1 2.1-1.4 1.4zM16.3 17.7l1.4-1.4 2.1 2.1-1.4 1.4zM4.2 18.4l2.1-2.1 1.4 1.4-2.1 2.1zM16.3 6.3l2.1-2.1 1.4 1.4-2.1 2.1zM7 9h2V7h6v2h2v6h-2v2H9v-2H7z"/></svg>
+        <svg class="i-moon" viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M9 2h6v2h-4v2H9v4H7v4h2v4h2v2h4v-2h4v-2h2v-4h-2v2h-2v2h-6v-2H9v-4H7v-2h2V6h2V4H9z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="ts-intro">
+    <p class="ts-lead"><b>Hydro ML Studio</b> &mdash; train and compare machine-learning models to simulate or forecast water level, discharge or rainfall. Lag features, eight models (SVR, random forest, gradient boosting, neural network and more), cross-validation, automatic tuning and hydrology metrics.</p>
+    <span class="ts-privacy">&#128274; Runs in your browser &middot; files are never uploaded</span>
+  </div>
+  <div class="hm-steps" id="steps" aria-label="Progress"></div>
+
+  <main class="app hm" id="app">
+    <p class="msg" id="msg" role="status"></p>
+
+    <!-- ============================== 1 DATA ============================== -->
+    <section class="pane" data-pane="data">
+      <section class="card welcome" id="dWelcome">
+        <div class="wt">Load a time series to begin</div>
+        <p>An .xlsx, .csv or .txt file with a date column and one or more numeric columns &mdash; for example daily rainfall, upstream water level and the downstream water level you want to predict. Dates and numbers are detected automatically.</p>
+        <div class="actions">
+          <button class="btn primary" id="dOpen" type="button">Open file</button>
+          <button class="btn" id="dPaste" type="button">Paste data</button>
+          <button class="btn" id="dSample" type="button">Try an example</button>
+        </div>
+        <p class="hint">Drop a file anywhere on this page, or press Ctrl+V to paste rows copied from Excel.</p>
+      </section>
+
+      <div id="dBody" class="stack" hidden>
+        <section class="card source">
+          <div class="srcHead"><span class="fname" id="dName"></span><span class="badge" id="dBadge" hidden>EXAMPLE &middot; SYNTHETIC DATA</span>
+            <span class="grow"></span><button class="btn small" id="dReplace" type="button">Load another file</button></div>
+          <div class="facts" id="dFacts"></div>
+          <div class="settings">
+            <label class="field" id="dSheetWrap" hidden>Sheet<select id="dSheet"></select></label>
+            <label class="field">Date column<select id="dDate"></select></label>
+            <label class="field">Time column<select id="dTime"></select></label>
+            <label class="check" id="dRegWrap" hidden><input type="checkbox" id="dReg" /> REGULAR rows only<button class="ib" type="button" data-info="regular" aria-label="About REGULAR rows" aria-expanded="false">i</button></label>
+            <label class="field">Date order<select id="dOrder"><option value="auto">Auto</option><option value="dmy">Day/Month/Year</option><option value="mdy">Month/Day/Year</option></select></label>
+            <label class="field"><em class="fl">Time step<button class="ib" type="button" data-info="agg" aria-label="About Time step" aria-expanded="false">i</button></em><select id="dAgg"><option value="none">As in the file</option><option value="day">Daily (aggregate)</option><option value="month">Monthly (aggregate)</option></select></label>
+            <label class="field"><em class="fl">Missing values<button class="ib" type="button" data-info="gaps" aria-label="About Missing values" aria-expanded="false">i</button></em><select id="dGap"><option value="interp">Interpolate short gaps</option><option value="ffill">Carry last value forward</option><option value="none">Leave empty (rows dropped)</option></select></label>
+            <label class="field" id="dGapMaxWrap">Longest gap to fill (steps)<input id="dGapMax" type="number" min="1" step="1" value="7" /></label>
+            <label class="field"><em class="fl">Ignore values<button class="ib" type="button" data-info="ignore" aria-label="About Ignore values" aria-expanded="false">i</button></em><input id="dIgnore" type="text" placeholder="e.g. -999, 9999" autocomplete="off" /></label>
+          </div>
+          <div class="notes" id="dNotes"></div>
+        </section>
+
+        <section class="card">
+          <div class="card-h"><h3>Columns<button class="ib" type="button" data-info="roles" aria-label="About target and inputs" aria-expanded="false">i</button></h3><span class="muted">Choose one <b class="c-target">Target</b> to predict and the <b class="c-input">Inputs</b> to learn from.</span></div>
+          <div class="tableWrap short"><table id="dCols"></table></div>
+        </section>
+
+        <section class="card">
+          <div class="card-h"><h3>Look at the data</h3>
+            <label class="inline">Column <select id="dPlotCol"></select></label>
+            <span class="grow"></span><span class="muted small">Drag on the chart to zoom &middot; double-click to reset</span></div>
+          <div class="chart" id="dChart"></div>
+        </section>
+        <div class="next"><button class="btn primary" type="button" data-go="features">Continue to Features &rarr;</button></div>
+      </div>
+    </section>
+
+    <!-- ============================== 2 FEATURES ============================== -->
+    <section class="pane" data-pane="features">
+      <div class="card empty needs" data-need="target"><b>Load data and choose a target first.</b><button class="btn primary small" type="button" data-go="data">Go to Data</button></div>
+      <div class="stack" data-show="target">
+        <section class="card panel">
+          <div class="card-h"><h3>What should the model learn?</h3></div>
+          <div class="params">
+            <label class="field"><em class="fl">Mode<button class="ib" type="button" data-info="mode" aria-label="About Mode" aria-expanded="false">i</button></em><select id="fMode"><option value="sim">Simulate (inputs at the same time are known)</option><option value="fc">Forecast ahead (only past data)</option></select></label>
+            <label class="field" id="fHWrap">Forecast horizon (steps ahead)<input id="fH" type="number" min="1" max="365" step="1" value="1" /></label>
+          </div>
+          <div class="params">
+            <label class="field wide"><em class="fl">Input lags (steps back, e.g. 0,1,2,3,7)<button class="ib" type="button" data-info="lags" aria-label="About Input lags (steps back, e.g. 0,1,2,3,7)" aria-expanded="false">i</button></em><input id="fLags" type="text" value="0,1,2,3,7" /></label>
+            <label class="field wide"><em class="fl">Rolling windows (e.g. 3,7,15)<button class="ib" type="button" data-info="roll" aria-label="About Rolling windows (e.g. 3,7,15)" aria-expanded="false">i</button></em><input id="fRoll" type="text" value="3,7" /></label>
+            <label class="field">Rolling statistic<select id="fRollStat"><option value="auto">Auto (sum for rain, mean otherwise)</option><option value="mean">Mean</option><option value="sum">Sum</option><option value="max">Maximum</option></select></label>
+          </div>
+          <div class="params">
+            <label class="check"><input type="checkbox" id="fAr" checked /> Use past values of the target<button class="ib" type="button" data-info="ar" aria-label="About past target values" aria-expanded="false">i</button></label>
+            <label class="field wide" id="fArWrap">Target lags (steps back)<input id="fArLags" type="text" value="1,2,3" /></label>
+            <label class="check"><input type="checkbox" id="fDoy" checked /> Season (day of year)<button class="ib" type="button" data-info="season" aria-label="About seasonal terms" aria-expanded="false">i</button></label>
+            <label class="check"><input type="checkbox" id="fMonth" /> Month</label>
+            <label class="check"><input type="checkbox" id="fTrend" /> Long-term trend</label>
+          </div>
+          <p class="help" id="fHelp"></p>
+        </section>
+
+        <section class="card">
+          <div class="card-h"><h3>Lags per input<button class="ib" type="button" data-info="inlags" aria-label="About lags per input" aria-expanded="false">i</button></h3><span class="muted small">Leave blank to use the defaults above · “-” for none</span>
+            <span class="grow"></span><button class="btn small" id="fSuggestAll" type="button">Suggest lags for all</button><button class="btn small" id="fResetLags" type="button">Reset to defaults</button></div>
+          <div class="tableWrap short"><table id="fInLags" class="space"></table></div>
+          <div class="card-h" style="padding-top:14px"><h3>Lag analysis<button class="ib" type="button" data-info="lagan" aria-label="About lag analysis" aria-expanded="false">i</button></h3>
+            <label class="inline">Series <select id="fLagCol"></select></label>
+            <label class="inline">Up to <input id="fLagMax" type="number" min="5" max="120" step="1" value="30" /> steps</label>
+            <span class="grow"></span><span class="muted small" id="fLagNote"></span></div>
+          <div class="chart" id="fLagChart"></div>
+          <p class="cap" id="fLagCap"></p>
+        </section>
+
+        <section class="kpis" id="fKpis"></section>
+
+        <div class="grid2">
+          <section class="card">
+            <div class="card-h"><h3>Correlation with the target</h3><span class="muted small">top features, training rows</span></div>
+            <div class="chart" id="fCorr"></div>
+          </section>
+          <section class="card">
+            <div class="card-h"><h3>Correlation between columns</h3></div>
+            <div class="chart" id="fHeat"></div>
+          </section>
+        </div>
+        <section class="card">
+          <div class="card-h"><h3>Features<button class="ib" type="button" data-info="featsel" aria-label="About switching features off" aria-expanded="false">i</button></h3><span class="muted small" id="fCount"></span><span class="grow"></span><span class="muted small">Click a feature to switch it off / on</span>
+            <button class="btn small" id="fAllOn" type="button">All on</button></div>
+          <div class="chips" id="fList"></div>
+        </section>
+        <div class="next"><button class="btn primary" type="button" data-go="train">Continue to Train &rarr;</button></div>
+      </div>
+    </section>
+
+    <!-- ============================== 3 TRAIN ============================== -->
+    <section class="pane" data-pane="train">
+      <div class="card empty needs" data-need="target"><b>Load data and choose a target first.</b><button class="btn primary small" type="button" data-go="data">Go to Data</button></div>
+      <div class="stack" data-show="target">
+        <section class="card panel">
+          <div class="card-h"><h3>Split the record<button class="ib" type="button" data-info="split" aria-label="About splitting the record" aria-expanded="false">i</button></h3></div>
+          <div class="params">
+            <label class="field">Method<select id="tSplit"><option value="chrono">Chronological (first part trains)</option><option value="date">Chronological, by date</option><option value="random">Random rows (not recommended)</option></select></label>
+            <label class="field" id="tPctWrap">Training share <span id="tPctV">70%</span><input id="tPct" type="range" min="40" max="90" step="5" value="70" /></label>
+            <label class="field" id="tDateWrap" hidden>Test period starts<input id="tDate" type="date" /></label>
+            <label class="field"><em class="fl">Validation for early stopping<button class="ib" type="button" data-info="val" aria-label="About Validation for early stopping" aria-expanded="false">i</button></em><select id="tVal"><option value="0.15">Last 15% of training</option><option value="0.1">Last 10%</option><option value="0.2">Last 20%</option><option value="0">None</option></select></label>
+            <label class="field"><em class="fl">Random seed<button class="ib" type="button" data-info="seed" aria-label="About Random seed" aria-expanded="false">i</button></em><input id="tSeed" type="number" min="1" step="1" value="42" /></label>
+          </div>
+          <div class="chart slim" id="tSplitChart"></div>
+          <p class="help" id="tSplitNote"></p>
+        </section>
+
+        <section class="card">
+          <div class="card-h"><h3>Models<button class="ib" type="button" data-info="models" aria-label="About choosing models" aria-expanded="false">i</button></h3><span class="muted small">Tick the models to train. Open a model to change its settings.</span>
+            <span class="grow"></span><button class="btn small" id="tAll" type="button">Select all</button><button class="btn small" id="tNone" type="button">Clear</button></div>
+          <div class="models" id="tModels"></div>
+        </section>
+
+        <section class="card panel">
+          <div class="runrow">
+            <button class="btn primary" id="tTrain" type="button">Train selected models</button>
+            <button class="btn" id="tCv" type="button">Cross-validate selected</button>
+            <label class="inline">Folds <input id="tFolds" type="number" min="2" max="20" step="1" value="5" /></label>
+            <label class="inline">Scheme<button class="ib" type="button" data-info="cv" aria-label="About cross-validation" aria-expanded="false">i</button> <select id="tCvType"><option value="timeseries">Time-series (expanding window)</option><option value="blocked">Blocked k-fold</option></select></label>
+            <button class="btn" id="tCancel" type="button" hidden>Stop</button>
+          </div>
+          <div class="prog" id="tProg"></div>
+          <div class="tableWrap" id="tCvWrap" hidden><table id="tCvTbl"></table></div>
+        </section>
+
+        <section class="card panel" id="tuneCard">
+          <div class="card-h"><h3>Automatic tuning<button class="ib" type="button" data-info="tuning" aria-label="About automatic tuning" aria-expanded="false">i</button></h3><span class="muted small">Searches model settings using cross-validation on the training period</span></div>
+          <div class="params">
+            <label class="field">Model<select id="uModel"></select></label>
+            <label class="field"><em class="fl">Search<button class="ib" type="button" data-info="tunemethod" aria-label="About Search" aria-expanded="false">i</button></em><select id="uMethod"><option value="bayes">Bayesian optimisation (GP + EI)</option><option value="random">Random search CV</option><option value="grid">Grid search CV</option></select></label>
+            <label class="field" id="uIterWrap">Trials<input id="uIter" type="number" min="4" max="200" step="1" value="20" /></label>
+            <label class="field">Folds<input id="uFolds" type="number" min="2" max="10" step="1" value="3" /></label>
+            <label class="field">Scheme<select id="uCvType"><option value="timeseries">Time-series</option><option value="blocked">Blocked k-fold</option></select></label>
+            <label class="field">Optimise<select id="uMetric"><option value="nse">NSE (higher is better)</option><option value="kge">KGE (higher is better)</option><option value="rmse">RMSE (lower is better)</option></select></label>
+          </div>
+          <div class="tableWrap short"><table id="uSpace" class="space"></table></div>
+          <p class="help" id="uHelp"></p>
+          <div class="runrow">
+            <button class="btn gen" id="uRun" type="button">Run tuning</button>
+            <button class="btn" id="uStop" type="button" hidden>Stop</button>
+            <button class="btn" id="uApply" type="button" hidden>Apply best settings &amp; train</button>
+            <span class="muted small" id="uStatus"></span>
+          </div>
+          <div class="grid2" id="uOut" hidden>
+            <div class="chart" id="uChart"></div>
+            <div class="tableWrap short"><table id="uTrials"></table></div>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <!-- ============================== 4 RESULTS ============================== -->
+    <section class="pane" data-pane="results">
+      <div class="card empty needs" data-need="runs"><b>No trained models yet.</b><button class="btn primary small" type="button" data-go="train">Go to Train</button></div>
+      <div class="stack" data-show="runs">
+        <p class="stale" id="rStale" hidden>Data, features or split changed since training. <button class="btn small" type="button" id="rRetrain">Retrain now</button></p>
+        <p class="stale" id="rMissing" hidden><span id="rMissingTxt"></span> <button class="btn small" type="button" id="rTrainMissing">Train them now</button></p>
+        <section class="kpis" id="rKpis"></section>
+
+        <section class="card results">
+          <div class="bar">
+            <div class="card-h"><h3>Leaderboard</h3></div>
+            <div class="tools">
+              <label>Evaluate on<button class="ib" type="button" data-info="evalset" aria-label="About evaluation period" aria-expanded="false">i</button> <select id="rSet"><option value="test">Test period</option><option value="train">Training period</option><option value="all">Whole record</option></select></label>
+              <button class="btn small" id="rCopy" type="button">Copy table</button>
+            </div>
+          </div>
+          <div class="tableWrap"><table id="rLb" class="lb"></table></div>
+          <p class="cap" id="rRating"></p>
+        </section>
+
+        <section class="card results" id="rDetailCard">
+          <div class="bar">
+            <div class="card-h"><h3 id="rDetailTitle">Model details</h3><button class="ib" type="button" data-info="details" aria-label="About model details" aria-expanded="false">i</button><span class="muted small">every period · settings · training info</span></div>
+            <div class="tools">
+              <button class="btn small" id="rPrev" type="button" title="Show the previous model">&larr; Prev model</button>
+              <button class="btn small" id="rNext" type="button" title="Show the next model">Next model &rarr;</button>
+              <button class="btn small" id="rSaveModel" type="button">Save this model</button>
+              <button class="btn primary small" id="rUseModel" type="button">Predict with it &rarr;</button>
+            </div>
+          </div>
+          <div class="tableWrap"><table id="rDetail"></table></div>
+          <p class="cap" id="rDetailInfo"></p>
+        </section>
+
+        <section class="card results">
+          <div class="bar">
+            <div class="tabs" role="tablist" id="rTabs"></div>
+            <div class="tools">
+              <label id="rModelWrap">Model <select id="rModel"></select></label>
+              <label id="rFeatWrap" hidden>Feature <select id="rFeat"></select></label>
+              <label id="rImpWrap" hidden>Method<button class="ib" type="button" data-info="impmethod" aria-label="About importance methods" aria-expanded="false">i</button> <select id="rImp"><option value="model">Built-in</option><option value="perm">Permutation (drop in NSE)</option></select></label>
+              <button class="btn small" id="rPng" type="button">Save .png</button>
+              <button class="btn small" id="rSvg" type="button">.svg</button>
+            </div>
+          </div>
+          <div class="chart tall" id="rChart"></div>
+          <p class="cap" id="rCap"></p>
+        </section>
+
+        <section class="card panel">
+          <div class="card-h"><h3>Export &amp; report</h3></div>
+          <div class="runrow">
+            <button class="btn primary" id="xZip" type="button">Download everything (.zip)</button><button class="ib" type="button" data-info="zip" aria-label="About download everything" aria-expanded="false">i</button>
+            <button class="btn" id="xXlsx" type="button">Excel workbook only</button>
+            <button class="btn" id="xModels" type="button">Save all models</button>
+            <button class="btn" id="xMethods" type="button">Methods paragraph</button>
+            <button class="btn" id="xSave" type="button">Save settings (.json)</button>
+            <button class="btn" id="xLoad" type="button">Load settings</button>
+          </div>
+          <p class="help"><b>Everything (.zip)</b>: the Excel workbook (predictions of every model, all metrics for training, test and whole record, importance, cross-validation, tuning, settings), a PNG of every chart for every model, the methods paragraph, the settings file and every trained model (re-usable with “Load a saved model”). <span id="xProg"></span></p>
+        </section>
+      </div>
+    </section>
+
+    <!-- ============================== 5 PREDICT ============================== -->
+    <section class="pane" data-pane="predict">
+      <section class="card panel">
+        <div class="card-h"><h3>Saved models<button class="ib" type="button" data-info="savedmodels" aria-label="About saved models" aria-expanded="false">i</button></h3><span class="muted small">Re-use a model trained earlier — no retraining needed</span></div>
+        <div class="runrow">
+          <button class="btn" id="pLoadModel" type="button">Load a saved model (.json)&hellip;</button>
+          <span class="muted small" id="pLoaded"></span>
+        </div>
+      </section>
+      <div class="card empty" id="pNeed"><b>Train a model or load a saved one.</b><button class="btn primary small" type="button" data-go="train">Go to Train</button></div>
+      <div class="stack" id="pBody">
+        <section class="card panel">
+          <div class="card-h"><h3>Use a model<button class="ib" type="button" data-info="predictmodes" aria-label="About fill gaps or predict" aria-expanded="false">i</button></h3></div>
+          <div class="params">
+            <label class="field">Model<select id="pModel"></select></label>
+          </div>
+          <p class="help" id="pModelInfo"></p>
+          <div class="runrow">
+            <button class="btn primary" id="pFill" type="button">Fill gaps in the loaded record</button>
+            <button class="btn" id="pNew" type="button">Predict for a new file&hellip;</button>
+          </div>
+          <p class="help">Fill gaps: predicts the target wherever it is missing but the inputs exist, and builds a complete series (observed where available, model elsewhere). New file: needs the same column names; if the model uses past target values, the file must contain the target&rsquo;s history too.</p>
+        </section>
+        <div class="stack" id="pOut" hidden>
+          <section class="kpis" id="pKpis"></section>
+          <section class="card">
+            <div class="card-h"><h3 id="pTitle">Prediction</h3><span class="grow"></span>
+              <button class="btn small" id="pPng" type="button">Save .png</button>
+              <button class="btn primary small" id="pXlsx" type="button">Download .xlsx</button></div>
+            <div class="chart tall" id="pChart"></div>
+            <div class="tableWrap short"><table id="pTbl"></table></div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <footer class="foot">
+      <span>Developed by <b>Mahfujur Rahman Joy</b> &middot; <a href="../../">portfolio</a> &middot; <a href="../hydro-series/">Hydro-Series Toolkit</a></span>
+      <span>Runs in your browser. Your files are not uploaded.</span>
+    </footer>
+  </main>
+
+  <div class="overlay drop" id="dropOv" hidden>Drop the file to load it</div>
+  <div class="overlay" id="pasteOv" hidden>
+    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="pasteTitle">
+      <h2 id="pasteTitle">Paste a table</h2>
+      <p>Copy columns straight from Excel (with the header row): a date column and one or more numeric columns.</p>
+      <textarea id="pasteBox" spellcheck="false" placeholder="Date&#9;Rain&#9;WL_up&#9;WL_down&#10;2020-01-01&#9;0&#9;3.21&#9;2.10"></textarea>
+      <div class="row"><button class="btn" id="pasteClose" type="button">Cancel</button><button class="btn primary" id="pasteGo" type="button">Load data</button></div>
+    </div>
+  </div>
+  <div class="overlay" id="methodsOv" hidden>
+    <div class="dialog wide" role="dialog" aria-modal="true" aria-labelledby="methodsTitle">
+      <h2 id="methodsTitle">Methods paragraph</h2>
+      <p>Edit as needed before using it in a report or paper.</p>
+      <textarea id="methodsBox" spellcheck="true"></textarea>
+      <div class="row"><button class="btn" id="methodsClose" type="button">Close</button><button class="btn primary" id="methodsCopy" type="button">Copy</button></div>
+    </div>
+  </div>
+  <input id="file" type="file" accept=".xlsx,.xlsm,.csv,.tsv,.txt" hidden />
+  <input id="pfile" type="file" accept=".xlsx,.xlsm,.csv,.tsv,.txt" hidden />
+  <input id="jfile" type="file" accept=".json,application/json" hidden />
+  <input id="mfile" type="file" accept=".json,application/json" multiple hidden />
+
+  <script src="ml-core.js"></script>
+  <script src="io.js"></script>
+  <script src="charts.js"></script>
+  <script src="app.js"></script>
+  <script src="../../assets/js/tool-shell.js"></script>
+</body>
+</html>
