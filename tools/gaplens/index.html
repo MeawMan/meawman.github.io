@@ -1,0 +1,998 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>GapLens &mdash; find, fill and compare gaps in hydroclimate records &middot; Mahfujur Rahman Joy</title>
+<meta name="description" content="GapLens finds, fills and compares gaps in streamflow, water level, rainfall and groundwater records: 70+ methods ranked by a hold-out test, rating curves with a live editor and year-by-year curves. Runs in your browser with Python (Pyodide); data are never uploaded.">
+<meta property="og:title" content="GapLens &middot; Mahfujur Rahman Joy">
+<meta property="og:description" content="Find, fill and compare gaps in hydroclimate records, with rating curves year by year. Runs in your browser.">
+<meta property="og:image" content="https://meawman.github.io/assets/og-image.png">
+<link rel="canonical" href="https://meawman.github.io/tools/gaplens/">
+<link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../../assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Silkscreen&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/css/tool-shell.css">
+<script>
+  (function () {
+    var t = null; try { t = localStorage.getItem('mrj_theme'); } catch (e) {}
+    if (!t) t = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', t);
+  })();
+</script>
+<style>
+:root{
+  --display:"Bahnschrift","DIN Alternate","Avenir Next Condensed","Roboto Condensed","Arial Narrow",system-ui,sans-serif;
+  --text:"Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+  --paper:#eef2ef;--sheet:#fafbfa;--ink:#11303a;--mute:#566b72;--rule:#c9d6d1;--grid:#dde6e2;--soft:#e3eae7;
+  --obs:#1f5f94;--fill:#c4571a;--gap-rgb:84,108,116;--hot-rgb:31,95,148;
+  --acc:#11303a;--acc-fg:#f4f8f6;--ok:#1b7548;--warn:#94600a;--bad:#b3261e;--focus:#1f5f94;
+}
+/* Colours follow the portfolio theme toggle (html[data-theme]); GapLens keeps its blue observed / orange filled pair */
+html[data-theme='light']{
+  --display:"Space Grotesk",system-ui,sans-serif;
+  --paper:#f2f4f9;--sheet:#ffffff;--ink:#0b1222;--mute:#5b6782;--rule:#dbe2ee;--grid:#e6ebf3;--soft:#eef2f8;
+  --obs:#1f5f94;--fill:#c4571a;--gap-rgb:84,100,128;--hot-rgb:31,95,148;
+  --acc:#0b1222;--acc-fg:#f2f4f9;--ok:#2c8a22;--warn:#b86200;--bad:#c0264d;--focus:#0786ad;
+}
+html[data-theme='dark']{
+  --display:"Space Grotesk",system-ui,sans-serif;
+  --paper:#080b14;--sheet:#0d1322;--ink:#eef3fb;--mute:#8592ab;--rule:#1d2a44;--grid:#16213a;--soft:#121b2f;
+  --obs:#74b3e8;--fill:#f2a154;--gap-rgb:140,160,190;--hot-rgb:116,179,232;
+  --acc:#5be7ff;--acc-fg:#04141a;--ok:#9dff6b;--warn:#ffc857;--bad:#ff6b8b;--focus:#5be7ff;
+}
+/* undo the parts of tool-shell.css meant for the other tools */
+html[data-theme] body{background:var(--paper)}
+html[data-theme] .app{max-width:none;padding-block:0}
+html[data-theme] .card{border-radius:0;box-shadow:none}
+html[data-theme] .btn{border-radius:4px}
+html[data-theme] .brand b{font:inherit;letter-spacing:normal}
+html[data-theme] tbody tr:hover td{background:rgba(var(--gap-rgb),.07)}
+html[data-theme] td{border-bottom-color:var(--rule)}
+.ts-bar{position:static}
+.ts-bar .ts-btn{font-family:var(--font)}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{color-scheme:light dark}html[data-theme=light]{color-scheme:light}html[data-theme=dark]{color-scheme:dark}
+body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.55 var(--text);font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.skip{position:absolute;left:-999px;top:8px;background:var(--acc);color:var(--acc-fg);padding:6px 12px;z-index:20}.skip:focus{left:8px}
+
+/* shell */
+.app{display:grid;grid-template-columns:236px minmax(0,1fr);min-height:100vh}
+.rail{position:sticky;top:0;height:100vh;align-self:start;display:flex;flex-direction:column;gap:26px;padding:24px 16px 20px 20px;border-right:1px solid var(--rule);overflow:auto}
+.brand{display:flex;gap:11px;align-items:flex-start}
+.brand svg{flex:none;margin-top:2px}
+.brand h1{margin:0;font:600 1.55rem/1.05 var(--display);letter-spacing:.01em}
+.brand small{display:block;margin-top:5px;color:var(--mute);font-size:.78rem;line-height:1.35}
+nav{display:flex;flex-direction:column;gap:2px}
+nav .gt{color:var(--mute);font-size:.8rem;margin:0 0 5px 10px}
+nav .gt:not(:first-child){margin-top:18px}
+nav button{display:flex;align-items:center;gap:11px;width:100%;text-align:left;padding:7px 10px;border:0;border-radius:4px;background:none;color:var(--ink);font:inherit;cursor:pointer}
+nav button:hover{background:var(--soft)}
+nav button[aria-selected=true]{background:var(--soft);font-weight:600;box-shadow:inset 3px 0 0 var(--ink)}
+nav .mk{flex:none;width:20px;height:20px;border:1.5px solid var(--mute);border-radius:50%;display:grid;place-items:center;font:600 .74rem/1 var(--display);color:var(--mute)}
+nav .mk.tool{border-radius:3px;border-style:dashed}
+nav button.done .mk{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+nav button[aria-selected=true] .mk{border-color:var(--ink);color:var(--ink)}
+nav button.done[aria-selected=true] .mk{color:var(--paper)}
+.rail-foot{margin:auto 0 0;color:var(--mute);font-size:.78rem;line-height:1.4}
+
+.main{min-width:0}
+.recbar{position:sticky;top:0;z-index:6;background:var(--paper);border-bottom:1px solid var(--rule);padding:12px 40px 8px}
+.rec-top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:4px 24px;margin-bottom:7px}
+.rec-id{display:flex;flex-wrap:wrap;gap:2px 16px;align-items:baseline}
+.rec-id b{font:600 1.05rem var(--display);letter-spacing:.01em}
+.rec-id span{font-size:.84rem}
+.rec-stats{display:flex;flex-wrap:wrap;gap:2px 20px;font-size:.84rem;color:var(--mute)}
+.rec-stats b{color:var(--ink);font:600 1rem var(--display)}
+.rec-strip{height:24px;line-height:0}
+.rec-strip svg{display:block;width:100%;height:24px;border:1px solid var(--rule)}
+.rec-key{display:flex;gap:16px;justify-content:flex-end;margin-top:4px;font-size:.76rem;color:var(--mute)}
+.rec-key i{display:inline-block;width:14px;height:8px;margin-right:5px;vertical-align:0}
+.rec-key .o{background:var(--obs)}.rec-key .f{background:var(--fill)}
+.rec-key .g{background:rgba(var(--gap-rgb),.3);background-image:repeating-linear-gradient(135deg,transparent 0 2px,rgba(var(--gap-rgb),.8) 2px 3px)}
+
+main{max-width:1110px;padding:8px 40px 90px}
+.tabwrap{display:none}.tabwrap.on{display:block}
+.pagehead{padding:26px 0 16px}
+.pagehead h1{margin:0;font:600 2.15rem/1.1 var(--display);letter-spacing:.005em}
+.pagehead p{margin:6px 0 0;color:var(--mute);max-width:64ch}
+
+/* content */
+.card{border-top:1px solid var(--rule);padding:22px 0 10px;margin:0}
+.card:first-child{border-top:0;padding-top:6px}
+.card h2{margin:0 0 10px;font:600 1.18rem/1.25 var(--display);letter-spacing:.01em;display:flex;flex-wrap:wrap;gap:6px 12px;align-items:baseline}
+.card h3{margin:20px 0 8px;font-size:.95rem}
+h2 .small,h3 .small{font:400 .82rem var(--text)}
+p{margin:.5em 0}
+.mute{color:var(--mute)}.small{font-size:.82rem}
+.row{display:flex;flex-wrap:wrap;gap:12px 18px;align-items:end}
+.row.fields{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
+.split{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:8px 48px}
+.cols2{display:grid;grid-template-columns:minmax(250px,1fr) minmax(300px,1.5fr);gap:8px 40px;align-items:start}
+@media (max-width:900px){.split,.cols2{grid-template-columns:1fr}}
+label{display:flex;flex-direction:column;gap:4px;font-size:.82rem;color:var(--mute)}
+label.inline{flex-direction:row;align-items:center;gap:7px;color:var(--ink);font-size:.9rem}
+select,input[type=number],input[type=text]{background:var(--sheet);color:var(--ink);border:1px solid var(--rule);border-radius:4px;padding:7px 9px;font:inherit;min-width:150px}
+input[type=file]{font:inherit;font-size:.85rem;color:var(--mute)}
+input[type=checkbox]{accent-color:var(--acc);width:15px;height:15px}
+button.primary,a.primary{background:var(--acc);color:var(--acc-fg);border:1px solid var(--acc);border-radius:4px;padding:8px 18px;font:600 .95rem var(--text);cursor:pointer}
+button.primary:hover,a.primary:hover{filter:brightness(1.18)}
+button.primary:disabled{opacity:.45;cursor:default;filter:none}
+button.ghost,a.ghost{background:transparent;color:var(--ink);border:1px solid var(--mute);border-radius:4px;padding:7px 14px;font:inherit;cursor:pointer}
+button.ghost:hover,a.ghost:hover{background:var(--soft)}
+a.btn{display:inline-block;text-decoration:none}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0 8px}
+
+table{border-collapse:collapse;width:100%;font-size:.88rem}
+th,td{padding:6px 10px;border-bottom:1px solid var(--rule);text-align:right;vertical-align:top}
+th:first-child,td:first-child,td.l,th.l{text-align:left}
+th{position:sticky;top:0;background:var(--paper);color:var(--mute);font-size:.8rem;font-weight:600;border-bottom:1px solid var(--ink);white-space:nowrap}
+tbody tr:hover td{background:rgba(var(--gap-rgb),.07)}
+.scroll{overflow:auto;max-height:460px}
+td .bar{margin:5px 0 0 auto;width:70px;min-width:0}
+input[type=file]::file-selector-button{background:transparent;color:var(--ink);border:1px solid var(--mute);border-radius:4px;padding:5px 11px;margin-right:9px;font:inherit;font-size:.85rem;cursor:pointer}
+input[type=file]::file-selector-button:hover{background:var(--soft)}
+td.c,th.c{text-align:center}
+
+.chip{display:inline-block;padding:0 7px;border-radius:3px;font-size:.78rem;line-height:1.55;border:1px solid var(--rule);background:var(--soft);margin:1px 2px 1px 0}
+.chip.code{font:600 .82rem/1.5 var(--display);border-color:var(--ink);background:transparent;letter-spacing:.02em}
+.chip.on{border-color:var(--ink);font-weight:600}
+.chip.good{color:var(--ok);border-color:var(--ok);background:transparent}
+.chip.fair{color:var(--warn);border-color:var(--warn);background:transparent}
+.chip.bad{color:var(--bad);border-color:var(--bad);background:transparent}
+.note{border-left:3px solid var(--warn);background:var(--soft);padding:7px 12px;margin:8px 0}
+.note.err{border-color:var(--bad)}.note.ok{border-color:var(--ok)}
+.bar{height:6px;background:var(--soft);min-width:70px}.bar i{display:block;height:100%;background:var(--obs)}
+.hb{display:flex;align-items:center;gap:8px;justify-content:flex-end}.hb i{display:block;height:8px;background:var(--obs);opacity:.8}
+.grid{display:flex;flex-wrap:wrap;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);margin:12px 0}
+.stat{flex:1 1 130px;padding:10px 18px 10px 0;margin-right:18px;border-right:1px solid var(--rule);color:var(--mute);font-size:.84rem;line-height:1.3}
+.stat:last-child{border-right:0;margin-right:0}
+.stat b{display:block;color:var(--ink);font:500 1.65rem/1.15 var(--display);letter-spacing:.005em}
+.empty{border:1.5px dashed var(--rule);padding:34px 24px;text-align:left;margin-top:14px;background-image:repeating-linear-gradient(135deg,transparent 0 9px,rgba(var(--gap-rgb),.06) 9px 10px)}
+.empty p{margin:0 0 12px}
+.drop{border:1.5px dashed var(--mute);padding:38px 24px;cursor:pointer;display:flex;flex-direction:column;gap:3px;background-color:var(--sheet);background-image:repeating-linear-gradient(135deg,transparent 0 9px,rgba(var(--gap-rgb),.07) 9px 10px)}
+.drop b{font:600 1.15rem var(--display)}.drop span{color:var(--mute);font-size:.88rem}
+.drop:hover,.drop.over{border-style:solid;border-color:var(--ink)}
+pre{margin:8px 0;padding:10px 12px;background:var(--soft);font:.82rem/1.5 "Cascadia Mono",Consolas,Menlo,monospace;overflow:auto}
+details{margin:8px 0}summary{cursor:pointer;font-weight:600;padding:2px 0}
+details>summary::marker{color:var(--mute)}
+.reasons{margin:4px 0 0;padding-left:18px;font-size:.84rem}.reasons li.w{color:var(--warn)}
+progress{appearance:none;display:block;width:100%;height:6px;border:0;background:var(--soft);overflow:hidden}
+progress::-webkit-progress-bar{background:var(--soft)}
+progress::-webkit-progress-value{background:var(--obs)}
+progress::-moz-progress-bar{background:var(--obs)}
+progress:indeterminate{background:linear-gradient(90deg,var(--soft) 0 35%,var(--obs) 35% 65%,var(--soft) 65%);background-size:300% 100%;animation:sweep 1.4s linear infinite}
+progress:indeterminate::-webkit-progress-bar{background:transparent}
+@keyframes sweep{from{background-position:100% 0}to{background-position:-100% 0}}
+@media (prefers-reduced-motion:reduce){progress:indeterminate{animation:none}}
+
+/* charts */
+svg text{fill:var(--mute);font:11px var(--text)}
+svg text.lg{paint-order:stroke;stroke:var(--sheet);stroke-width:3px;font-weight:600}
+.chart{display:block;width:100%;height:auto;color:var(--ink)}
+.heat{width:auto}
+.heat td,.heat th{text-align:center;padding:3px 0;width:2.3rem;font-size:.8rem}
+.heat td:first-child,.heat th:first-child{text-align:left;width:auto;padding-right:14px}
+#tip{position:fixed;z-index:30;pointer-events:none;background:var(--ink);color:var(--paper);padding:6px 10px;font-size:.8rem;line-height:1.4;box-shadow:0 2px 10px rgba(0,0,0,.25);max-width:260px}
+#tip b{display:block;font:600 .85rem var(--display);letter-spacing:.02em;margin-bottom:2px}
+#tip i{display:inline-block;width:9px;height:3px;margin-right:6px;vertical-align:middle}
+
+/* rating-curve editor */
+.rt-grid{display:grid;grid-template-columns:minmax(260px,340px) minmax(0,1fr);gap:24px;align-items:start;margin-top:8px}
+.rt-seg{border:1px solid var(--rule);border-radius:4px;padding:8px 12px 12px;margin:12px 0 0;display:grid;gap:9px;min-width:0}
+.rt-seg legend{font:600 .92rem var(--display);color:var(--ink);padding:0 4px}
+.rt-seg label{gap:3px}
+.rt-seg input[type=number]{min-width:0;width:100%}
+.rt-seg input[type=range]{width:100%;margin:2px 0 0;accent-color:var(--obs)}
+.rt-seg input:disabled{opacity:.55}
+input[type=date]{background:var(--sheet);color:var(--ink);border:1px solid var(--rule);border-radius:4px;padding:6px 8px;font:inherit;min-width:0}
+.rt-eq{font:.86rem/1.55 ui-monospace,Consolas,monospace;background:var(--soft);padding:10px 14px;border-left:3px solid var(--ink);white-space:pre-wrap;margin:12px 0}
+.rt-view svg{width:100%;height:auto;display:block}
+.rt-view{position:sticky;top:96px}  /* the plot stays in view while the segment controls scroll */
+.rt-res{margin-top:6px}
+svg text.rt-lbl{font-size:10.5px}
+#rty-out td,#rty-out th{white-space:nowrap}
+.rt-ramp{display:inline-block;width:72px;height:8px;vertical-align:middle;border-radius:2px;margin-right:6px}
+@media (max-width:1100px){.rt-grid{grid-template-columns:1fr}.rt-view{position:static}}
+
+@media (max-width:860px){
+  .app{display:block}
+  .rail{position:static;height:auto;flex-direction:column;gap:12px;padding:14px 16px 8px;border-right:0;border-bottom:1px solid var(--rule)}
+  .brand small,.rail-foot,nav .gt{display:none}
+  nav{flex-direction:row;overflow-x:auto;gap:4px;padding-bottom:6px}
+  nav button{width:auto;white-space:nowrap}
+  .recbar{padding:10px 16px 6px;position:static}
+  .stat{flex:1 1 40%;border-right:0;margin-right:0}
+  main{padding:4px 16px 70px}
+  .pagehead h1{font-size:1.8rem}
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+  <pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" style="stroke:rgb(var(--gap-rgb));stroke-width:1.2;stroke-opacity:.6"/></pattern>
+</defs></svg>
+<a class="skip" href="#content">Skip to content</a>
+<header class="ts-bar">
+  <div class="ts-brand">
+    <a class="ts-logo" href="../../" title="Back to the portfolio"><img src="../../assets/favicon.svg" alt="Mahfujur Rahman Joy &mdash; portfolio" width="34" height="34"></a>
+    <span class="ts-crumb"><a href="../../"><b>Joy</b></a><span aria-hidden="true">/</span><a href="../../#tools">Tools</a><span aria-hidden="true">/</span><em>GapLens</em></span>
+  </div>
+  <div class="ts-actions" style="margin-left:auto">
+    <a class="ts-btn" href="../../#tools">All tools</a>
+    <button class="ts-btn icon" id="tsTheme" type="button" aria-label="Toggle light or dark theme" title="Toggle theme">
+      <svg class="i-sun" viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M11 1h2v3h-2zM11 20h2v3h-2zM1 11h3v2H1zM20 11h3v2h-3zM4.2 5.6l1.4-1.4 2.1 2.1-1.4 1.4zM16.3 17.7l1.4-1.4 2.1 2.1-1.4 1.4zM4.2 18.4l2.1-2.1 1.4 1.4-2.1 2.1zM16.3 6.3l2.1-2.1 1.4 1.4-2.1 2.1zM7 9h2V7h6v2h2v6h-2v2H9v-2H7z"/></svg>
+      <svg class="i-moon" viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M9 2h6v2h-4v2H9v4H7v4h2v4h2v2h4v-2h4v-2h2v-4h-2v2h-2v2h-6v-2H9v-4H7v-2h2V6h2V4H9z"/></svg>
+    </button>
+  </div>
+</header>
+<div class="app">
+  <aside class="rail">
+    <div class="brand">
+      <svg viewBox="0 0 32 32" width="34" height="34" aria-hidden="true"><circle cx="16" cy="16" r="12.5" fill="none" style="stroke:var(--ink)" stroke-width="2.8"/><path d="M7.5 19L11 14.5 14 18M19 13.5L22 19 24.5 16" fill="none" style="stroke:var(--obs)" stroke-width="2.4" stroke-linejoin="round"/><path d="M14 18L19 13.5" fill="none" style="stroke:var(--fill)" stroke-width="2.4" stroke-dasharray="1.8 1.8"/></svg>
+      <div><h1>GapLens</h1><small>Find, fill and compare gaps in hydroclimate records</small></div>
+    </div>
+    <nav id="nav" role="tablist" aria-label="Workflow"></nav>
+    <p class="rail-foot">Runs in your browser with Python (Pyodide). Your data are not uploaded anywhere.</p>
+  </aside>
+  <div class="main" id="content">
+    <div class="recbar" id="recbar" hidden>
+      <div class="rec-top">
+        <div class="rec-id"><b id="rec-name"></b><span class="mute" id="rec-target"></span><span class="mute" id="rec-span"></span></div>
+        <div class="rec-stats" id="rec-stats"></div>
+      </div>
+      <div class="rec-strip" id="rec-strip" role="img" aria-label="Availability of the target series over time"></div>
+      <div class="rec-key"><span><i class="o"></i>observed</span><span><i class="g"></i>missing</span><span id="rec-fkey" hidden><i class="f"></i>filled</span></div>
+    </div>
+    <main id="pages"></main>
+  </div>
+</div>
+<div id="tip" role="tooltip" hidden></div>
+<script src="import.js"></script>
+<script src="bridge.js"></script>
+<script>
+"use strict";
+const $=(s,r=document)=>r.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmt=(v,d=3)=>v==null||v===""?"":(typeof v==="number"?(Math.abs(v)>=1e5||(Math.abs(v)<1e-3&&v!==0)?v.toExponential(2):(+v.toPrecision(d)).toString()):esc(v));
+const fmtDate=s=>String(s).slice(0,10);
+function fmtStep(s){const m=/^(\d+) days? (\d+):(\d+):(\d+)/.exec(String(s));if(!m)return String(s);const d=+m[1],h=+m[2],mi=+m[3];
+  if(d===1&&!h&&!mi)return "daily";if(d>1&&!h&&!mi)return d+" days";if(!d&&h===1&&!mi)return "hourly";if(!d&&h&&!mi)return h+" hours";if(!d&&!h&&mi)return mi+" min";return String(s)}
+async function api(path,body){
+  const opt=body===undefined?{}:{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)};
+  const r=await fetch(path,opt);let j;try{j=await r.json()}catch(e){throw new Error("The server returned no JSON ("+r.status+")")}
+  if(j.error)throw new Error(j.error);return j;
+}
+async function poll(jobId,onProgress){
+  for(;;){const j=await api("/api/job?id="+jobId);if(onProgress)onProgress(j);
+    if(j.status==="done")return j.result;if(j.status==="error")throw new Error(j.error);await new Promise(r=>setTimeout(r,900));}
+}
+function say(el,msg,kind=""){el.innerHTML=msg?`<div class="note ${kind}" role="status">${msg}</div>`:""}
+function table(rows,cols,o={}){
+  if(!rows||!rows.length)return '<p class="mute">Nothing to show.</p>';
+  cols=cols||Object.keys(rows[0]);
+  const HT={};if(o.heat)o.heat.cols.forEach(c=>{const v=rows.map(r=>r[c]).filter(x=>typeof x==="number");if(v.length)HT[c]=[Math.min(...v),Math.max(...v)]});
+  const L=c=>o.left&&o.left.includes(c)?"l":"";
+  const head=cols.map(c=>`<th class="${L(c)}">${esc((o.names&&o.names[c])||c)}</th>`).join("");
+  const body=rows.map(r=>"<tr>"+cols.map(c=>{const v=r[c];const h=o.html&&o.html[c]?o.html[c](v,r):fmt(v,o.digits||3);
+    let st="";if(HT[c]&&typeof v==="number"){const[a,b]=HT[c];const n=b>a?(v-a)/(b-a):0;const k=o.heat.low?1-n:n;st=` style="background:rgba(var(--hot-rgb),${(.06+.4*k).toFixed(3)})"`}
+    return `<td class="${L(c)}"${st}>${h}</td>`}).join("")+"</tr>").join("");
+  return `<div class="scroll"><table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>`;
+}
+/* ---------- charts ---------- */
+const T=s=>Date.parse(String(s).replace(" ","T"));
+const CH={};let chN=0;
+function niceTicks(lo,hi,n=5){if(!(hi>lo)){hi=lo+1}const step0=(hi-lo)/n,mag=Math.pow(10,Math.floor(Math.log10(step0))),f=step0/mag;const step=(f<1.5?1:f<3?2:f<7?5:10)*mag;const out=[];for(let v=Math.ceil(lo/step)*step;v<=hi+1e-9;v+=step)out.push(+v.toPrecision(12));return out}
+function lineChart(series,o={}){
+  const W=o.w||Math.max(340,Math.min(900,innerWidth-(innerWidth>860?320:34))),H=o.h||(W<520?230:270),L=W<520?50:58,R=14,Tp=14,B=30;
+  let xs=[],ys=[];
+  series.forEach(s=>{s.x=s.t.map(T);s.x.forEach(x=>xs.push(x));[s.mean,s.lo,s.hi].forEach(a=>a&&a.forEach(v=>{if(v!=null)ys.push(v)}))});
+  if(!xs.length||!ys.length)return '<p class="mute">No data to plot.</p>';
+  let x0=xs[0],x1=xs[0];xs.forEach(v=>{if(v<x0)x0=v;if(v>x1)x1=v});
+  let y0=Infinity,y1=-Infinity;ys.forEach(v=>{if(v<y0)y0=v;if(v>y1)y1=v});if(o.zero)y0=Math.min(0,y0);if(y1===y0)y1=y0+1;
+  const pad=(y1-y0)*.05;y1+=pad;if(!o.zero)y0-=pad;
+  const X=v=>L+(W-L-R)*(v-x0)/((x1-x0)||1),Y=v=>Tp+(H-Tp-B)*(1-(v-y0)/(y1-y0));
+  const id="c"+(++chN);
+  let g=`<svg class="chart" data-cid="${id}" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(o.label||"time series")}">`;
+  g+=`<rect x="${L}" y="${Tp}" width="${W-L-R}" height="${H-Tp-B}" style="fill:var(--sheet);stroke:var(--rule)"/>`;
+  niceTicks(y0,y1).forEach(v=>{g+=`<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" style="stroke:var(--grid)"/><text x="${L-6}" y="${Y(v)+4}" text-anchor="end">${fmt(v,3)}</text>`});
+  for(let k=0;k<=4;k++){const t=x0+(x1-x0)*k/4;if(k>0&&k<4)g+=`<line x1="${X(t)}" x2="${X(t)}" y1="${Tp}" y2="${H-B}" style="stroke:var(--grid)"/>`;g+=`<text x="${X(t)}" y="${H-10}" text-anchor="${k==4?"end":k==0?"start":"middle"}">${new Date(t).toISOString().slice(0,10)}</text>`}
+  if(o.shade){const s=series[0];const miss=i=>s.miss?s.miss[i]>0:s.mean[i]==null;let start=null;for(let i=0;i<s.x.length;i++){const m=miss(i);if(m&&start===null)start=i;if((!m||i===s.x.length-1)&&start!==null){const e=m?i:i-1;const xa=X(s.x[Math.max(start-1,0)]),xb=X(s.x[Math.min(e+1,s.x.length-1)]);const w=Math.max(xb-xa,1.5);g+=`<rect x="${xa}" y="${Tp}" width="${w}" height="${H-Tp-B}" style="fill:rgba(var(--gap-rgb),.13)"/><rect x="${xa}" y="${Tp}" width="${w}" height="${H-Tp-B}" fill="url(#hatch)"/>`;start=null}}}
+  series.forEach(s=>{
+    const col=s.color||"var(--obs)";
+    if(s.lo&&s.hi){let seg=[];const flush=()=>{if(seg.length){const top=seg.map(p=>`${X(s.x[p])},${Y(s.hi[p])}`).join(" "),bot=seg.slice().reverse().map(p=>`${X(s.x[p])},${Y(s.lo[p])}`).join(" ");g+=`<polygon points="${top} ${bot}" style="fill:${col}" fill-opacity="${s.band||.25}" stroke="none"/>`;seg=[]}};
+      for(let i=0;i<s.x.length;i++){if(s.lo[i]!=null&&s.hi[i]!=null)seg.push(i);else flush()}flush()}
+    if(s.mean){let d="",pen=false;for(let i=0;i<s.x.length;i++){const v=s.mean[i];if(v==null){pen=false;continue}d+=(pen?"L":"M")+X(s.x[i]).toFixed(1)+","+Y(v).toFixed(1);pen=true}
+      if(s.dots){s.x.forEach((x,i)=>{if(s.mean[i]!=null)g+=`<circle cx="${X(x)}" cy="${Y(s.mean[i])}" r="2" style="fill:${col}"/>`})}else g+=`<path d="${d}" fill="none" style="stroke:${col}" stroke-width="${s.width||1.2}" stroke-linejoin="round"/>`}
+  });
+  let lx=L+10;series.forEach(s=>{if(s.label){g+=`<line x1="${lx}" x2="${lx+14}" y1="${Tp+13}" y2="${Tp+13}" style="stroke:${s.color||"var(--obs)"}" stroke-width="2.4"/><text class="lg" x="${lx+19}" y="${Tp+17}" style="fill:${s.color||"var(--obs)"}">${esc(s.label)}</text>`;lx+=s.label.length*6.4+40}});
+  g+=`<line class="xh" y1="${Tp}" y2="${H-B}" style="stroke:var(--ink)" stroke-opacity=".55" visibility="hidden"/>`;
+  CH[id]={W,L,R,x0,x1,series:series.filter(s=>s.mean).map(s=>({label:s.label||o.valueLabel||"value",color:s.color||"var(--obs)",x:s.x,mean:s.mean,t:s.t}))};
+  return g+"</svg>";
+}
+function nearest(x,t){let lo=0,hi=x.length-1;while(hi-lo>1){const m=(lo+hi)>>1;if(x[m]<t)lo=m;else hi=m}return Math.abs(x[lo]-t)<=Math.abs(x[hi]-t)?lo:hi}
+(function hover(){
+  const tip=$("#tip");let last=null;
+  function off(){tip.hidden=true;if(last){const x=last.querySelector(".xh");if(x)x.setAttribute("visibility","hidden");last=null}}
+  document.addEventListener("pointermove",e=>{
+    const svg=e.target.closest&&e.target.closest("svg.chart[data-cid]");
+    if(!svg){off();return}
+    const c=CH[svg.dataset.cid];if(!c)return;const r=svg.getBoundingClientRect();const px=(e.clientX-r.left)*c.W/r.width;
+    if(px<c.L||px>c.W-c.R){off();return}
+    const t=c.x0+(px-c.L)/(c.W-c.L-c.R)*((c.x1-c.x0)||1);
+    let rows="",head="";c.series.forEach((s,k)=>{const i=nearest(s.x,t);if(k===0){const ts=String(s.t[i]);head=ts.slice(11,19)==="00:00:00"||ts.length<=10?ts.slice(0,10):ts.slice(0,16)}
+      const v=s.mean[i];rows+=`<div><i style="background:${s.color}"></i>${esc(s.label)}: ${v==null?"missing":fmt(v,4)}</div>`});
+    const first=c.series[0];const xi=nearest(first.x,t);const xp=c.L+(c.W-c.L-c.R)*(first.x[xi]-c.x0)/((c.x1-c.x0)||1);
+    const xh=svg.querySelector(".xh");xh.setAttribute("x1",xp);xh.setAttribute("x2",xp);xh.setAttribute("visibility","visible");last=svg;
+    tip.innerHTML=`<b>${head}</b>${rows}`;tip.hidden=false;
+    const w=tip.offsetWidth;tip.style.left=Math.min(e.clientX+16,innerWidth-w-8)+"px";tip.style.top=(e.clientY+16)+"px";
+  });
+  document.addEventListener("pointerleave",off);window.addEventListener("scroll",off,{passive:true});
+})();
+function scatterChart(a,b,o={}){
+  const W=420,H=380,L=52,R=10,Tp=10,B=34;const all=a.concat(b).filter(v=>v!=null);if(!all.length)return "";
+  let lo=Math.min(...all),hi=Math.max(...all);const pad=(hi-lo)*.04;lo-=pad;hi+=pad;
+  const X=v=>L+(W-L-R)*(v-lo)/(hi-lo),Y=v=>Tp+(H-Tp-B)*(1-(v-lo)/(hi-lo));
+  let g=`<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="observed against simulated"><rect x="${L}" y="${Tp}" width="${W-L-R}" height="${H-Tp-B}" style="fill:var(--sheet);stroke:var(--rule)"/>`;
+  niceTicks(lo,hi).forEach(v=>{g+=`<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" style="stroke:var(--grid)"/><line x1="${X(v)}" x2="${X(v)}" y1="${Tp}" y2="${H-B}" style="stroke:var(--grid)"/><text x="${L-6}" y="${Y(v)+4}" text-anchor="end">${fmt(v,3)}</text><text x="${X(v)}" y="${H-18}" text-anchor="middle">${fmt(v,3)}</text>`});
+  g+=`<line x1="${X(lo)}" y1="${Y(lo)}" x2="${X(hi)}" y2="${Y(hi)}" style="stroke:var(--ink)" stroke-dasharray="4 3"/>`;
+  a.forEach((v,i)=>{if(v!=null&&b[i]!=null)g+=`<circle cx="${X(v)}" cy="${Y(b[i])}" r="2.4" style="fill:var(--obs)" fill-opacity=".4"/>`});
+  g+=`<text x="${(L+W)/2}" y="${H-3}" text-anchor="middle">${esc(o.xl||"observed")}</text><text transform="translate(12 ${H/2}) rotate(-90)" text-anchor="middle">${esc(o.yl||"simulated")}</text>`;
+  return g+"</svg>";
+}
+function lagChart(c){
+  const W=620,H=170,L=44,R=10,Tp=10,B=28;const ok=c.filter(x=>x.r!=null);if(!ok.length)return "";const lags=c.map(x=>x.lag_steps),l0=Math.min(...lags),l1=Math.max(...lags);
+  let lo=Math.min(...ok.map(x=>x.r)),hi=Math.max(...ok.map(x=>x.r));const pad=(hi-lo)*.1||.05;lo-=pad;hi+=pad;
+  const X=v=>L+(W-L-R)*(v-l0)/((l1-l0)||1),Y=v=>Tp+(H-Tp-B)*(1-(v-lo)/(hi-lo));let g=`<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="correlation by lag"><rect x="${L}" y="${Tp}" width="${W-L-R}" height="${H-Tp-B}" style="fill:var(--sheet);stroke:var(--rule)"/>`;
+  niceTicks(lo,hi,4).forEach(v=>{g+=`<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" style="stroke:var(--grid)"/><text x="${L-6}" y="${Y(v)+4}" text-anchor="end">${fmt(v,3)}</text>`});
+  niceTicks(l0,l1,6).forEach(v=>{g+=`<text x="${X(v)}" y="${H-12}" text-anchor="middle">${v}</text>`});
+  g+=`<line x1="${X(0)}" x2="${X(0)}" y1="${Tp}" y2="${H-B}" style="stroke:var(--mute)" stroke-dasharray="3 3"/><polyline fill="none" style="stroke:var(--obs)" stroke-width="1.6" points="${ok.map(x=>X(x.lag_steps)+","+Y(x.r)).join(" ")}"/>`;
+  const best=ok.reduce((a,b)=>b.r>a.r?b:a);g+=`<circle cx="${X(best.lag_steps)}" cy="${Y(best.r)}" r="4.5" style="fill:var(--fill)"/><text x="${W/2}" y="${H-1}" text-anchor="middle">lag in steps (positive: simulation later)</text>`;
+  return g+"</svg>";
+}
+function barChart(items,o={}){ // [{label,value,lo,hi}]
+  const W=Math.max(340,Math.min(620,innerWidth-(innerWidth>860?320:34))),rowH=24,H=items.length*rowH+12,L=W<500?118:150,R=44;const vals=items.flatMap(i=>[i.value,i.lo,i.hi]).filter(v=>v!=null);if(!vals.length)return "";
+  const mx=Math.max(...vals)*1.05,X=v=>L+(W-L-R)*v/mx;let g=`<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(o.label||"bars")}">`;
+  items.forEach((it,i)=>{const y=i*rowH+6;g+=`<text x="${L-8}" y="${y+13}" text-anchor="end" style="${i===0?"fill:var(--ink);font-weight:600":""}">${esc(it.label)}</text><rect x="${L}" y="${y+2}" width="${Math.max(X(it.value)-L,1)}" height="13" style="fill:${i===0?"var(--ink)":"var(--obs)"}" fill-opacity="${i===0?1:.6}"/>`;
+    if(it.lo!=null&&it.hi!=null)g+=`<g style="stroke:var(--fill)" stroke-width="1.6"><line x1="${X(it.lo)}" x2="${X(it.hi)}" y1="${y+8.5}" y2="${y+8.5}"/><line x1="${X(it.lo)}" x2="${X(it.lo)}" y1="${y+4}" y2="${y+13}"/><line x1="${X(it.hi)}" x2="${X(it.hi)}" y1="${y+4}" y2="${y+13}"/></g>`;
+    g+=`<text x="${X(it.hi??it.value)+6}" y="${y+13}">${fmt(it.value,3)}</text>`});
+  return g+"</svg>";
+}
+function heat(monthly){ // {col:[[YYYY-MM,frac]]}
+  const col=Object.keys(monthly)[0];if(!col)return "";const m=Object.fromEntries(monthly[col]);const yrs=[...new Set(Object.keys(m).map(k=>k.slice(0,4)))].sort();
+  let h=`<div class="scroll"><table class="heat"><thead><tr><th>${esc(col)}</th>${[..."JFMAMJJASOND"].map(x=>`<th>${x}</th>`).join("")}</tr></thead><tbody>`;
+  yrs.forEach(y=>{h+=`<tr><td>${y}</td>`;for(let mo=1;mo<=12;mo++){const v=m[y+"-"+String(mo).padStart(2,"0")];const a=v>0?.14+.8*v:0;h+=`<td style="background:rgba(var(--gap-rgb),${a.toFixed(2)});color:${a>.55?"var(--sheet)":"var(--ink)"}" title="${v==null?"no data":(100*v).toFixed(0)+" % missing"}">${v==null?"":v>0?(100*v).toFixed(0):""}</td>`}h+="</tr>"});
+  return h+"</tbody></table></div><p class='mute small'>Percent of each month missing for the target.</p>";
+}
+/* ---------- record strip ---------- */
+function drawStrip(){
+  const host=$("#rec-strip"),r=S.rec;if(!host||!r||!r.obs)return;
+  const W=Math.max(host.clientWidth,300),H=24,o=r.obs,n=o.t.length,f=r.fill&&r.fill.series;
+  const st=new Array(n);for(let i=0;i<n;i++){const m=o.miss?o.miss[i]>0:o.mean[i]==null;st[i]=!m?0:(f&&f.mean[i]!=null?2:1)}
+  let g=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><rect width="${W}" height="${H}" style="fill:var(--sheet)"/>`;
+  let i=0;while(i<n){let j=i;while(j+1<n&&st[j+1]===st[i])j++;const x=i/n*W,w=Math.max((j+1-i)/n*W,st[i]===0?.7:2);
+    if(st[i]===0)g+=`<rect x="${x.toFixed(1)}" width="${w.toFixed(1)}" height="${H}" style="fill:var(--obs)"/>`;
+    else if(st[i]===2)g+=`<rect x="${x.toFixed(1)}" width="${w.toFixed(1)}" height="${H}" style="fill:var(--fill)"/>`;
+    else g+=`<rect x="${x.toFixed(1)}" width="${w.toFixed(1)}" height="${H}" style="fill:rgba(var(--gap-rgb),.4)"><title>${fmtDate(o.t[i])} to ${fmtDate(o.t[Math.min(j+1,n-1)])}</title></rect><rect x="${x.toFixed(1)}" width="${w.toFixed(1)}" height="${H}" fill="url(#hatch)" pointer-events="none"/>`;
+    i=j+1}
+  host.innerHTML=g+"</svg>";
+}
+function setRecord(){
+  const bar=$("#recbar"),r=S.rec;if(!S.ds||!r||!r.obs){bar.hidden=true;return}
+  bar.hidden=false;const o=r.obs;
+  $("#rec-name").textContent=S.ds.name;$("#rec-target").textContent="target "+r.target;
+  $("#rec-span").textContent=fmtDate(o.t[0])+" to "+fmtDate(o.t[o.t.length-1]);
+  const st=[`<span><b>${fmt(100*r.frac,3)} %</b> missing</span>`];
+  if(r.runs!=null)st.push(`<span><b>${r.runs}</b> gaps</span>`,`<span>longest <b>${fmt(r.longest)}</b> d</span>`);
+  if(r.fill)st.push(`<span><b>${r.fill.n_filled}</b> filled</span>`,r.fill.n_missing?`<span><b>${r.fill.n_missing}</b> still missing</span>`:"");
+  $("#rec-stats").innerHTML=st.join("");$("#rec-fkey").hidden=!r.fill;
+  drawStrip();
+}
+let rsz;window.addEventListener("resize",()=>{clearTimeout(rsz);rsz=setTimeout(drawStrip,120)});
+/* ---------- state and tabs ---------- */
+const S={ds:null,gaug:null,stations:null,sug:null,comp:null,fill:null,prof:null,rec:null,jobCompare:null,done:{},settings:{}};
+const STEPS=[["data","Data"],["diag","Diagnose"],["sugg","Suggest"],["comp","Compare"],["fill","Fill"]];
+const TOOLS=[["val","Validate two series"],["rate","Rating curve"],["meth","Methods"]];
+const PAGES={
+  data:["Data","Load a table with a date column and one column per series, then say which series to fill."],
+  diag:["Diagnose","Which kinds of gap the record contains, and what they may mean for the choice of method."],
+  sugg:["Suggest","Methods ranked for the gap types found. This is advice before testing."],
+  comp:["Compare","Hide observed values in your own record, fill them with each method and score the result."],
+  fill:["Fill","Apply the chosen methods in order. Every filled value is flagged in the file you download."],
+  val:["Validate two series","Check a simulation, a product or a second gauge against an observation, and calibrate a built-in model."],
+  rate:["Rating curve","Fit a stage-discharge curve to gaugings, adjust it by hand against the gaugings, and use it to fill or convert a record."],
+  meth:["Methods","The catalogue behind the suggestions: what each method is for and where it stops working."]};
+const nav=$("#nav"),pages=$("#pages");
+function navBtn(k,t,n){const b=document.createElement("button");b.type="button";b.dataset.k=k;b.setAttribute("role","tab");b.setAttribute("aria-selected",k==="data");b.innerHTML=`<span class="mk${n?"":" tool"}">${n||""}</span><span>${t}</span>`;b.onclick=()=>show(k);return b}
+function groupTitle(t){const d=document.createElement("div");d.className="gt";d.textContent=t;nav.appendChild(d)}
+groupTitle("Workflow");STEPS.forEach(([k,t],i)=>nav.appendChild(navBtn(k,t,i+1)));groupTitle("Other tools");TOOLS.forEach(([k,t])=>nav.appendChild(navBtn(k,t,0)));
+Object.entries(PAGES).forEach(([k,[h,p]])=>{const w=document.createElement("div");w.className="tabwrap"+(k==="data"?" on":"");w.dataset.k=k;w.innerHTML=`<header class="pagehead"><h1>${esc(h)}</h1><p>${esc(p)}</p></header><section class="tab" id="t-${k}"></section>`;pages.appendChild(w)});
+function done(k){S.done[k]=true;const b=nav.querySelector(`[data-k=${k}]`);if(b)b.classList.add("done")}
+function resetResults(){
+  S.prof=S.sug=S.comp=S.fill=S.picked=S.fillMethods=S.rec=S.jobCompare=null;
+  ["diag","sugg","comp","fill"].forEach(k=>{$("#t-"+k).innerHTML=""});["v-out","m-out","r-out"].forEach(id=>{const e=$("#"+id);if(e)e.innerHTML=""});
+  S.done={};nav.querySelectorAll("button.done").forEach(b=>b.classList.remove("done"));setRecord();
+}
+const RUN={diag:["Diagnose the gaps",()=>runDiag()],sugg:["Rank the methods",()=>runSuggest()]};
+function pending(k){
+  const box=$("#t-"+k);if(!need(box))return;if(k==="comp")return drawCompare();if(k==="fill")return drawFill();
+  box.innerHTML=`<div class="empty"><p><b>${k==="diag"?"The gaps have not been diagnosed yet.":"No methods have been ranked yet."}</b></p><button class="primary" type="button" id="pend-go">${RUN[k][0]}</button></div>`;$("#pend-go").onclick=()=>RUN[k][1]();
+}
+function show(k){
+  document.querySelectorAll(".tabwrap").forEach(w=>w.classList.toggle("on",w.dataset.k===k));
+  nav.querySelectorAll("button").forEach(b=>{const on=b.dataset.k===k;b.setAttribute("aria-selected",on);if(on)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current")});
+  if(k==="meth"&&!S.meth)loadMethods();if(k==="val"||k==="rate")refreshSelectors();
+  if((k in RUN||k==="comp"||k==="fill")&&!$("#t-"+k).innerHTML.trim())pending(k);
+  window.scrollTo(0,0);if(k==="data")drawStrip();
+}
+function settings(){
+  const g=id=>{const e=$("#"+id);return e?e.value:""};const p={id:S.ds&&S.ds.id,target:g("s-target"),variable:g("s-var")||"auto",driver:g("s-driver"),surrogate:g("s-surr"),precip:g("s-precip"),pet:g("s-pet"),latitude:g("s-lat")};
+  p.product=[...document.querySelectorAll(".s-prod:checked")].map(e=>e.value);p.exclude=[...document.querySelectorAll(".s-excl:checked")].map(e=>e.value);
+  if(S.gaug)p.gaugings_id=S.gaug;if(S.stations)p.stations_id=S.stations;
+  if(RT.use&&S.manualRating)p.manual_rating=S.manualRating;  /* the curve from the rating-curve editor (method rating_manual) */
+  if(RTY.use)p.yearly_rating=rtyOpts();  /* options of the year-by-year rating (method rating_yearly) */
+  Object.keys(p).forEach(k=>{if(p[k]===""||p[k]==null)delete p[k]});return p;
+}
+function need(el){
+  if(!S.ds){el.innerHTML=`<div class="empty"><p><b>No data loaded yet.</b></p><p class="mute">Load a CSV file or one of the built-in examples first.</p><button class="primary" type="button" id="to-data">Go to Data</button></div>`;const b=$("#to-data",el);if(b)b.onclick=()=>show("data");return false}
+  return true}
+/* ---------- 1 data ---------- */
+function drawData(){
+  const box=$("#t-data");
+  box.innerHTML=`
+  <div class="card"><div class="split">
+    <div><h2>Load your file</h2>
+      <div class="drop" id="drop" tabindex="0" role="button" aria-label="Choose a CSV or Excel file"><b>Drop a CSV or Excel file here</b><span>or click to choose one</span><input id="file" type="file" accept=".csv,.txt,.tsv,.xlsx,.xlsm,.xls" hidden></div>
+      <details><summary>What the file should look like</summary>
+        <pre>date,R01,R02,R03
+2001-01-01,3.2,2.8,3.0
+2001-01-02,,1.9,2.2
+2001-01-03,-999,0.0,0.4</pre>
+        <p class="mute small">One date column, then one column per series: the series to fill, neighbouring stations, drivers. A missing value can be empty, NaN or a code such as -999; the diagnosis finds such codes. Excel files and hydrometric downloads (for example BWDB) also work: title rows, HIGH / LOW rows, a separate time column and serial-number columns are handled, and irregular readings within a day become daily means.</p></details>
+    </div>
+    <div><h2>Or start from an example</h2>
+      <p class="mute small">Synthetic records with known true values, so a fill can be checked against the truth.</p>
+      <div class="row"><label>Example<select id="ex"></select></label><button class="ghost" id="exgo" type="button">Load example</button></div>
+      <p class="small" id="ex-desc"></p><span id="up-msg" aria-live="polite"></span></div>
+  </div></div>
+  <div id="data-body"></div>`;
+  const drop=$("#drop"),file=$("#file");drop.onclick=()=>file.click();drop.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();file.click()}};
+  drop.ondragover=e=>{e.preventDefault();drop.classList.add("over")};drop.ondragleave=()=>drop.classList.remove("over");
+  drop.ondrop=e=>{e.preventDefault();drop.classList.remove("over");if(e.dataTransfer.files[0])upload(e.dataTransfer.files[0])};file.onchange=()=>file.files[0]&&upload(file.files[0]);
+  api("/api/samples").then(r=>{const ex=$("#ex");S.samples=r.samples;Object.entries(r.samples).forEach(([k,v])=>{const o=document.createElement("option");o.value=k;o.textContent=k.replace(/_/g," ");ex.appendChild(o)});const d=()=>{$("#ex-desc").textContent=S.samples[ex.value]||""};ex.onchange=d;d()});
+  $("#exgo").onclick=async()=>{const m=$("#up-msg");say(m,"Building the example...");try{const r=await api("/api/sample",{name:$("#ex").value});S.gaug=r.gaugings_id||null;S.stations=r.stations_id||null;S.ds=r;S.pre=r.settings;resetResults();done("data");say(m,"");drawDataBody()}catch(e){say(m,esc(e.message),"err")}};
+  if(S.ds)drawDataBody();
+}
+async function upload(f){
+  const m=$("#up-msg");say(m,"Reading "+esc(f.name)+"...");
+  try{const buf=await f.arrayBuffer();const r=await fetch("/api/upload?kind=data&name="+encodeURIComponent(f.name),{method:"POST",body:buf});const j=await r.json();if(j.error)throw new Error(j.error);S.ds=j;S.gaug=null;S.stations=null;S.pre=null;resetResults();done("data");say(m,"");drawDataBody()}
+  catch(e){say(m,esc(e.message),"err")}
+}
+async function uploadAux(kind,f){
+  const buf=await f.arrayBuffer();const r=await fetch("/api/upload?kind="+kind+"&name="+encodeURIComponent(f.name),{method:"POST",body:buf});const j=await r.json();if(j.error)throw new Error(j.error);return j;
+}
+function opts(cols,sel,blank){return (blank?`<option value="">${blank}</option>`:"")+cols.map(c=>`<option value="${esc(c)}" ${c===sel?"selected":""}>${esc(c)}</option>`).join("")}
+function drawDataBody(){
+  ["v-obs","r-stage"].forEach(id=>{const e=$("#"+id);if(e)delete e.dataset.f});
+  const d=S.ds,cols=d.columns.map(c=>c.name),pre=S.pre||{};const tgt=pre.target||cols[0];
+  const guess=(d.columns.find(c=>c.name===tgt)||{}).guess||"generic";
+  const VARS=["auto","rainfall","temperature","streamflow","stage","groundwater","tide","sediment","salinity","generic"];
+  const anyOpt=!!(pre.driver||pre.surrogate||pre.precip||pre.pet||pre.latitude!=null||S.gaug||S.stations);
+  $("#data-body").innerHTML=`
+  <div class="card"><h2>${esc(d.name)}</h2>
+    <div class="grid"><div class="stat"><b>${d.n}</b>time steps</div><div class="stat"><b>${esc(fmtStep(d.step))}</b>time step</div><div class="stat"><b>${esc(fmtDate(d.start))}</b>start</div><div class="stat"><b>${esc(fmtDate(d.end))}</b>end</div></div>
+    ${(d.warnings||[]).map(w=>`<div class="note">${esc(w)}</div>`).join("")}
+    <div class="scroll" style="margin-top:10px"><table><thead><tr><th class="l">Series</th><th>Missing</th><th>Min</th><th>Max</th><th class="l">Looks like</th><th class="c">Gridded product</th><th class="c">Leave out</th></tr></thead><tbody>
+    ${d.columns.map(c=>`<tr><td class="l"><b>${esc(c.name)}</b></td><td>${fmt(100*c.missing_frac,3)} %<div class="bar" title="share missing"><i style="width:${Math.min(100,Math.round(100*c.missing_frac))}%;background:rgba(var(--gap-rgb),.9)"></i></div></td><td>${fmt(c.min)}</td><td>${fmt(c.max)}</td><td class="l">${esc(c.guess||"")}</td><td class="c"><input type="checkbox" class="s-prod" value="${esc(c.name)}" ${(pre.product||[]).includes(c.name)?"checked":""} aria-label="${esc(c.name)} is a gridded product"></td><td class="c"><input type="checkbox" class="s-excl" value="${esc(c.name)}" aria-label="leave out ${esc(c.name)}"></td></tr>`).join("")}
+    </tbody></table></div>
+    <p class="mute small">Series that are not marked as driver, surrogate, rainfall or gridded product are used as neighbouring stations. Tick "Leave out" to ignore a series.</p></div>
+  <div class="card"><h2>What do you want to fill?</h2>
+    <div class="row fields">
+      <label>Series to fill (target)<select id="s-target">${opts(cols,tgt)}</select></label>
+      <label>Kind of variable<select id="s-var">${VARS.map(v=>`<option ${v===(pre.variable||"auto")?"selected":""}>${v}</option>`).join("")}</select></label>
+    </div>
+    <p class="mute small">Detected from the column name (or, if the name gives no clue, the values): <b id="guessed">${esc(guess)}</b>. Leave the kind on auto unless that is wrong.</p>
+    <details ${anyOpt?"open":""}><summary>Optional inputs: driver, surrogate, rainfall, evaporation, latitude, gaugings, stations</summary>
+      <div class="row fields" style="margin-top:10px">
+        <label>Driver series (stage for a rating, discharge, rainfall for groundwater, river for tide)<select id="s-driver">${opts(cols,pre.driver,"none")}</select></label>
+        <label>Surrogate series (for example turbidity)<select id="s-surr">${opts(cols,pre.surrogate,"none")}</select></label>
+        <label>Rainfall forcing (for rainfall-runoff models)<select id="s-precip">${opts(cols,pre.precip,"none")}</select></label>
+        <label>Evaporation<select id="s-pet">${opts(cols,pre.pet,"none")}</select></label>
+        <label>Latitude in degrees (tides)<input id="s-lat" type="number" step="0.1" value="${pre.latitude??""}"></label>
+        <label>Gaugings table for a rating curve (date, stage, discharge)<input id="gfile" type="file" accept=".csv,.txt,.xlsx,.xls"></label>
+        <label>Station table: station, x_km, y_km, and optionally elevation_m and area_km2 (catchment area)<input id="sfile" type="file" accept=".csv,.txt,.xlsx,.xls"></label>
+      </div><p id="aux-msg" class="small mute">${S.gaug?"Gaugings loaded. ":""}${S.stations?"Stations loaded.":""}</p></details>
+    <div class="actions"><button class="primary" id="go-diag" type="button">Diagnose the gaps</button></div>
+  </div>
+  <div class="card"><h2>Target series</h2><div id="prev"></div></div>`;
+  $("#go-diag").onclick=()=>{show("diag");runDiag()};
+  $("#gfile").onchange=async e=>{try{const j=await uploadAux("gaugings",e.target.files[0]);S.gaug=j.id;$("#aux-msg").textContent="Gaugings loaded ("+j.n+" rows)"}catch(x){$("#aux-msg").textContent=x.message}};
+  $("#sfile").onchange=async e=>{try{const j=await uploadAux("stations",e.target.files[0]);S.stations=j.id;$("#aux-msg").textContent="Stations loaded ("+j.n+" rows)"}catch(x){$("#aux-msg").textContent=x.message}};
+  $("#s-target").onchange=()=>{const c=d.columns.find(c=>c.name===$("#s-target").value);$("#guessed").textContent=c?c.guess:"";preview()};
+  preview();
+}
+async function preview(){
+  const box=$("#prev");if(!box)return;try{const st=settings(),r=await api("/api/series",st);
+    box.innerHTML=lineChart([{t:r.series.t,mean:r.series.mean,lo:r.series.lo,hi:r.series.hi,miss:r.series.miss,label:st.target}],{shade:true,label:"target series",valueLabel:st.target})+'<p class="mute small">Hatched bands mark gaps. Hover the chart to read values.</p>';
+    S.rec={obs:r.series,target:st.target,frac:r.missing_frac,runs:null,longest:null,fill:null};setRecord()}
+  catch(e){box.innerHTML='<div class="note err">'+esc(e.message)+"</div>"}
+}
+/* ---------- 2 diagnose ---------- */
+function findingsHtml(f,target){
+  const groups=new Map();f.forEach(x=>{if(!groups.has(x.code))groups.set(x.code,{code:x.code,name:x.name,items:[]});groups.get(x.code).items.push(x)});
+  if(!groups.size)return '<p class="mute">No gap types were found.</p>';
+  let h='<div class="scroll"><table><thead><tr><th class="l">Type</th><th class="l">Series</th><th class="l">Strength</th><th class="l">Evidence</th></tr></thead><tbody>';
+  groups.forEach(g=>{
+    const best=g.items.reduce((a,b)=>(b.strength||0)>(a.strength||0)?b:a);const first=g.items.find(x=>x.scope===target)||best;
+    const chips=g.items.slice(0,8).map(x=>`<span class="chip ${x.scope===target?"on":""}">${esc(x.scope)}</span>`).join(" ")+(g.items.length>8?` <span class="mute small">+${g.items.length-8} more</span>`:"");
+    h+=`<tr><td class="l"><span class="chip code">${esc(g.code)}</span> ${esc(g.name||"")}</td><td class="l">${chips}</td><td class="l" style="min-width:90px"><div class="bar" style="margin-top:9px"><i style="width:${Math.round(100*(best.strength||0))}%"></i></div></td>
+      <td class="l">${esc(first.evidence)}${g.items.length>1?`<details><summary>${g.items.length} series</summary><ul class="reasons">${g.items.map(x=>`<li><b>${esc(x.scope)}</b>: ${esc(x.evidence)}</li>`).join("")}</ul></details>`:""}</td></tr>`});
+  return h+"</tbody></table></div>";
+}
+async function runDiag(){
+  const box=$("#t-diag");if(!need(box))return;box.innerHTML='<div class="card"><p>Diagnosing the gaps...</p><progress></progress></div>';
+  try{const st=settings(),r=await api("/api/profile",st);S.prof=r;
+    const tcol=r.columns.find(c=>c.column===st.target)||r.columns[0];
+    const names={};r.findings.forEach(x=>{names[x.code]=x.name});
+    box.innerHTML=`
+    <div class="card"><h2>Gap types found ${r.codes.length?r.codes.map(c=>`<span class="chip code" title="${esc(names[c]||"")}">${esc(c)}</span>`).join(" "):'<span class="mute small">none</span>'}</h2>
+      <div class="grid"><div class="stat"><b>${fmt(100*tcol.missing_frac,3)} %</b>missing</div><div class="stat"><b>${tcol.n_runs}</b>gaps (runs)</div><div class="stat"><b>${fmt(tcol.longest_days)} d</b>longest gap</div><div class="stat"><b>${esc(r.step)}</b>time step</div></div>
+      <p><b>Mechanism.</b> ${esc(r.verdict)}</p>
+      <p class="mute small">Whether gaps are random (MCAR), depend on other observed values (MAR) or on the missing value itself (MNAR) cannot be proven from the data. The tool reports what the tests allow and flags a suspicion of MNAR when gaps sit next to extremes.</p></div>
+    <div class="card"><h2>Findings</h2>${findingsHtml(r.findings,st.target)}</div>
+    <div class="card"><h2>Series and gaps</h2>${lineChart([{t:r.series.t,mean:r.series.mean,lo:r.series.lo,hi:r.series.hi,miss:r.series.miss,label:st.target}],{shade:true,valueLabel:st.target})}
+      <div class="cols2"><div><h3>Gap lengths</h3>${table(r.run_hist,["label","runs","steps"],{left:["label"],names:{label:"Length",runs:"Gaps",steps:"Missing steps"},html:{runs:(v,row)=>{const mx=Math.max(...r.run_hist.map(x=>x.runs),1);return `<div class="hb"><i style="width:${Math.round(70*v/mx)}px"></i><span>${v}</span></div>`}}})}</div>
+      <div><h3>When the data are missing</h3>${heat(r.monthly)}</div></div></div>
+    <div class="card"><h2>All series</h2>${table(r.columns,["column","n_missing","missing_frac","n_runs","longest_days","median_run"],{left:["column"],names:{column:"Series",n_missing:"Missing steps",missing_frac:"Missing",n_runs:"Gaps",longest_days:"Longest (days)",median_run:"Median gap (steps)"},html:{missing_frac:v=>fmt(100*v,3)+" %"}})}</div>
+    <div class="card"><details><summary>Tests behind the mechanism verdict</summary>${table(r.mechanism)}</details>
+      <div class="actions"><button class="primary" id="go-sugg" type="button">Suggest methods</button></div></div>`;
+    $("#go-sugg").onclick=()=>{show("sugg");runSuggest()};
+    if(S.rec){S.rec.runs=tcol.n_runs;S.rec.longest=tcol.longest_days;setRecord()}
+    done("diag");
+  }catch(e){box.innerHTML='<div class="card"><div class="note err">'+esc(e.message)+"</div></div>"}
+}
+/* ---------- 3 suggest ---------- */
+async function runSuggest(){
+  const box=$("#t-sugg");if(!need(box))return;box.innerHTML='<div class="card"><p>Ranking the methods...</p><progress></progress></div>';
+  try{const r=await api("/api/suggest",Object.assign(settings(),{top:40}));S.sug=r;
+    const mx=Math.max(...r.table.map(m=>m.score),1e-9);
+    box.innerHTML=`<div class="card"><h2>Methods for gap types ${r.codes.map(c=>`<span class="chip code">${esc(c)}</span>`).join(" ")||'<span class="mute small">none</span>'}</h2>
+      ${r.warnings.map(w=>`<div class="note">${esc(w)}</div>`).join("")}
+      <p class="mute small">The score adds the usual choice for this kind of variable, how well the method suits the gap types found, gap length, available neighbours and special rules. The next step tests the methods on your own data.</p>
+      <div class="actions"><button class="ghost" id="pick3" type="button">Select top 3</button><button class="ghost" id="pick8" type="button">Select top 8</button><button class="ghost" id="pickall" type="button">Select all listed</button><button class="primary" id="go-comp" type="button">Compare selected on my data</button></div>
+      <div class="scroll"><table><thead><tr><th class="l"></th><th>#</th><th class="l">Method</th><th class="l">Family</th><th class="l">Score</th><th class="l">Why</th></tr></thead><tbody>
+      ${r.table.map((m,i)=>`<tr><td class="l"><input type="checkbox" class="pick" value="${esc(m.method)}" ${i<5?"checked":""} aria-label="select ${esc(m.method)}"></td><td>${m.rank}</td><td class="l"><b>${esc(m.method)}</b><br><span class="mute small">${esc(m.name)}</span></td><td class="l">${esc(m.family)}</td><td class="l" style="min-width:90px">${fmt(m.score,2)}<div class="bar"><i style="width:${Math.max(3,Math.round(100*m.score/mx))}%"></i></div></td>
+      <td class="l"><ul class="reasons">${m.reasons.map(x=>`<li>${esc(x)}</li>`).join("")}${m.warnings.map(x=>`<li class="w">${esc(x)}</li>`).join("")}</ul></td></tr>`).join("")}</tbody></table></div></div>
+      <div class="card"><details><summary>${Object.keys(r.not_available).length} methods cannot run on this data</summary>${table(Object.entries(r.not_available).map(([k,v])=>({method:k,reason:v.join("; ")})),null,{left:["method","reason"]})}</details></div>`;
+    const setN=n=>document.querySelectorAll(".pick").forEach((e,i)=>e.checked=i<n);$("#pick3").onclick=()=>setN(3);$("#pick8").onclick=()=>setN(8);$("#pickall").onclick=()=>setN(999);
+    $("#go-comp").onclick=()=>{S.picked=[...document.querySelectorAll(".pick:checked")].map(e=>e.value);show("comp");drawCompare()};
+    done("sugg");
+  }catch(e){box.innerHTML='<div class="card"><div class="note err">'+esc(e.message)+"</div></div>"}
+}
+/* ---------- 4 compare ---------- */
+function drawCompare(){
+  const box=$("#t-comp");if(!need(box))return;
+  const picked=S.picked||(S.sug?S.sug.table.slice(0,5).map(m=>m.method):[]);
+  box.innerHTML=`<div class="card"><h2>Compare methods on your own data</h2>
+    <p class="mute small">Observed values are hidden in blocks of several lengths (or in blocks like your real gaps), every method fills them, and the result is scored against what was hidden. Real gaps are never scored.</p>
+    <div class="row"><label>Methods (comma separated; empty = every fast applicable method)<input type="text" id="c-methods" style="min-width:min(420px,80vw)" value="${esc(picked.join(", "))}"></label>
+      <label>Repetitions<input type="number" id="c-rep" value="4" min="1" max="30" style="min-width:90px;width:90px"></label><label>Share hidden<input type="number" id="c-frac" value="0.10" step="0.05" min="0.02" max="0.4" style="min-width:90px;width:90px"></label>
+      <label>Design<select id="c-design"><option>auto</option><option>ladder</option><option>match</option><option>mnar_upper</option><option>sample</option></select></label>
+      <button class="primary" id="c-go" type="button">Run comparison</button></div><div id="c-prog" style="margin-top:12px"></div></div><div id="c-out"></div>`;
+  $("#c-go").onclick=runCompare;if(S.comp)showCompare(S.comp);
+}
+async function runCompare(){
+  const out=$("#c-out"),pg=$("#c-prog");const ms=$("#c-methods").value.split(",").map(s=>s.trim()).filter(Boolean);
+  const p=Object.assign(settings(),{methods:ms,n_rep:+$("#c-rep").value,frac:+$("#c-frac").value,design:$("#c-design").value,preset:"balanced"});
+  $("#c-go").disabled=true;out.innerHTML="";pg.innerHTML='<progress id="pbar" value="0" max="1"></progress><div class="small mute" id="ptxt" style="margin-top:4px">starting...</div>';
+  try{const {job}=await api("/api/compare",p);S.jobCompare=job;const res=await poll(job,j=>{const b=$("#pbar");if(b&&j.total){b.max=j.total;b.value=j.done}const t=$("#ptxt");if(t)t.textContent=`${j.done||0} of ${j.total||"?"} runs - ${j.message||""} - ${Math.round(j.elapsed)} s`});
+    S.comp=res;pg.innerHTML="";showCompare(res);done("comp")}catch(e){pg.innerHTML="";say(out,esc(e.message),"err")}$("#c-go").disabled=false;
+}
+function showCompare(r){
+  const out=$("#c-out");const rk=r.ranking.map(x=>Object.assign({},x));const groups=Object.keys(rk[0]||{}).filter(k=>k!=="method"&&k!=="weighted_rank");
+  const rmse=r.rmse_ci.map(x=>({label:x.method,value:x.mean,lo:x.lo,hi:x.hi})).sort((a,b)=>a.value-b.value);
+  const lens=r.by_length.length?Object.keys(r.by_length[0]).filter(k=>k!=="method"):[];
+  out.innerHTML=`<div class="card"><h2>Ranking <span class="mute small">hold-out design: ${esc(r.design)}</span></h2>
+    <div class="row"><label>Use case (weights of the metric groups)<select id="preset">${r.presets.map(p=>`<option ${p===r.preset?"selected":""}>${p}</option>`).join("")}</select></label>
+    <a class="ghost btn" id="rep-link" href="/api/report?job=${S.jobCompare}" download>Download HTML report</a></div>
+    <p style="margin-top:12px">Best for this use case: ${r.best.map(b=>`<span class="chip good">${esc(b)}</span>`).join(" ")}</p>
+    <div id="rank-tab">${rankTable(rk,groups)}</div>
+    <p class="mute small">Cells are mean ranks (1 = best) within each metric group, shaded darker for better ranks; the weighted column is their weighted mean for the chosen use case. <b>fill_share</b> is the share of the hidden values the method filled itself (1 = all). A method that leaves some empty, such as a spline limited to short gaps or a rating curve where the stage is missing, is scored with linear interpolation on the rest, as it would be in a fill cascade.</p></div>
+    <div class="card"><h2>Error by method</h2>${barChart(rmse,{label:"RMSE"})}<p class="mute small">RMSE with a 95 % bootstrap interval over repetitions (orange whiskers). Lower is better.</p></div>
+    <div class="card"><h2>Metrics</h2>${table(r.summary,null,{left:["method"],digits:3})}</div>
+    ${lens.length?`<div class="card"><h2>RMSE by gap length (steps)</h2>${table(r.by_length,["method",...lens],{left:["method"],digits:3})}</div>`:""}
+    <div class="card"><h2>Time and failures</h2>${table(r.timing.map?r.timing:Object.entries(r.timing).map(([m,s])=>({method:m,seconds:s})),null,{left:["method"]})}
+    ${r.errors.length?`<h3>Methods that failed</h3>${table(r.errors,null,{left:["method","error"]})}`:""}
+    <div class="actions"><button class="primary" id="go-fill" type="button">Fill with the best methods</button></div></div>`;
+  $("#preset").onchange=async e=>{const rr=await api("/api/rank",{job:S.jobCompare,preset:e.target.value});r.preset=rr.preset;r.best=rr.best;r.ranking=rr.ranking;showCompare(r)};
+  $("#go-fill").onclick=()=>{S.fillMethods=r.best.concat(["linear"]);show("fill");drawFill()};
+}
+function rankTable(rk,groups){return table(rk,["method",...groups,"weighted_rank"],{left:["method"],digits:3,names:{weighted_rank:"weighted"},heat:{cols:[...groups,"weighted_rank"],low:true}})}
+/* ---------- 5 fill ---------- */
+function drawFill(){
+  const box=$("#t-fill");if(!need(box))return;const ms=S.fillMethods||(S.comp?S.comp.best.concat(["linear"]):(S.sug?S.sug.table.slice(0,3).map(m=>m.method):[]));
+  box.innerHTML=`<div class="card"><h2>Fill the gaps</h2><p class="mute small">Methods are applied in order: the first fills every gap it can, the next fills what is left. Observed values are never changed.</p>
+    <div class="row"><label>Methods in order<input type="text" id="f-methods" style="min-width:min(460px,80vw)" value="${esc(ms.join(", "))}"></label><button class="primary" id="f-go" type="button">Fill</button></div><div id="f-prog" style="margin-top:12px"></div></div><div id="f-out"></div>`;
+  $("#f-go").onclick=runFill;if(S.fill)showFill(S.fill);
+}
+async function runFill(){
+  const out=$("#f-out"),pg=$("#f-prog");const ms=$("#f-methods").value.split(",").map(s=>s.trim()).filter(Boolean);if(!ms.length){say(out,"Name at least one method.","err");return}
+  $("#f-go").disabled=true;pg.innerHTML='<progress></progress>';out.innerHTML="";
+  try{const {job}=await api("/api/fill",Object.assign(settings(),{methods:ms}));const r=await poll(job);S.fill=r;pg.innerHTML="";showFill(r);done("fill")}catch(e){pg.innerHTML="";say(out,esc(e.message),"err")}$("#f-go").disabled=false;
+}
+function showFill(r){
+  const out=$("#f-out");const chart=lineChart([{t:r.observed.t,mean:r.observed.mean,lo:r.observed.lo,hi:r.observed.hi,miss:r.observed.miss,label:"observed"},
+    ...(r.lo&&r.hi?[{t:r.lo.t,lo:r.lo.mean,hi:r.hi.mean,color:"var(--fill)",band:.18}]:[]),
+    {t:r.filled.t,mean:r.filled.mean,lo:r.filled.lo,hi:r.filled.hi,color:"var(--fill)",label:"filled",width:1.8}],{shade:true});
+  out.innerHTML=`<div class="card"><h2>Result</h2>
+    <div class="grid"><div class="stat"><b>${r.n_filled}</b>steps filled</div><div class="stat"><b>${r.n_missing}</b>still missing</div><div class="stat"><b>${Object.keys(r.counts).length}</b>methods used</div></div>
+    <p>${Object.entries(r.counts).map(([m,n])=>`<span class="chip">${esc(m)}: ${n}</span>`).join(" ")}</p>
+    ${r.notes.map(n=>`<div class="note">${esc(n)}</div>`).join("")}
+    ${r.truth_check?`<div class="note ok">The example data come with the true values: RMSE of the filled steps is ${fmt(r.truth_check.rmse)} and the mean error ${fmt(r.truth_check.bias)} (n = ${r.truth_check.n}).</div>`:""}
+    ${chart}<p class="mute small">Hatched bands show where the observed record had gaps. Orange is filled; the band around it, when present, is the interval of the method.</p>
+    <div class="actions"><a class="primary btn" href="/api/download?id=${r.fill_id}" download>Download filled table (CSV)</a>
+    ${S.jobCompare?`<a class="ghost btn" href="/api/report?job=${S.jobCompare}&fill=${r.fill_id}" download>Download HTML report</a>`:""}</div></div>`;
+  if(S.rec){S.rec.fill={series:r.filled,n_filled:r.n_filled,n_missing:r.n_missing};setRecord()}
+}
+/* ---------- 6 validate two series ---------- */
+function refreshSelectors(){
+  if(!S.ds)return;const cols=S.ds.columns.map(c=>c.name);
+  const v=$("#v-obs");if(v&&!v.dataset.f){["v-obs","v-sim"].forEach((id,i)=>{$("#"+id).innerHTML=opts(cols,cols[Math.min(i,cols.length-1)])});v.dataset.f=1;["m-obs","m-x","m-pet"].forEach(id=>{const e=$("#"+id);if(e)e.innerHTML=opts(cols,id==="m-x"?cols[Math.min(1,cols.length-1)]:cols[0],id==="m-pet"?"default seasonal curve":null)})}
+  const r=$("#r-stage");if(r&&!r.dataset.f){r.innerHTML=opts(cols,null,"none");r.dataset.f=1}
+}
+function drawVal(){
+  $("#t-val").innerHTML=`<div class="card"><h2>Validate one series against another</h2>
+    <p class="mute small">For an observation and a simulation (model output, a product, a second gauge, a rating curve). Uses the table loaded on the Data page: choose the two columns. The tool aligns them, looks for a time lag, a unit factor or a datum offset, then reports metrics with block-bootstrap intervals and qualitative ratings, and tests which correction helps under cross-validation.</p>
+    <div class="row fields"><label>Observed<select id="v-obs"></select></label><label>Simulated<select id="v-sim"></select></label>
+    <label>Variable<select id="v-var"><option>generic</option><option>streamflow</option><option>rainfall</option><option>temperature</option><option>sediment</option><option>groundwater</option><option>tide</option></select></label>
+    <label>If steps differ<select id="v-how"><option value="mean">average</option><option value="sum">sum</option></select></label>
+    <label>Rating thresholds<select id="v-th"><option value="moriasi2015">Moriasi 2015 (daily and monthly)</option><option value="moriasi2007">Moriasi 2007 (monthly)</option></select></label>
+    <label>Correction test<select id="v-scheme"><option>blocked_kfold</option><option>split_sample_swap</option><option>rolling_origin</option><option>leave_one_year_out</option><option>differential</option></select></label></div>
+    <div class="actions" style="align-items:center"><label class="inline"><input type="checkbox" id="v-lag"> remove a detected lag</label><button class="primary" id="v-go" type="button">Validate</button></div><div id="v-msg"></div></div><div id="v-out"></div>
+    <div class="card"><h2>Calibrate a built-in model</h2>
+    <p class="mute small">Fit the parameters of a power-law rating curve, a linear reservoir or GR4J to an observed series, with split-sample or cross-validation. The report shows calibration and validation scores side by side and warns about parameters that do not transfer and about many equally good parameter sets.</p>
+    <div class="row fields"><label>Model<select id="m-model"><option value="rating">power-law rating (needs stage)</option><option value="linear_reservoir">linear reservoir (needs rainfall)</option><option value="gr4j">GR4J (needs rainfall)</option></select></label>
+    <label>Observed<select id="m-obs"></select></label><label>Input series (stage or rainfall)<select id="m-x"></select></label><label>Evaporation (GR4J)<select id="m-pet"></select></label>
+    <label>Scheme<select id="m-scheme"><option>split_sample_swap</option><option>split_sample</option><option>differential</option><option>blocked_kfold</option><option>rolling_origin</option></select></label>
+    <label>Objective<select id="m-obj"><option>kge</option><option>nse</option><option>nse_logmix</option><option>log_nse</option><option>rmse</option></select></label>
+    <label>Optimiser<select id="m-opt"><option value="de">differential evolution</option><option value="sce">shuffled complex</option><option value="lhs">Latin hypercube + simplex</option></select></label>
+    <label>Runs<input type="number" id="m-bud" value="1200" step="100" min="200"></label><label>Warm-up steps<input type="number" id="m-warm" value="0" min="0"></label></div>
+    <div class="actions"><button class="primary" id="m-go" type="button">Calibrate and validate</button></div><div id="m-prog"></div><div id="m-out"></div></div>`;
+  refreshSelectors();$("#v-go").onclick=runVal;$("#m-go").onclick=runCal;
+}
+const chipFor=r=>r?`<span class="chip ${/very good|good/.test(r)?"good":/satisf|fair/.test(r)?"fair":"bad"}">${esc(r)}</span>`:"";
+async function runVal(){
+  const out=$("#v-out");if(!S.ds){say($("#v-msg"),"Load data on the Data page first.","err");return}$("#v-go").disabled=true;out.innerHTML='<div class="card"><progress></progress></div>';
+  try{const r=await api("/api/calval",{id:S.ds.id,obs:$("#v-obs").value,sim:$("#v-sim").value,variable:$("#v-var").value,how:$("#v-how").value,thresholds:$("#v-th").value,scheme:$("#v-scheme").value,apply_lag:$("#v-lag").checked});
+    const tab=r.validation.filter(x=>["nse","kge","kge2012","pbias","rsr","rmse","mae","bias","pearson","log_nse","npkge"].includes(x.metric));
+    out.innerHTML=`<div class="card"><h2>Alignment</h2>${r.notes.length?r.notes.map(n=>`<div class="note">${esc(n)}</div>`).join(""):'<div class="note ok">No time lag, unit factor or datum offset found.</div>'}
+      ${r.lag_curve?`<details><summary>Correlation by lag</summary>${lagChart(r.lag_curve)}</details>`:""}</div>
+      <div class="card"><h2>Validation <span class="mute small">ratings: ${esc(r.thresholds_source)}</span></h2>
+      ${r.val_notes.map(n=>`<div class="note">${esc(n)}</div>`).join("")}
+      ${table(tab,["metric","value","low","high","rating"],{left:["metric","rating"],html:{rating:chipFor},names:{metric:"Metric",value:"Value",low:"5 %",high:"95 %",rating:"Rating"}})}
+      <details><summary>All metrics</summary>${table(r.validation,["metric","value","low","high"],{left:["metric"]})}</details></div>
+      <div class="card"><h2>Series</h2>${lineChart([{t:r.obs.t,mean:r.obs.mean,lo:r.obs.lo,hi:r.obs.hi,label:"observed"},{t:r.sim.t,mean:r.sim.mean,lo:r.sim.lo,hi:r.sim.hi,color:"var(--fill)",label:"simulated"}])}
+      <div style="max-width:440px;margin-top:10px">${scatterChart(r.scatter.obs,r.scatter.sim)}</div></div>
+      <div class="card"><h2>Which correction helps? <span class="mute small">cross-validated, ${esc($("#v-scheme").value)}</span></h2>${table(r.corrections,null,{left:["correction","note"]})}
+      <p class="mute small">Higher NSE and KGE and lower RMSE are better. A correction is only worth applying if it wins on periods it was not fitted to.</p></div>`;
+  }catch(e){out.innerHTML="";say($("#v-msg"),esc(e.message),"err")}$("#v-go").disabled=false;
+}
+async function runCal(){
+  const out=$("#m-out"),pg=$("#m-prog");if(!S.ds){say(out,"Load data on the Data page first.","err");return}$("#m-go").disabled=true;out.innerHTML="";pg.innerHTML='<progress></progress><div class="small mute" style="margin-top:4px">Calibrating: this can take a minute or more.</div>';
+  try{const {job}=await api("/api/calibrate",{id:S.ds.id,model:$("#m-model").value,obs:$("#m-obs").value,x:$("#m-x").value,pet:$("#m-pet").value||undefined,scheme:$("#m-scheme").value,objective:$("#m-obj").value,method:$("#m-opt").value,budget:+$("#m-bud").value,warmup:+$("#m-warm").value});
+    const r=await poll(job);pg.innerHTML="";
+    out.innerHTML=`<h3>Calibration and validation by split</h3>${table(r.table,null,{left:["split","metric"]})}
+      ${r.warnings.map(w=>`<div class="note">${esc(w)}</div>`).join("")}
+      <h3>Parameters of each split</h3>${table(r.params,null,{left:["split"]})}
+      <h3>Final fit on all data</h3><p>${Object.entries(r.final||{}).map(([k,v])=>`<span class="chip">${esc(k)} = ${fmt(v,4)}</span>`).join(" ")}</p>
+      <p class="mute small">Width of the best 5 % of parameter sets as a share of the search range: ${Object.entries(r.spread||{}).map(([k,v])=>`${esc(k)} ${fmt(100*v,2)} %`).join(", ")}. Wide values mean the parameter is poorly identified.</p>
+      ${r.sim?lineChart([{t:r.obs.t,mean:r.obs.mean,lo:r.obs.lo,hi:r.obs.hi,label:"observed"},{t:r.sim.t,mean:r.sim.mean,lo:r.sim.lo,hi:r.sim.hi,color:"var(--fill)",label:"model"}]):""}
+      ${r.validation?`<h3>Metrics of the final fit</h3>${table(r.validation.filter(x=>["nse","kge","pbias","rsr","rmse"].includes(x.metric)),["metric","value","low","high","rating"],{left:["metric","rating"],html:{rating:chipFor}})}`:""}`;
+  }catch(e){pg.innerHTML="";say(out,esc(e.message),"err")}$("#m-go").disabled=false;
+}
+/* ---------- 7 rating ---------- */
+/* The rating-curve editor: gaugings, the automatic fit as a reference, and a manual curve of 1-3 segments
+   Q = C (h - e)^n that the plot, the residuals and the statistics follow as the numbers change. */
+const RT={g:null,fit:null,segs:[],cont:true,view:"lin",from:"",to:"",use:false};
+function rtSorted(){return RT.segs.map(s=>Object.assign({},s)).sort((x,y)=>(x.h_from==null?-1e99:x.h_from)-(y.h_from==null?-1e99:y.h_from))}
+function rtQ(h,segs){let s=segs[0];for(let i=1;i<segs.length;i++){if(h>=segs[i].h_from)s=segs[i];else break}const d=h-s.h0;return d>0?s.a*Math.pow(d,s.b):0}
+/* continuity: the C of every upper segment follows from the segment below at the break stage */
+function rtSegs(){const out=rtSorted();out[0].h_from=null;if(RT.cont)for(let i=1;i<out.length;i++){const hb=out[i].h_from,qb=rtQ(hb-1e-9,out.slice(0,i)),d=hb-out[i].h0;if(d>0&&qb>0)out[i].a=qb/Math.pow(d,out[i].b)}return out}
+function rtFromFit(f){const h0=f.h0[f.h0.length-1],segs=[{h_from:null,a:f.a,h0,b:f.b1}];if(f.b2&&f.hb)segs.push({h_from:f.hb,a:f.a*Math.pow(f.hb-h0,f.b1-f.b2),h0,b:f.b2});return segs}
+function rtInRange(p){const d=String(p.date).slice(0,10);return(!RT.from||d>=RT.from)&&(!RT.to||d<=RT.to)}
+function rtStats(segs){
+  const e=[];RT.g.forEach(p=>{if(!rtInRange(p))return;const qc=rtQ(p.stage,segs);if(qc>0)e.push(100*(p.gauged-qc)/qc)});
+  const n=e.length,k=3*segs.length;if(!n)return null;const m=e.reduce((a,b)=>a+b,0)/n;
+  return{n,bias:m,se:Math.sqrt(e.reduce((a,b)=>a+b*b,0)/Math.max(n-k,1)),w5:100*e.filter(v=>Math.abs(v)<=5).length/n,w10:100*e.filter(v=>Math.abs(v)<=10).length/n,max:Math.max(...e.map(Math.abs))}}
+function rtEquation(segs){return segs.map((s,i)=>`Q = ${fmt(s.a,5)} (h ${s.h0<0?"+ "+fmt(-s.h0,4):"- "+fmt(s.h0,4)})^${fmt(s.b,4)}`+(segs.length>1?(i===0?`   for h < ${fmt(segs[1].h_from,4)}`:`   for h ≥ ${fmt(s.h_from,4)}`):"")).join("\n")}
+function rtYearColor(y,y0,y1){const t=y1>y0?(y-y0)/(y1-y0):1;return `hsl(${210-170*t} 70% ${58-18*t}%)`}
+function rtPlot(){
+  const segs=rtSegs(),g=RT.g,log=RT.view==="log",W=640,H=380,L=60,R=14,Tp=12,B=40;
+  const hs=g.map(p=>p.stage),hmin=Math.min(...hs),hmax=Math.max(...hs),span=Math.max(hmax-hmin,0.1),e1=segs[0].h0;
+  const yTop=hmax+0.18*span,yBot=Math.min(hmin-0.05*span,Math.max(e1,hmin-0.6*span));
+  const curve=[];for(let i=0;i<=220;i++){const h=yBot+(yTop-yBot)*i/220;const q=rtQ(h,segs);if(q>0)curve.push([h,q])}
+  const qAll=g.map(p=>p.gauged).concat(curve.map(c=>c[1]));const qmax=Math.max(...qAll)*1.04;
+  const years=g.map(p=>+String(p.date).slice(0,4)),y0=Math.min(...years),y1=Math.max(...years);
+  let X,Y,xt,yt,ylab,qlo=0,dlo=0;
+  if(!log){X=q=>L+(W-L-R)*q/qmax;Y=h=>Tp+(H-Tp-B)*(1-(h-yBot)/(yTop-yBot));xt=niceTicks(0,qmax);yt=niceTicks(yBot,yTop);ylab="stage h"}
+  else{const pos=g.filter(p=>p.stage>e1&&p.gauged>0);qlo=Math.min(...pos.map(p=>p.gauged))/1.6;dlo=Math.max(Math.min(...pos.map(p=>p.stage-e1))/1.6,1e-4);const dhi=(yTop-e1)*1.05;
+    X=q=>L+(W-L-R)*(Math.log10(Math.max(q,qlo))-Math.log10(qlo))/(Math.log10(qmax)-Math.log10(qlo));Y=h=>Tp+(H-Tp-B)*(1-(Math.log10(Math.max(h-e1,dlo))-Math.log10(dlo))/(Math.log10(dhi)-Math.log10(dlo)));
+    const dec=(a,b)=>{const o=[];for(let k=Math.floor(Math.log10(a));k<=Math.ceil(Math.log10(b));k++)[1,2,5].forEach(m=>{const v=m*Math.pow(10,k);if(v>=a&&v<=b)o.push(v)});return o};
+    xt=dec(qlo,qmax);yt=dec(dlo,dhi).map(d=>d+e1);ylab=`h − e (e = ${fmt(e1,4)}), log`}
+  let s=`<svg class="chart rt-plot" viewBox="0 0 ${W} ${H}" role="img" aria-label="rating curve"><rect x="${L}" y="${Tp}" width="${W-L-R}" height="${H-Tp-B}" style="fill:var(--sheet);stroke:var(--rule)"/>`;
+  xt.forEach(v=>{s+=`<line x1="${X(v)}" x2="${X(v)}" y1="${Tp}" y2="${H-B}" style="stroke:var(--grid)"/><text x="${X(v)}" y="${H-B+15}" text-anchor="middle">${fmt(v,3)}</text>`});
+  yt.forEach(v=>{if(Y(v)<Tp-1||Y(v)>H-B+1)return;s+=`<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" style="stroke:var(--grid)"/><text x="${L-6}" y="${Y(v)+4}" text-anchor="end">${fmt(log?v-e1:v,3)}</text>`});
+  s+=`<line x1="${L}" x2="${W-R}" y1="${Y(hmax)}" y2="${Y(hmax)}" style="stroke:var(--mute)" stroke-dasharray="2 4"/><text x="${W-R-4}" y="${Y(hmax)-5}" text-anchor="end" class="rt-lbl">highest gauging · above it the curve is extrapolated</text>`;
+  segs.slice(1).forEach((sg,i)=>{s+=`<line x1="${L}" x2="${W-R}" y1="${Y(sg.h_from)}" y2="${Y(sg.h_from)}" style="stroke:var(--fill)" stroke-dasharray="6 3" stroke-width="1.2"/><text x="${L+6}" y="${Y(sg.h_from)-5}" class="rt-lbl" style="fill:var(--fill)">break ${i+1}: h = ${fmt(sg.h_from,4)}</text>`});
+  if(RT.fit&&RT.fit.curve){const pts=RT.fit.curve.h.map((h,i)=>[h,RT.fit.curve.q[i]]).filter(p=>p[1]>0&&p[0]>=yBot&&p[0]<=yTop&&(!log||(p[1]>=qlo&&p[0]-e1>=dlo)));s+=`<polyline fill="none" style="stroke:var(--mute)" stroke-width="1.4" stroke-dasharray="5 4" points="${pts.map(p=>X(p[1])+","+Y(p[0])).join(" ")}"/>`}
+  const shown=log?curve.filter(c=>c[1]>=qlo&&c[0]-e1>=dlo):curve;  /* a log axis cannot show the drop to zero flow */
+  const inR=shown.filter(c=>c[0]<=hmax),outR=shown.filter(c=>c[0]>=hmax);
+  s+=`<polyline fill="none" style="stroke:var(--ink)" stroke-width="2.4" points="${inR.map(c=>X(c[1])+","+Y(c[0])).join(" ")}"/><polyline fill="none" style="stroke:var(--ink)" stroke-width="2.4" stroke-dasharray="7 4" points="${outR.map(c=>X(c[1])+","+Y(c[0])).join(" ")}"/>`;
+  g.forEach(p=>{if(log&&p.stage<=e1)return;const on=rtInRange(p),qc=rtQ(p.stage,segs),err=qc>0?100*(p.gauged-qc)/qc:NaN;
+    s+=`<circle cx="${X(p.gauged)}" cy="${Y(p.stage)}" r="${on?4:3}" style="${on?`fill:${rtYearColor(+String(p.date).slice(0,4),y0,y1)};stroke:var(--sheet)`:"fill:none;stroke:var(--mute)"}" stroke-width="1"><title>${esc(String(p.date).slice(0,10))}  h ${fmt(p.stage,4)}  Q ${fmt(p.gauged,4)}\ncurve ${fmt(qc,4)}  error ${isFinite(err)?fmt(err,3)+" %":"–"}${on?"":"\n(outside the chosen period)"}</title></circle>`});
+  s+=`<text x="${(L+W-R)/2}" y="${H-6}" text-anchor="middle">discharge Q${log?" (log)":""}</text><text transform="translate(14 ${(Tp+H-B)/2}) rotate(-90)" text-anchor="middle">${esc(ylab)}</text></svg>`;
+  // residuals: percent deviation of each gauging from the curve, against stage
+  const RW=640,RH=180,rL=60,rB=34,rT=10,ev=g.map(p=>{const qc=rtQ(p.stage,segs);return qc>0?{h:p.stage,e:100*(p.gauged-qc)/qc,on:rtInRange(p),y:+String(p.date).slice(0,4)}:null}).filter(Boolean);
+  const em=Math.max(15,...ev.map(v=>Math.min(Math.abs(v.e),80)))*1.1,RX=h=>rL+(RW-rL-R)*(h-hmin+0.02*span)/(span*1.04),RY=v=>rT+(RH-rT-rB)*(1-(Math.max(-em,Math.min(em,v))+em)/(2*em));
+  let r=`<svg class="chart rt-res" viewBox="0 0 ${RW} ${RH}" role="img" aria-label="residuals"><rect x="${rL}" y="${rT}" width="${RW-rL-R}" height="${RH-rT-rB}" style="fill:var(--sheet);stroke:var(--rule)"/>`;
+  r+=`<rect x="${rL}" y="${RY(10)}" width="${RW-rL-R}" height="${RY(-10)-RY(10)}" style="fill:rgba(var(--hot-rgb),.07)"/><rect x="${rL}" y="${RY(5)}" width="${RW-rL-R}" height="${RY(-5)-RY(5)}" style="fill:rgba(var(--hot-rgb),.1)"/>`;
+  niceTicks(-em,em,4).forEach(v=>{r+=`<text x="${rL-6}" y="${RY(v)+4}" text-anchor="end">${fmt(v,3)}</text>`});r+=`<line x1="${rL}" x2="${RW-R}" y1="${RY(0)}" y2="${RY(0)}" style="stroke:var(--ink)"/>`;
+  niceTicks(hmin,hmax,6).forEach(v=>{r+=`<text x="${RX(v)}" y="${RH-rB+14}" text-anchor="middle">${fmt(v,3)}</text>`});
+  ev.forEach(v=>{r+=`<circle cx="${RX(v.h)}" cy="${RY(v.e)}" r="${v.on?3.4:2.6}" style="${v.on?`fill:${rtYearColor(v.y,y0,y1)}`:"fill:none;stroke:var(--mute)"}"/>`});
+  r+=`<text x="${(rL+RW-R)/2}" y="${RH-4}" text-anchor="middle">stage h · shaded ±5 % and ±10 %</text><text transform="translate(14 ${(rT+RH-rB)/2}) rotate(-90)" text-anchor="middle">error %</text></svg>`;
+  $("#rt-plot").innerHTML=s;$("#rt-res").innerHTML=r;
+  $("#rt-years").innerHTML=`<span class="rt-ramp" style="background:linear-gradient(90deg,${rtYearColor(y0,y0,y1)},${rtYearColor(y1,y0,y1)})"></span> gaugings ${y0} → ${y1}`;
+  const st=rtStats(segs);
+  $("#rt-stats").innerHTML=st?`<div class="stat"><b>${st.n}</b>gaugings used</div><div class="stat"><b>${fmt(st.bias,2)} %</b>mean deviation</div><div class="stat"><b>${fmt(st.se,3)} %</b>standard error</div><div class="stat"><b>${fmt(st.w5,3)} %</b>within ±5 %</div><div class="stat"><b>${fmt(st.w10,3)} %</b>within ±10 %</div>`:'<p class="mute">No gaugings in the chosen period.</p>';
+  $("#rt-eq").textContent=rtEquation(segs);
+  segs.forEach((sg,i)=>{const c=$(`#rt-a-${i}`),sl=$(`#rt-as-${i}`);if(c&&RT.cont&&i>0){c.value=+sg.a.toPrecision(6);c.disabled=true;if(sl){sl.value=Math.log10(sg.a);sl.disabled=true}}else if(c){c.disabled=false;if(sl)sl.disabled=false}});
+  if(RT.use)rtPush();
+}
+function rtSlider(id,v,lo,hi,step,disabled){return `<input type="range" id="${id}" min="${lo}" max="${hi}" step="${step}" value="${v}"${disabled?" disabled":""}>`}
+function rtDrawSegments(){
+  const g=RT.g,hs=g.map(p=>p.stage),hmin=Math.min(...hs),hmax=Math.max(...hs),span=Math.max(hmax-hmin,0.1),segs=rtSegs();RT.segs=segs;
+  $("#rt-segs").innerHTML=segs.map((sg,i)=>{const la=Math.log10(sg.a);return `<fieldset class="rt-seg"><legend>Segment ${i+1}${i===0?" (lowest)":""}</legend>
+    <label>From stage h${i===0?`<input type="number" value="" placeholder="lowest" disabled>`:`<input type="number" id="rt-hf-${i}" step="any" value="${+sg.h_from.toPrecision(6)}">${rtSlider("rt-hfs-"+i,sg.h_from,hmin,hmax,span/400)}`}</label>
+    <label>C (coefficient)<input type="number" id="rt-a-${i}" step="any" value="${+sg.a.toPrecision(6)}"${RT.cont&&i>0?" disabled":""}>${rtSlider("rt-as-"+i,la,la-1.5,la+1.5,0.005,RT.cont&&i>0)}</label>
+    <label>e (stage of zero flow)<input type="number" id="rt-e-${i}" step="any" value="${+sg.h0.toPrecision(6)}">${rtSlider("rt-es-"+i,sg.h0,Math.min(hmin-3*span,sg.h0),hmin+0.3*span,span/800)}</label>
+    <label>n (exponent)<input type="number" id="rt-n-${i}" step="0.01" value="${+sg.b.toPrecision(5)}">${rtSlider("rt-ns-"+i,sg.b,0.5,4.5,0.005)}</label></fieldset>`}).join("");
+  segs.forEach((sg,i)=>{
+    const bind=(numId,sliderId,key,fromSlider)=>{const n=$("#"+numId),s=sliderId?$("#"+sliderId):null;
+      const set=v=>{if(!isFinite(v))return;RT.segs[i][key]=v;rtPlot()};
+      if(n)n.oninput=()=>{const v=parseFloat(n.value);if(s)s.value=key==="a"?Math.log10(v):v;set(v)};
+      if(s)s.oninput=()=>{const v=fromSlider(parseFloat(s.value));if(n)n.value=+v.toPrecision(6);set(v)}};
+    if(i>0)bind(`rt-hf-${i}`,`rt-hfs-${i}`,"h_from",v=>v);
+    bind(`rt-a-${i}`,`rt-as-${i}`,"a",v=>Math.pow(10,v));bind(`rt-e-${i}`,`rt-es-${i}`,"h0",v=>v);bind(`rt-n-${i}`,`rt-ns-${i}`,"b",v=>v)});
+  $("#rt-del").disabled=segs.length<2;$("#rt-add").disabled=segs.length>=3;rtPlot();
+}
+function rtPush(){S.manualRating={segments:rtSegs().map(s=>({h_from:s.h_from,a:s.a,h0:s.h0,b:s.b}))}}
+/* ---- fitting the segments to the gaugings (least squares in log space, gaugings of the chosen period) ----
+   Free segment: for each trial e, ln Q = ln C + n ln(h - e) is a straight line (closed form); e is searched.
+   Anchored segment (continuity): the curve must pass through the end of the segment below, (hb, Qb), so
+   ln Q - ln Qb = n [ln(h - e) - ln(hb - e)] and C follows; e is searched, n is closed form. */
+function rtPts(){return RT.g.filter(p=>rtInRange(p)&&p.gauged>0).map(p=>({h:p.stage,lq:Math.log(p.gauged)})).sort((a,b)=>a.h-b.h)}
+function rtFitSeg(pts,eLo,eHi,anchor){
+  const tryE=e=>{let sx=0,sy=0,sxx=0,sxy=0,n=0;const L=[];
+    for(const p of pts){const d=p.h-e;if(d<=0)return null;const x=anchor?Math.log(d)-Math.log(anchor.hb-e):Math.log(d),y=anchor?p.lq-anchor.lq:p.lq;L.push([x,y]);sx+=x;sy+=y;sxx+=x*x;sxy+=x*y;n++}
+    let b,la;if(anchor){if(!(sxx>0))return null;b=sxy/sxx;la=anchor.lq-b*Math.log(anchor.hb-e)}else{const den=n*sxx-sx*sx;if(!(den>0))return null;b=(n*sxy-sx*sy)/den;la=(sy-b*sx)/n}
+    if(!(b>=0.8&&b<=4.5))return null;let sse=0;  /* natural controls have n of roughly 1 to 3.5; outside 0.8-4.5 the fit is not physical */for(const [x,y] of L){const r=anchor?y-b*x:y-(la+b*x);sse+=r*r}return{e,a:Math.exp(la),b,sse}};
+  let best=null;const G=120;for(let i=0;i<=G;i++){const r=tryE(eLo+(eHi-eLo)*i/G);if(r&&(!best||r.sse<best.sse))best=r}
+  if(!best)return null;let step=(eHi-eLo)/G;  /* refine around the best e */
+  for(let k=0;k<30;k++){step/=2;for(const e of [best.e-step,best.e+step]){if(e<eLo||e>eHi)continue;const r=tryE(e);if(r&&r.sse<best.sse)best=r}}
+  return best}
+/* fit every segment for the given break stages; returns {segs, sse, n} or {error} */
+function rtFitBreaks(breaks,pts){
+  pts=pts||rtPts();const all=pts.map(p=>p.h),span=Math.max(all[all.length-1]-all[0],0.1),bounds=[-Infinity].concat(breaks,[Infinity]),out=[];let sse=0;
+  for(let i=0;i<bounds.length-1;i++){
+    const sp=pts.filter(p=>p.h>=bounds[i]&&p.h<bounds[i+1]);if(sp.length<4)return{error:`segment ${i+1} has ${sp.length} gaugings in the chosen period (at least 4 are needed)`};
+    const hmin=sp[0].h,eHi=hmin-0.002*span,eLo=hmin-3*span;let anchor=null;
+    if(i>0&&RT.cont){const hb=breaks[i-1],q=rtQ(hb-1e-9,out);if(q>0)anchor={hb,lq:Math.log(q)}}
+    const f=rtFitSeg(sp,Math.min(eLo,anchor?anchor.hb-3*span:eLo),Math.min(eHi,anchor?anchor.hb-0.002*span:eHi),anchor);
+    if(!f)return{error:`no power law fits segment ${i+1}; move its break`};
+    out.push({h_from:i?breaks[i-1]:null,a:f.a,h0:f.e,b:f.b});sse+=f.sse}
+  /* an exponent pinned at its limit means the gaugings of that segment do not follow a power law of their own */
+  const atLimit=out.map((s,i)=>s.b<0.82||s.b>4.4?i+1:0).filter(Boolean);
+  return{segs:out,sse,n:pts.length,atLimit}}
+/* best break stages for k segments: candidates between the 12th and 92nd percentile of the gauged stages, at least 6 gaugings each */
+function rtBestBreaks(k,pts){
+  pts=pts||rtPts();if(k<2)return rtFitBreaks([],pts);const hs=pts.map(p=>p.h),n=hs.length,MIN=6,cand=[];
+  for(let i=0;i<=28;i++){const q=0.12+0.8*i/28,v=hs[Math.min(n-1,Math.floor(q*n))];if(!cand.length||v>cand[cand.length-1]+1e-9)cand.push(v)}
+  const ok=br=>{const b=[-Infinity].concat(br,[Infinity]);for(let i=0;i<b.length-1;i++)if(hs.filter(h=>h>=b[i]&&h<b[i+1]).length<MIN)return false;return true};
+  let best=null;const consider=br=>{if(!ok(br))return;const r=rtFitBreaks(br,pts);if(!r.error&&!r.atLimit.length&&(!best||r.sse<best.sse))best=r};
+  if(k===2)cand.forEach(c=>consider([c]));else for(let i=0;i<cand.length;i++)for(let j=i+1;j<cand.length;j++)consider([cand[i],cand[j]]);
+  return best||{error:`no ${k}-segment curve fits these gaugings with physical exponents (n between 0.8 and 4.5) and at least ${MIN} gaugings per segment`}}
+/* BIC: n ln(SSE/n) + p ln n, p = 3 per segment plus each break, minus one per break when the curve is kept continuous */
+function rtBIC(r,k){const p=3*k+(k-1)-(RT.cont?(k-1):0);return r.n*Math.log(Math.max(r.sse,1e-12)/r.n)+p*Math.log(r.n)}
+async function rtAutoFit(){
+  const out=$("#rt-msg");say(out,"Fitting…");
+  try{const r=await api("/api/rating",{gaugings_id:S.gaug,segmented:$("#r-seg").checked,shifts:$("#r-shift").checked});
+    RT.fit=r;RT.g=r.residuals;say(out,"");return r}catch(e){say(out,esc(e.message),"err");return null}}
+function drawRate(){
+  $("#t-rate").innerHTML=`<div class="card"><h2>Gaugings</h2>
+    <p class="mute small">Stage-discharge measurements: columns date, stage, discharge (and optionally u_rel, the relative uncertainty). The examples “rating curve” and “sediment samples” include gaugings.</p>
+    <div class="row fields"><label>Gaugings file<input type="file" id="r-file" accept=".csv,.txt,.xlsx,.xls"></label>
+    <label>Stage series in the loaded data (to apply the curve)<select id="r-stage"></select></label></div>
+    <div class="actions" style="align-items:center"><label class="inline"><input type="checkbox" id="r-seg"> automatic fit: two segments</label><label class="inline"><input type="checkbox" id="r-shift"> detect shifts</label><button class="primary" id="r-go" type="button">Fit and open the editor</button><span class="small mute" id="r-have">${S.gaug?"Gaugings loaded":""}</span></div><div id="rt-msg"></div></div>
+    <div id="rt-editor"></div><div id="rty-card"></div><div id="r-out"></div>`;
+  refreshSelectors();$("#r-file").onchange=async e=>{try{const j=await uploadAux("gaugings",e.target.files[0]);S.gaug=j.id;$("#r-have").textContent="Gaugings loaded ("+j.n+" rows)"}catch(x){$("#r-have").textContent=x.message}};
+  $("#r-go").onclick=async()=>{if(!S.gaug){say($("#rt-msg"),"Load a gaugings file (or an example with gaugings) first.","err");return}
+    const r=await rtAutoFit();if(!r)return;RT.segs=rtFromFit(r);rtEditor();rtyCard()};
+}
+function rtEditor(){
+  const r=RT.fit,dates=RT.g.map(p=>String(p.date).slice(0,10)).sort();
+  $("#rt-editor").innerHTML=`<div class="card"><h2>Rating curve editor <span class="mute small">${esc(r.kind)} automatic fit as the starting point · ${r.n} gaugings</span></h2>
+    <p class="mute small">Each segment is Q = C (h − e)<sup>n</sup>, with e the stage of zero flow. Change a number or drag a slider: the curve, the residuals and the statistics follow at once. The dashed grey line is the automatic fit; points are coloured by year, so a shifting rating shows up as colour bands. Hover a point for its values.</p>
+    <div class="rt-grid">
+      <div class="rt-ctrl">
+        <div class="actions" style="margin-top:0"><button class="ghost" id="rt-reset" type="button">Start from the automatic fit</button><button class="ghost" id="rt-add" type="button">Add segment</button><button class="ghost" id="rt-del" type="button">Remove top segment</button></div>
+        <label class="inline"><input type="checkbox" id="rt-cont"${RT.cont?" checked":""}><span>keep the curve continuous at the breaks (upper C computed)</span></label>
+        <div class="actions" style="margin:10px 0 0"><button class="primary" id="rt-fitseg" type="button">Fit C, e, n to these segments</button><button class="ghost" id="rt-findbr" type="button">Find the best breaks</button></div>
+        <div id="rt-fitmsg" class="small"></div>
+        <details class="small mute" style="margin-top:6px"><summary>How the segments and breaks are set</summary>
+          <p>A segment covers the stages from its break up to the next break. <b>Add segment</b> places the new break at the median stage of the gaugings in the top segment (so both parts have data) and copies its C, e, n; nothing changes until you edit or fit it. Move a break by typing or with its slider.</p>
+          <p><b>Fit C, e, n</b> keeps your breaks and fits every segment to the gaugings of the chosen period: least squares on ln Q, with e searched below the segment's lowest gauging. With the curve kept continuous, an upper segment is fitted through the end of the segment below.</p>
+          <p><b>Find the best breaks</b> tries break stages between the 12th and 92nd percentile of the gauged stages (at least 6 gaugings per segment), fits each and keeps the best. It also compares 1, 2 and 3 segments with the Bayesian information criterion (BIC), which charges each extra parameter: a break is only advised when it lowers the BIC by 6 or more (strong evidence), because each segment claims a change of hydraulic control. Fits keep n between 0.8 and 4.5, the range of natural controls.</p></details>
+        <div id="rt-segs"></div>
+        <div class="row fields"><label>Gaugings from<input type="date" id="rt-from" value="${RT.from||dates[0]}" min="${dates[0]}" max="${dates[dates.length-1]}"></label><label>to<input type="date" id="rt-to" value="${RT.to||dates[dates.length-1]}" min="${dates[0]}" max="${dates[dates.length-1]}"></label></div>
+        <p class="mute small">Only the gaugings in this period count in the statistics (the others are drawn hollow). Use it to build the curve for the present state of the channel.</p>
+      </div>
+      <div class="rt-view">
+        <div class="actions" style="margin:0 0 6px"><label class="inline"><input type="radio" name="rt-view" value="lin"${RT.view==="lin"?" checked":""}> linear axes</label><label class="inline"><input type="radio" name="rt-view" value="log"${RT.view==="log"?" checked":""}> log-log (straight segments)</label><span class="small mute" id="rt-years"></span></div>
+        <div id="rt-plot"></div><div id="rt-res"></div>
+      </div>
+    </div>
+    <div class="grid" id="rt-stats"></div>
+    <pre class="rt-eq" id="rt-eq"></pre>
+    <div class="actions"><label class="inline"><input type="checkbox" id="rt-use"${RT.use?" checked":""}><span>use this curve as the method <b>rating_manual</b> in Compare and Fill</span></label></div>
+    <div class="actions"><button class="primary" id="rt-fill" type="button">Fill discharge gaps with this curve</button><button class="ghost" id="rt-apply" type="button">Apply to the stage series</button><button class="ghost" id="rt-table" type="button">Download rating table (CSV)</button><button class="ghost" id="rt-copy" type="button">Copy equation</button></div>
+    <div id="rt-apply-out"></div></div>`;
+  $("#rt-reset").onclick=()=>{RT.segs=rtFromFit(RT.fit);rtDrawSegments()};
+  $("#rt-add").onclick=()=>{const sg=rtSegs(),top=sg[sg.length-1],from=top.h_from==null?-Infinity:top.h_from;
+    /* new break at the median stage of the gaugings (chosen period) in the top segment; 60 % of its stage range if it holds too few */
+    const inTop=rtPts().map(p=>p.h).filter(h=>h>=from),all=RT.g.map(p=>p.stage),lo=Math.max(from,Math.min(...all)),hi=Math.max(...all);
+    const hb=inTop.length>=8?inTop[Math.floor(inTop.length/2)]:lo+0.6*(hi-lo);
+    RT.segs=sg.concat([{h_from:+hb.toPrecision(5),a:top.a,h0:top.h0,b:top.b}]);rtDrawSegments();
+    say($("#rt-fitmsg"),`Break ${sg.length} added at h = ${fmt(hb,4)}. Press <b>Fit C, e, n</b> to estimate the new segment, or <b>Find the best breaks</b>.`)};
+  $("#rt-fitseg").onclick=()=>{const sg=rtSegs(),br=sg.slice(1).map(s=>s.h_from),r=rtFitBreaks(br);
+    if(r.error){say($("#rt-fitmsg"),esc(r.error),"err");return}
+    RT.segs=r.segs;rtDrawSegments();
+    const warn=r.atLimit.length?` Segment ${r.atLimit.join(" and ")} has its exponent n at the limit: its gaugings do not follow a power law of their own, so that break is probably not real.`:"";
+    say($("#rt-fitmsg"),`Fitted ${r.segs.length} segment${r.segs.length>1?"s":""} to ${r.n} gaugings (spread in ln Q: ${fmt(Math.sqrt(r.sse/r.n),3)}).${warn}`,warn?"":"ok")};
+  $("#rt-findbr").onclick=()=>{const k=rtSegs().length,pts=rtPts(),res={},bic={};
+    for(let j=1;j<=3;j++){const r=rtBestBreaks(j,pts);if(!r.error){res[j]=r;bic[j]=rtBIC(r,j)}}
+    /* fewest segments whose BIC is within 6 of the lowest: each segment claims a change of hydraulic control, so only strong evidence (a drop of 6 or more, Kass and Raftery 1995) adds one */
+    const ks=Object.keys(bic).map(Number).sort((a,b)=>a-b),low=Math.min(...ks.map(j=>bic[j])),best=ks.find(j=>bic[j]<=low+6);
+    if(!res[k]){const ks2=Object.keys(bic).map(Number);say($("#rt-fitmsg"),esc((rtBestBreaks(k,pts)||{}).error||"no fit found")+(ks2.length?`. The gaugings support ${ks2.sort((a,b)=>bic[a]-bic[b])[0]} segment(s): remove the top segment and press Find again.`:""),"err");return}
+    RT.segs=res[k].segs;rtDrawSegments();
+    const line=Object.keys(bic).map(j=>`${j} segment${j>1?"s":""}: ${fmt(bic[j],4)}`).join(" · ");
+    const advice=best===k?`The gaugings support ${k} segment${k>1?"s":""}.`:`The gaugings support <b>${best} segment${best>1?"s":""}</b>: ${best>k?"the extra break lowers the BIC clearly. Add a segment":"more segments do not lower the BIC by 6 or more (strong evidence), so the simpler curve is preferred. Remove the top segment"} and press Find again.`;
+    say($("#rt-fitmsg"),`Best break${k>2?"s":""} for ${k} segment${k>1?"s":""}: ${k>1?res[k].segs.slice(1).map(s=>"h = "+fmt(s.h_from,4)).join(", "):"none needed"}. ${advice}<br><span class="mute">BIC (lower is better): ${line}</span>`,best===k?"ok":"")};
+  $("#rt-del").onclick=()=>{const sg=rtSegs();if(sg.length>1){RT.segs=sg.slice(0,-1);rtDrawSegments()}};
+  $("#rt-cont").onchange=e=>{RT.cont=e.target.checked;rtDrawSegments()};
+  document.querySelectorAll('input[name="rt-view"]').forEach(x=>x.onchange=()=>{RT.view=x.value;rtPlot()});
+  $("#rt-from").onchange=e=>{RT.from=e.target.value;rtPlot()};$("#rt-to").onchange=e=>{RT.to=e.target.value;rtPlot()};
+  $("#rt-use").onchange=e=>{RT.use=e.target.checked;if(RT.use)rtPush();else S.manualRating=null};
+  $("#rt-fill").onclick=()=>{if(!S.ds){say($("#rt-apply-out"),"Load the data with the discharge series to fill first (Data page).","err");return}
+    RT.use=true;$("#rt-use").checked=true;rtPush();S.fillMethods=["rating_manual"];$("#t-fill").innerHTML="";show("fill")};
+  $("#rt-apply").onclick=async()=>{const o=$("#rt-apply-out"),sc=$("#r-stage").value;if(!S.ds||!sc){say(o,"Choose the stage series of the loaded data above first.","err");return}
+    try{rtPush();const a=await api("/api/rating",{gaugings_id:S.gaug,segmented:$("#r-seg").checked,shifts:$("#r-shift").checked,id:S.ds.id,stage_col:sc,manual_rating:S.manualRating});
+      o.innerHTML=`<h3>Discharge from ${esc(sc)} with this curve</h3>${a.above_gauged_pct>0?`<div class="note">${fmt(a.above_gauged_pct,2)} % of the stage record is above the highest gauging: those discharges are extrapolated.</div>`:""}${lineChart([{t:a.discharge_manual.t,mean:a.discharge_manual.mean,lo:a.discharge_manual.lo,hi:a.discharge_manual.hi,label:"manual curve"},{t:a.discharge.t,mean:a.discharge.mean,color:"var(--mute)",label:"automatic fit"}])}`}
+    catch(e){say(o,esc(e.message),"err")}};
+  $("#rt-table").onclick=()=>{const sg=rtSegs(),hs=RT.g.map(p=>p.stage),lo=Math.max(Math.min(...hs),sg[0].h0),hi=Math.max(...hs)*1.15,step=+(Math.pow(10,Math.floor(Math.log10((hi-lo)/60)))).toPrecision(1);
+    let csv="stage,discharge,note\n";for(let h=Math.ceil(lo/step)*step;h<=hi+1e-9;h+=step){const hh=+h.toFixed(6);csv+=`${hh},${+rtQ(hh,sg).toPrecision(6)},${hh>Math.max(...hs)?"extrapolated":""}\n`}
+    csv+="\n# "+rtEquation(sg).replace(/\n/g,"\n# ")+"\n";const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download="rating_table.csv";document.body.appendChild(a);a.click();a.remove()};
+  $("#rt-copy").onclick=async()=>{const t=rtEquation(rtSegs());try{await navigator.clipboard.writeText(t);$("#rt-copy").textContent="Copied"}catch(e){$("#rt-copy").textContent="Copy failed"}setTimeout(()=>{$("#rt-copy").textContent="Copy equation"},2000)};
+  rtDrawSegments();
+}
+/* ---------- 7b year-by-year rating ----------
+   One power law per hydrological year (fitted in Python, the same code the method rating_yearly uses), years without
+   enough gaugings borrow a curve, and the discharge at a fixed stage per year shows how the channel drifts. */
+const RTY={start:4,min_n:8,rule:"nearest",mode:"shared",segments:1,rows:null,sources:null,info:null,use:false};
+const MONTH_NAMES=["January","February","March","April","May","June","July","August","September","October","November","December"];
+function rtyOpts(){return{start_month:RTY.start,min_n:RTY.min_n,min_span:0.3,rule:RTY.rule,mode:RTY.mode,segments:RTY.segments}}
+function rtyLabel(y){return RTY.start===1?String(y):`${y}–${String((y+1)%100).padStart(2,"0")}`}
+function rtyQ(r,h){return rtQ(h,r.segments)}
+/* where a year without its own curve takes one from (the same rule as the Python method) */
+function rtySource(y,fy){if(fy.includes(y))return{kind:"own"};const prev=fy.filter(v=>v<y),nxt=fy.filter(v=>v>y);
+  if(RTY.rule==="interpolate"&&prev.length&&nxt.length)return{kind:"interp",p:prev[prev.length-1],n:nxt[0]};
+  if(RTY.rule==="previous"&&prev.length)return{kind:"from",y:prev[prev.length-1]};
+  let best=fy[0];fy.forEach(v=>{if(Math.abs(v-y)<Math.abs(best-y))best=v});return{kind:"from",y:best}}
+function rtyQat(y,h,fit,fy){const s=rtySource(y,fy);if(s.kind==="own")return rtyQ(fit[y],h);if(s.kind==="from")return rtyQ(fit[s.y],h);
+  const w=(y-s.p)/(s.n-s.p),a=rtyQ(fit[s.p],h),b=rtyQ(fit[s.n],h);return a>0&&b>0?Math.exp((1-w)*Math.log(a)+w*Math.log(b)):(1-w)*a+w*b}
+function rtyCard(){
+  $("#rty-card").innerHTML=`<div class="card"><h2>Year by year</h2>
+    <p class="mute small">Alluvial channels scour and silt, so the rating moves from year to year; many agencies (BWDB among them) set a new curve every hydrological year. Each year with enough gaugings over enough of the stage range gets its own Q = C (h − e)<sup>n</sup>; the other years borrow one.</p>
+    <div class="row fields"><label>Year starts in<select id="rty-start">${MONTH_NAMES.map((m,i)=>`<option value="${i+1}"${RTY.start===i+1?" selected":""}>${m}${i===3?" (BWDB hydrological year)":i===0?" (calendar year)":""}</option>`).join("")}</select></label>
+      <label>Curve for each year<select id="rty-mode"><option value="shared"${RTY.mode==="shared"?" selected":""}>shared shape, own e each year (recommended)</option><option value="free"${RTY.mode==="free"?" selected":""}>own C, e and n each year</option></select></label>
+      <label>Segments per curve<select id="rty-segs"><option value="1"${RTY.segments===1?" selected":""}>1 (one power law)</option><option value="2"${RTY.segments===2?" selected":""}>2 (break found from the gaugings)</option></select></label>
+      <label>Gaugings needed for a year's own curve<input type="number" id="rty-min" min="4" max="60" step="1" value="${RTY.min_n}"></label>
+      <label>Years without their own curve use<select id="rty-rule"><option value="nearest"${RTY.rule==="nearest"?" selected":""}>the nearest year's curve</option><option value="previous"${RTY.rule==="previous"?" selected":""}>the previous year's curve (in force until a new one)</option><option value="interpolate"${RTY.rule==="interpolate"?" selected":""}>a blend of the years before and after</option></select></label></div>
+    <p class="mute small"><b>Two segments</b> add a continuous second segment above a break stage, for a change of control such as the river leaving its banks. With a shared shape the break and both exponents are common to all years (the break is usually a fixed feature such as bank-full level) and e still moves each year; with own curves each year keeps a break only when its gaugings clearly support it. <b>Shared shape</b>: C and n are fitted on all years together and each year gets its own e, the stage of zero flow that scour and siltation move. One value per year, so half the gaugings suffice, and the flood part of the curve comes from all years rather than from one year's few high gaugings. <b>Own C, e and n</b> fits each year on its own; a year then also needs gaugings over at least 30 % of the whole gauged stage range, so a year measured only at low flow does not set its flood discharges. With a blend, ln Q is interpolated between the curves of the fitted years before and after, weighted by distance in years. On a tie, the nearest rule takes the earlier year.</p>
+    <div class="actions"><button class="primary" id="rty-go" type="button">Fit a curve for each year</button></div><div id="rty-out"></div></div>`;
+  $("#rty-start").onchange=e=>{RTY.start=+e.target.value};$("#rty-mode").onchange=e=>{RTY.mode=e.target.value};$("#rty-segs").onchange=e=>{RTY.segments=+e.target.value};$("#rty-min").onchange=e=>{RTY.min_n=Math.max(4,+e.target.value||8)};
+  $("#rty-rule").onchange=e=>{RTY.rule=e.target.value;if(RTY.rows)rtyShow()};
+  $("#rty-go").onclick=rtyFit;if(RTY.rows)rtyShow();
+}
+async function rtyFit(){
+  const o=$("#rty-out");say(o,"Fitting each year…");
+  try{const sc=$("#r-stage").value,r=await api("/api/rating",{gaugings_id:S.gaug,yearly_rating:rtyOpts(),id:sc&&S.ds?S.ds.id:undefined,stage_col:sc||undefined});
+    RTY.rows=r.yearly;RTY.info=r.yearly_info||null;RTY.sources=r.yearly_sources||null;rtyShow()}
+  catch(e){say(o,esc(e.message),"err")}}
+function rtyShow(){
+  const o=$("#rty-out"),rows=RTY.rows,fit={};rows.forEach(r=>{if(r.status==="fitted")fit[r.year]=r});const fy=Object.keys(fit).map(Number).sort((a,b)=>a-b);
+  if(!fy.length){say(o,"No year has enough gaugings for a curve of its own. Lower the number of gaugings needed, or use one curve for the whole record.","err");return}
+  /* every year to report: the years with gaugings plus the years of the stage record */
+  const years=[...new Set(rows.map(r=>r.year).concat(RTY.sources?Object.keys(RTY.sources).map(Number):[]))].sort((a,b)=>a-b);
+  const byYear={};rows.forEach(r=>byYear[r.year]=r);
+  const all=(RT.g&&RT.g.length?RT.g.map(p=>p.stage):rows.flatMap(r=>[r.h_min,r.h_max])).sort((a,b)=>a-b),href=all[Math.floor(all.length/2)];
+  const srcText=y=>{const s=rtySource(y,fy);return s.kind==="own"?"own curve":s.kind==="from"?`curve of ${rtyLabel(s.y)}`:`blend of ${rtyLabel(s.p)} and ${rtyLabel(s.n)}`};
+  const y0=fy[0],y1=fy[fy.length-1];
+  /* overlay of the yearly curves */
+  const W=640,H=330,L=60,R=14,Tp=12,B=40,hs=rows.flatMap(r=>[r.h_min,r.h_max]),hmin=Math.min(...hs),hmax=Math.max(...hs),span=hmax-hmin||1,yb=hmin-0.05*span,yt=hmax+0.12*span;
+  const curves=fy.map(y=>{const pts=[];for(let i=0;i<=80;i++){const h=yb+(yt-yb)*i/80,q=rtyQ(fit[y],h);if(q>0)pts.push([h,q])}return{y,pts}});
+  const qmax=Math.max(...curves.flatMap(c=>c.pts.map(p=>p[1])),...(RT.g||[]).map(p=>p.gauged))*1.04;
+  const X=q=>L+(W-L-R)*q/qmax,Y=h=>Tp+(H-Tp-B)*(1-(h-yb)/(yt-yb));
+  let s=`<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="curves by year"><rect x="${L}" y="${Tp}" width="${W-L-R}" height="${H-Tp-B}" style="fill:var(--sheet);stroke:var(--rule)"/>`;
+  niceTicks(0,qmax).forEach(v=>{s+=`<line x1="${X(v)}" x2="${X(v)}" y1="${Tp}" y2="${H-B}" style="stroke:var(--grid)"/><text x="${X(v)}" y="${H-B+15}" text-anchor="middle">${fmt(v,3)}</text>`});
+  niceTicks(yb,yt).forEach(v=>{s+=`<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" style="stroke:var(--grid)"/><text x="${L-6}" y="${Y(v)+4}" text-anchor="end">${fmt(v,3)}</text>`});
+  (RT.g||[]).forEach(p=>{s+=`<circle cx="${X(p.gauged)}" cy="${Y(p.stage)}" r="2" style="fill:var(--mute)" fill-opacity=".35"/>`});
+  curves.forEach(c=>{s+=`<polyline fill="none" style="stroke:${rtYearColor(c.y,y0,y1)}" stroke-width="1.8" points="${c.pts.map(p=>X(p[1])+","+Y(p[0])).join(" ")}"><title>${rtyLabel(c.y)}</title></polyline>`});
+  s+=`<text x="${(L+W-R)/2}" y="${H-6}" text-anchor="middle">discharge Q</text><text transform="translate(14 ${(Tp+H-B)/2}) rotate(-90)" text-anchor="middle">stage h</text></svg>`;
+  /* discharge at a fixed stage, year by year: the drift of the channel */
+  const qs=years.map(y=>({y,q:rtyQat(y,href,fit,fy),own:!!fit[y]})),DW=640,DH=220,dL=60,dB=40,dT=12,qv=qs.map(v=>v.q).filter(v=>v>0),qlo=Math.min(...qv)*0.9,qhi=Math.max(...qv)*1.08;
+  const DX=y=>dL+(DW-dL-R)*(years.length>1?(y-years[0])/(years[years.length-1]-years[0]):0.5),DY=q=>dT+(DH-dT-dB)*(1-(q-qlo)/(qhi-qlo||1));
+  let d=`<svg class="chart" viewBox="0 0 ${DW} ${DH}" role="img" aria-label="discharge at a fixed stage by year"><rect x="${dL}" y="${dT}" width="${DW-dL-R}" height="${DH-dT-dB}" style="fill:var(--sheet);stroke:var(--rule)"/>`;
+  niceTicks(qlo,qhi,4).forEach(v=>{d+=`<line x1="${dL}" x2="${DW-R}" y1="${DY(v)}" y2="${DY(v)}" style="stroke:var(--grid)"/><text x="${dL-6}" y="${DY(v)+4}" text-anchor="end">${fmt(v,3)}</text>`});
+  years.forEach((y,i)=>{if(years.length<=16||i%Math.ceil(years.length/12)===0)d+=`<text x="${DX(y)}" y="${DH-dB+15}" text-anchor="middle">${y}</text>`});
+  d+=`<polyline fill="none" style="stroke:var(--mute)" stroke-width="1.2" points="${qs.filter(v=>v.q>0).map(v=>DX(v.y)+","+DY(v.q)).join(" ")}"/>`;
+  qs.forEach(v=>{if(v.q>0)d+=`<circle cx="${DX(v.y)}" cy="${DY(v.q)}" r="4.5" style="${v.own?`fill:${rtYearColor(v.y,y0,y1)}`:"fill:var(--sheet);stroke:var(--ink)"}" stroke-width="1.4"><title>${rtyLabel(v.y)}: Q = ${fmt(v.q,4)} at h = ${fmt(href,4)} (${srcText(v.y)})</title></circle>`});
+  d+=`<text x="${(dL+DW-R)/2}" y="${DH-6}" text-anchor="middle">year (filled: own curve · hollow: borrowed)</text><text transform="translate(14 ${(dT+DH-dB)/2}) rotate(-90)" text-anchor="middle">Q at h = ${fmt(href,3)}</text></svg>`;
+  const nOwn=fy.length,nBor=years.length-nOwn;
+  const tbl=`<div class="scroll"><table><thead><tr><th class="l">Year</th><th>Gaugings</th><th>Stage range</th><th>C</th><th>e</th><th>n</th><th>Break h</th><th>SE %</th><th>Bias %</th><th class="l">Curve</th><th></th></tr></thead><tbody>${years.map(y=>{const r=byYear[y]||{n:0};const own=!!fit[y];
+      return `<tr><td class="l">${rtyLabel(y)}</td><td>${r.n||0}</td><td>${r.h_min!=null?fmt(r.h_min,3)+" – "+fmt(r.h_max,3):"–"}</td><td>${own?fmt(r.a,4):""}</td><td>${own?fmt(r.h0,4):""}</td><td>${own?fmt(r.b,3)+(r.b2!=null?" / "+fmt(r.b2,3):""):""}</td><td>${own&&r.hb!=null?fmt(r.hb,4):""}</td><td>${own?fmt(r.se_pct,3):""}</td><td>${own?fmt(r.bias_pct,2):""}</td>
+        <td class="l">${own?"own curve"+(r.note?` <span class="mute small">(${esc(r.note)})</span>`:""):`${esc(srcText(y))}${r.status&&r.status!=="fitted"?` <span class="mute small">(${esc(r.status)})</span>`:r.n?"":` <span class="mute small">(no gaugings)</span>`}`}</td>
+        <td>${own?`<button class="ghost rty-open" data-y="${y}" type="button" style="padding:3px 10px">Open in editor</button>`:""}</td></tr>`}).join("")}</tbody></table></div>`;
+  const I=RTY.info||{},advice=I.mode==="shared"&&I.bic&&I.bic[2]!=null?`<div class="note${I.supported===2?" ok":""}">${I.segments_used===2?`One break for all years at h = ${fmt(I.hb,4)}. `:""}${I.supported===2?"On the gaugings, two segments are supported":"The gaugings do not support a second segment"} (BIC with 1 segment ${fmt(I.bic[1],4)}, with 2 segments ${fmt(I.bic[2],4)}; a second segment needs a drop of 6 or more).${I.supported===2?" Gaugings alone can be fooled by seasonal or hysteresis effects: confirm it on the record with the test below.":" One segment per year is the better choice."}</div>`:I.mode==="free"&&RTY.segments===2?`<div class="note">${rows.filter(r=>r.hb!=null).length} of ${fy.length} years have a break of their own; the others keep one segment (see the notes in the table).</div>`:"";
+  const tester=`<div class="actions" style="margin:6px 0 0;align-items:center"><button class="ghost" id="rty-test" type="button">Test 1 against 2 segments on the record</button><span class="small mute">hides parts of the discharge record and refills them with each choice (needs the record loaded, with stage as the driver)</span></div><div id="rty-test-out"></div>`;
+  o.innerHTML=`${advice}${tester}<div class="grid"><div class="stat"><b>${nOwn}</b>years with their own curve</div><div class="stat"><b>${nBor}</b>years borrowing a curve</div><div class="stat"><b>${fmt(Math.min(...qv),3)} – ${fmt(Math.max(...qv),3)}</b>Q at h = ${fmt(href,3)} across the years</div></div>
+    <div class="cols2"><div><h3>Curves by year</h3>${s}</div><div><h3>Discharge at a fixed stage</h3>${d}<p class="mute small">The discharge each year's curve gives at the median gauged stage. A steady trend means the channel is changing; a jump points to a scour or siltation event.</p></div></div>
+    ${tbl}
+    <div class="actions"><label class="inline"><input type="checkbox" id="rty-use"${RTY.use?" checked":""}><span>use the year-by-year curves as the method <b>rating_yearly</b> in Compare and Fill</span></label></div>
+    <div class="actions"><button class="primary" id="rty-fill" type="button">Fill discharge gaps year by year</button><button class="ghost" id="rty-apply" type="button">Apply to the stage series</button></div><div id="rty-apply-out"></div>`;
+  o.querySelectorAll(".rty-open").forEach(b=>b.onclick=()=>{const y=+b.dataset.y,r=fit[y],st=String(RTY.start).padStart(2,"0");
+    RT.from=`${y}-${st}-01`;RT.to=new Date(Date.UTC(y+1,RTY.start-1,1)-86400000).toISOString().slice(0,10);RT.segs=r.segments.map(s=>Object.assign({},s));
+    rtEditor();$("#rt-editor").scrollIntoView({behavior:"smooth"});say($("#rt-fitmsg"),`The curve of ${rtyLabel(y)}, with only that year's gaugings counted. Adjust it here; the year-by-year table keeps the fitted curve.`)});
+  $("#rty-use").onchange=e=>{RTY.use=e.target.checked};
+  /* the decisive check: the same hold-out test as Compare, for one and for two segments */
+  $("#rty-test").onclick=async()=>{const to=$("#rty-test-out"),p=settings();
+    if(!S.ds||!p.target||!p.driver){say(to,"Load the discharge record on the Data page and set the stage column as the driver first.","err");return}
+    $("#rty-test").disabled=true;say(to,"Testing: hiding parts of the record and refilling them with each choice…");
+    try{const res={};for(const k of [1,2]){const {job}=await api("/api/compare",Object.assign({},p,{methods:["rating_yearly"],n_rep:3,yearly_rating:Object.assign(rtyOpts(),{segments:k})}));const r=await poll(job);
+        const m=(r.summary||[])[0]||{};res[k]={nse:m["efficiency.nse"],rmse:m["pointwise.rmse"],bias:m["pointwise.bias"]}}
+      const better=res[2].rmse<res[1].rmse*0.97?2:1;
+      to.innerHTML=`<div class="note ${better===RTY.segments?"ok":""}"><b>On the record:</b> 1 segment RMSE ${fmt(res[1].rmse,3)}, NSE ${fmt(res[1].nse,4)} · 2 segments RMSE ${fmt(res[2].rmse,3)}, NSE ${fmt(res[2].nse,4)}. ${better===2?"Two segments fill the record better.":"One segment fills the record as well or better; keep it simple."} (Two segments must lower the RMSE by at least 3 % to count.)</div>`}
+    catch(e){say(to,esc(e.message),"err")}$("#rty-test").disabled=false};
+  $("#rty-fill").onclick=()=>{if(!S.ds){say($("#rty-apply-out"),"Load the data with the discharge series to fill first (Data page).","err");return}
+    RTY.use=true;$("#rty-use").checked=true;S.fillMethods=["rating_yearly"];$("#t-fill").innerHTML="";show("fill")};
+  $("#rty-apply").onclick=async()=>{const ao=$("#rty-apply-out"),sc=$("#r-stage").value;if(!S.ds||!sc){say(ao,"Choose the stage series of the loaded data at the top of this page first.","err");return}
+    try{const a=await api("/api/rating",{gaugings_id:S.gaug,id:S.ds.id,stage_col:sc,yearly_rating:rtyOpts()});
+      ao.innerHTML=`<h3>Discharge from ${esc(sc)}, year by year</h3>${a.above_gauged_pct>0?`<div class="note">${fmt(a.above_gauged_pct,2)} % of the stage record is above the highest gauging: those discharges are extrapolated.</div>`:""}${lineChart([{t:a.discharge_yearly.t,mean:a.discharge_yearly.mean,lo:a.discharge_yearly.lo,hi:a.discharge_yearly.hi,label:"year by year"},{t:a.discharge.t,mean:a.discharge.mean,color:"var(--mute)",label:"one curve for all years"}])}`}
+    catch(e){say(ao,esc(e.message),"err")}};
+}
+/* ---------- methods ---------- */
+async function loadMethods(){
+  const box=$("#t-meth");box.innerHTML='<div class="card"><progress></progress></div>';const r=await api("/api/methods");S.meth=r;
+  const draw=q=>{const rows=r.methods.filter(m=>(m.id+m.name+m.family+m.variables.join(" ")+m.best_for.join(" ")).toLowerCase().includes(q.toLowerCase()));$("#m-table").innerHTML=table(rows,["id","name","family","variables","best_for","cost","library","limits"],{left:["id","name","family","variables","best_for","library","limits"],html:{variables:v=>esc(v.join(", ")),best_for:v=>esc(v.join(", "))}});$("#m-count").textContent=rows.length+" of "+r.methods.length+" methods"};
+  box.innerHTML=`<div class="card"><h2>Method catalogue</h2><div class="row"><label>Filter<input type="text" id="m-q" placeholder="rain, tide, kriging, G3 ..."></label><span class="mute small" id="m-count"></span></div><div id="m-table" style="margin-top:10px"></div></div>
+  <div class="card"><h2>Gap types</h2>${table(Object.entries(r.gap_types).map(([k,v])=>({code:k,type:v})),null,{left:["code","type"],html:{code:v=>`<span class="chip code">${esc(v)}</span>`}})}<p class="mute small">gaplens ${esc(r.version)}</p></div>`;
+  $("#m-q").oninput=e=>draw(e.target.value);draw("");
+}
+drawData();drawVal();drawRate();
+</script>
+<script src="../../assets/js/tool-shell.js"></script>
+</body>
+</html>

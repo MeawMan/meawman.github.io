@@ -566,6 +566,7 @@ body.is-preview::before { content: 'PREVIEW · DRAFT'; position: fixed; bottom: 
 .ta-div { stroke: var(--violet); stroke-width: 1; stroke-dasharray: 4 3; }
 .ta-lbl { font: 10px var(--mono); fill: var(--violet); }
 .ta-lbl2 { font: 10px var(--mono); fill: var(--dim); }
+.ta-dot { fill: var(--violet); }
 .ta-train { fill: color-mix(in srgb, var(--tc) 8%, transparent); }
 .ta-obs { fill: none; stroke: var(--text); stroke-width: 1.6; stroke-linejoin: round; opacity: .85; }
 @keyframes draw { to { stroke-dashoffset: 0; } }
@@ -591,7 +592,8 @@ body.is-preview::before { content: 'PREVIEW · DRAFT'; position: fixed; bottom: 
   .map-side { position: static; }
   .toolbox { grid-template-columns: 1fr; }
   .tb-tabs { flex-direction: row; overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--line); }
-  .tb-tab { flex: 1 1 0; min-width: 180px; }
+  .tb-tab { flex: 1 1 0; min-width: 140px; }
+  .tb-tabs:has(> .tb-tab:nth-child(4)) .tb-txt small { display: none; }
   .tb-more { display: none; }
   .tb-panel { grid-template-columns: 1fr; min-height: 0; }
   .tb-art { order: -1; }
@@ -614,6 +616,11 @@ body.is-preview::before { content: 'PREVIEW · DRAFT'; position: fixed; bottom: 
   .tb-ico { width: 30px; height: 30px; border-radius: 8px; }
   .tb-txt small { display: none; }
   .tb-txt b { font-size: 12.5px; line-height: 1.25; white-space: normal; }
+  /* four or more tools: a 2-column grid of icon + name, so long names still fit */
+  .tb-tabs:has(> .tb-tab:nth-child(4)) { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); overflow: visible; }
+  .tb-tabs:has(> .tb-tab:nth-child(4)) .tb-tab { min-width: 0; grid-template-columns: 28px 1fr; justify-items: start; text-align: left; gap: 8px; padding: 8px; }
+  .tb-tabs:has(> .tb-tab:nth-child(4)) .tb-ico { width: 28px; height: 28px; }
+  .tb-tabs:has(> .tb-tab:nth-child(4)) .tb-tab:nth-child(odd):nth-last-child(2) { grid-column: 1 / -1; } /* odd tab out spans the row (.tb-more follows it) */
   .tb-foot { margin-top: 14px; }
   .buddy { right: 10px; bottom: 10px; }
   .buddy-btn, .buddy-btn canvas { width: 64px; height: 55px; }

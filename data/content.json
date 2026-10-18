@@ -3,7 +3,7 @@
     "title": "Mahfujur Rahman Joy — Water Resources Engineer & Researcher",
     "description": "Portfolio of Mahfujur Rahman Joy: Research Consultant at CEGIS, M.Sc. (WRD) candidate at BUET. Hydrodynamic modeling, GIS & remote sensing, CMIP6 downscaling and machine learning for floods and droughts.",
     "siteUrl": "https://meawman.github.io/",
-    "updated": "2026-10-17"
+    "updated": "2026-10-18"
   },
   "settings": {
     "showPhone": false,
@@ -101,6 +101,27 @@
       "status": "live",
       "features": ["SVR, random forest, extra trees, gradient boosting, neural network, KNN, tree, Lasso", "Save & reload trained models", "One-click zip of all results & plots", "n-fold time-series cross-validation", "Grid, random & Bayesian hyper-parameter tuning", "Importance, partial dependence, duration curves", "Recursive gap filling & prediction on new files", "Methods paragraph + full Excel report"],
       "tags": ["Machine learning", "Forecasting", "Gap filling"]
+    },
+    {
+      "name": "GapLens",
+      "tagline": "Find, fill & compare gaps in hydroclimate records",
+      "description": "Load a streamflow, water-level, rainfall or groundwater record with its neighbours and GapLens maps the gaps, recommends methods, ranks 70+ filling methods by hiding real observations and scoring how well each one restores them, and fills the record. Includes a rating-curve editor with automatic segments and year-by-year curves. Real Python (Pyodide) running in your browser.",
+      "url": "tools/gaplens/",
+      "icon": "gap",
+      "accent": "pink",
+      "status": "beta",
+      "features": ["70+ methods: interpolation, seasonal, regression, neighbour stations, ML, state-space", "Hold-out comparison: NSE, KGE, RMSE over a ladder of gap lengths", "Recommends methods from the gap pattern and the data at hand", "Rating curves: live editor, automatic breaks (BIC), year-by-year curves", "Reads Excel and BWDB files: title rows, REGULAR rows, daily means", "Python in the browser: about 40 MB on first start, then cached"],
+      "tags": ["Gap filling", "Rating curve", "Python"]
+    },    {
+      "name": "Dependability Analyzer",
+      "tagline": "Dependable water level, flow & rainfall for reports",
+      "description": "Rank a long record with the Weibull plotting position (or Gringorten, Cunnane, Hazen) and read off dependable low and high values at any P. Filter years and months, convert the datum (e.g. mPWD to mMSL), and export report-style figures, a dependability table, a methods paragraph and an Excel workbook.",
+      "url": "tools/dependability/",
+      "icon": "depend",
+      "accent": "lime",
+      "status": "live",
+      "features": ["Dependable low and high values at any P", "One value per year or every value, whole series or by month", "Year and month filters, incomplete-year warnings", "Datum conversion, e.g. mPWD to mMSL", "Reads BWDB files: title rows, REGULAR rows, daily mean of readings", "Report-style figures (PNG), dependability table, Excel and report text"],
+      "tags": ["Dependable flow", "Water level", "Reports"]
     },
     {
       "name": "Min-Max-Avg Terminal",

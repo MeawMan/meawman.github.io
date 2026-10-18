@@ -173,6 +173,8 @@
     ml: '<path d="M5 6l7 6-7 6M12 12h7M19 5l0 0M19 19l0 0" fill="none" stroke="currentColor" stroke-width="1.3" opacity=".55"/><circle cx="5" cy="6" r="2.2" fill="currentColor"/><circle cx="5" cy="18" r="2.2" fill="currentColor"/><circle cx="12" cy="12" r="2.6" fill="currentColor"/><circle cx="19" cy="6" r="2.2" fill="currentColor"/><circle cx="19" cy="18" r="2.2" fill="currentColor"/><path d="M12 12l7-6M12 12l7 6" fill="none" stroke="currentColor" stroke-width="1.3" opacity=".55"/>',
     map: '<path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="10" r="2.5" fill="currentColor"/>',
     wave: '<path d="M2 9c2.5 0 2.5-3 5-3s2.5 3 5 3 2.5-3 5-3 2.5 3 5 3M2 16c2.5 0 2.5-3 5-3s2.5 3 5 3 2.5-3 5-3 2.5 3 5 3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+    depend: '<path d="M3 4c3 1 5 4 8 7s5 5 10 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M18 3v18" stroke="currentColor" stroke-width="1.6" stroke-dasharray="2 2"/><path d="M3 21h18" stroke="currentColor" stroke-width="1.2" opacity=".55"/>',
+    gap: '<circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5.5 14l2.5-3.5 2 2.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M14 11.5l2 3.5 2.5-2.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M10 13l4-1.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-dasharray="1.6 1.6" opacity=".7"/>',
   };
   // Small decorative preview drawn from a seeded pseudo-random series
   function toolArt(kind) {
@@ -193,6 +195,24 @@
         '<rect x="' + pad + '" y="' + pad + '" width="' + (x(cut) - pad) + '" height="' + (H - 2 * pad) + '" class="ta-train"/>' +
         '<text x="' + (pad + 6) + '" y="' + (pad + 12) + '" class="ta-lbl2">train</text><text x="' + (+x(cut) + 6) + '" y="' + (pad + 12) + '" class="ta-lbl2">test</text>' +
         '<path d="' + line(pts, 0, N) + '" class="ta-obs"/><path d="' + line(pred, 0, N) + '" class="ta-avg"/></svg>';
+    }
+    if (kind === 'depend') {
+      // dependability curve: values ranked high to low with plotting position, and the target line at P
+      const ranked = pts.slice().sort((a, b) => b - a), cut = Math.round(0.88 * (N - 1));
+      return '<svg viewBox="0 0 ' + W + ' ' + H + '" aria-hidden="true">' + g +
+        '<path d="' + line(ranked, 0, N) + '" class="ta-avg"/>' +
+        '<line x1="' + x(cut) + '" x2="' + x(cut) + '" y1="' + pad + '" y2="' + (H - pad) + '" class="ta-div"/>' +
+        '<circle cx="' + x(cut) + '" cy="' + y(ranked[cut]) + '" r="4" class="ta-dot"/>' +
+        '<text x="' + (+x(cut) - 6) + '" y="' + (H - pad - 6) + '" text-anchor="end" class="ta-lbl">97% dependable</text></svg>';
+    }
+    if (kind === 'gap') {
+      // observed record with a missing stretch (shaded) and the filled values bridging it
+      const a = 19, b = 31;
+      return '<svg viewBox="0 0 ' + W + ' ' + H + '" aria-hidden="true">' + g +
+        '<rect x="' + x(a) + '" y="' + pad + '" width="' + (x(b) - x(a)) + '" height="' + (H - 2 * pad) + '" class="ta-fill"/>' +
+        '<path d="' + line(pts, 0, a + 1) + '" class="ta-real"/><path d="' + line(pts, b, N) + '" class="ta-real"/>' +
+        '<path d="' + line(pts, a, b + 1) + '" class="ta-gen"/>' +
+        '<text x="' + (+x(a) + 6) + '" y="' + (pad + 12) + '" class="ta-lbl">filled</text></svg>';
     }
     if (kind === 'extend') {
       const cut = 18;

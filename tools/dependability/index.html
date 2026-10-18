@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Dependability Analyzer &mdash; dependable water level, flow &amp; rainfall &middot; Mahfujur Rahman Joy</title>
+<meta name="description" content="Dependable water levels, flows and rainfall from long records: year and month filters, datum conversion, Weibull (or Gringorten, Cunnane, Hazen) plotting positions, report-ready figures, dependability tables and Excel export. Runs in your browser; files are never uploaded." />
+<meta property="og:title" content="Dependability Analyzer &middot; Mahfujur Rahman Joy" />
+<meta property="og:description" content="Dependable levels, flows and rainfall from long hydrological records, with report-ready figures and Excel export." />
+<meta property="og:image" content="https://meawman.github.io/assets/og-image.png" />
+<link rel="canonical" href="https://meawman.github.io/tools/dependability/" />
+<link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml" />
+<link rel="icon" href="../../assets/favicon-32.png" sizes="32x32" type="image/png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Silkscreen&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../../assets/css/tool-shell.css" />
+<script>
+  (function () {
+    var t = null; try { t = localStorage.getItem('mrj_theme'); } catch (e) {}
+    if (!t) t = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', t);
+  })();
+</script>
+<style>
+/* Layout concept: a two-column bench. Left: the setup, in the order the work is done (data, series, analysis, datum).
+   Right: results that read like the report - figures first, then Table 4.10-style values. Figures stay in report style
+   (white plate, blue curve, purple target line) so what you see is what you export.
+   Colours follow the portfolio (dark + light); declared on html[data-theme] after tool-shell.css so they win. */
+html[data-theme='light']{
+  --bg:#f2f4f9; --surface:#ffffff; --surface-2:#eef2f8; --ink:#0b1222; --ink-2:#4a5672; --muted:#6b7794;
+  --line:#dbe2ee; --line-strong:#c5cfe0; --accent:#0786ad; --accent-ink:#ffffff; --accent-soft:#dff1f7;
+  --warn:#8a4b00; --warn-bg:#fff4e3; --warn-line:#efcf9c; --bad:#c0264d; --bad-bg:#fdeef2;
+  --fig-bg:#FFFFFF; --fig-ink:#0E1A22; --fig-grid:#DADFE3; --fig-axis:#B8C0C6; --fig-line:#1BA1E2;
+  --fig-target:#A0228C; --fig-box:#CDEBF7; --fig-border:#D9DEE2;
+  --font-ui:'Space Grotesk',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --font-fig:Cambria,Caladea,'Source Serif 4',Georgia,'Times New Roman',serif;
+  color-scheme:light;
+}
+html[data-theme='dark']{
+  --bg:#06080f; --surface:#0d1322; --surface-2:#121b2f; --ink:#eef3fb; --ink-2:#a7b3cb; --muted:#7d8aa5;
+  --line:#1d2a44; --line-strong:#2a3a5c; --accent:#5be7ff; --accent-ink:#04141a; --accent-soft:rgba(91,231,255,.12);
+  --warn:#ffc857; --warn-bg:rgba(255,200,87,.08); --warn-line:rgba(255,200,87,.35); --bad:#ff6b8b; --bad-bg:rgba(255,107,139,.1);
+  --fig-bg:#0d1322; --fig-ink:#e6eef8; --fig-grid:#1d2a44; --fig-axis:#2f4268; --fig-line:#4FB7EE;
+  --fig-target:#E27FD2; --fig-box:rgba(79,183,238,.18); --fig-border:#1d2a44;
+  --font-ui:'Space Grotesk',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --font-fig:Cambria,Caladea,'Source Serif 4',Georgia,'Times New Roman',serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html[data-theme] body{color:var(--ink);font:14px/1.5 var(--font-ui)}
+.wrap{max-width:1320px;margin:0 auto;padding:18px max(16px,env(safe-area-inset-right,0px)) 48px max(16px,env(safe-area-inset-left,0px))}
+html[data-theme] .results{overflow:visible}
+html[data-theme] .card,html[data-theme] .fig,html[data-theme] .tblcard,html[data-theme] .panel{box-shadow:var(--shadow)}
+.intro{display:flex;gap:8px 16px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:16px}
+.intro .ts-privacy{font:12px var(--font-mono)}
+.fig header button,.tbar button{white-space:nowrap;flex:none}
+h1{font-size:24px;line-height:1.2;margin:0;font-weight:700;letter-spacing:-.01em;text-wrap:balance}
+h2{font-size:12px;letter-spacing:.08em;text-transform:uppercase;margin:0 0 12px;color:var(--ink-2);font-weight:700}
+h3{font-size:15px;margin:0;font-weight:600}
+p{margin:0}
+.sub{color:var(--ink-2);margin-top:4px;max-width:70ch}
+.top{display:flex;gap:16px;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;margin-bottom:16px}
+.banner{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:var(--accent-soft);color:var(--ink);
+  border:1px solid var(--line-strong);border-radius:8px;padding:8px 12px;font-size:13px}
+.banner[hidden]{display:none}
+.status:empty{display:none}
+.optgrid{display:grid;gap:10px}
+.layout.fresh{grid-template-columns:minmax(0,560px);justify-content:start;margin-top:8px}
+.layout.fresh .results,.layout.fresh #secSeries,.layout.fresh #secAnalysis,.layout.fresh #secDatum,.layout.fresh .method,.layout.fresh #dataOpts,.layout.fresh #secData h2{display:none}
+.layout.fresh .panel{padding:20px}
+.layout.fresh .drop{padding:34px 20px;justify-items:center;text-align:center;gap:6px}
+.layout.fresh .drop b{font-size:16px}
+.layout{display:grid;grid-template-columns:minmax(300px,372px) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:980px){.layout{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;display:grid;gap:20px;min-width:0}
+.sec{display:grid;gap:10px;min-width:0}
+.sec+.sec{border-top:1px solid var(--line);padding-top:18px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.row>*{min-width:0}
+label.f{display:grid;gap:4px;font-size:12px;color:var(--ink-2);font-weight:500;min-width:0}
+input[type=text],input[type=number],select,textarea{width:100%;font:inherit;font-size:14px;color:var(--ink);background:var(--surface-2);
+  border:1px solid var(--line-strong);border-radius:6px;padding:7px 9px;min-width:0}
+textarea{font-family:var(--font-mono);font-size:12px;min-height:90px;resize:vertical}
+input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible,.drop:focus-within{outline:2px solid var(--accent);outline-offset:1px}
+.check{display:flex;gap:8px;align-items:flex-start;font-size:13px;color:var(--ink);line-height:1.35}
+.check input{margin-top:2px;accent-color:var(--accent)}
+.check small{display:block;color:var(--muted);font-size:12px}
+.hint{font-size:12px;color:var(--muted)}
+button{font:inherit;font-size:13px;font-weight:600;border-radius:6px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);padding:6px 11px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+button.ghost{border-color:transparent;background:transparent;color:var(--accent);padding:4px 6px}
+button[disabled]{opacity:.5;cursor:default}
+.drop{display:grid;gap:2px;justify-items:start;border:1.5px dashed var(--line-strong);border-radius:8px;padding:12px;cursor:pointer;background:var(--surface-2)}
+.drop.over{border-color:var(--accent);background:var(--accent-soft)}
+.drop b{font-size:14px}.drop span{font-size:12px;color:var(--muted)}
+.drop input{position:absolute;opacity:0;width:1px;height:1px}
+details>summary{cursor:pointer;font-size:13px;color:var(--accent);font-weight:600}
+details[open]>summary{margin-bottom:8px}
+.status{font-size:12px;color:var(--ink-2);background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:8px 10px;font-family:var(--font-mono);line-height:1.5;overflow-wrap:anywhere}
+.status.err{color:var(--bad);background:var(--bad-bg);border-color:var(--bad)}
+.chips{display:flex;flex-wrap:wrap;gap:5px}
+.chip{font-size:12px;font-weight:600;padding:3px 8px;border-radius:999px;border:1px solid var(--line-strong);background:var(--surface-2);color:var(--ink);font-variant-numeric:tabular-nums;font-family:var(--font-mono)}
+.chip[aria-pressed="false"]{text-decoration:line-through;color:var(--muted);background:transparent}
+.chip.out{opacity:.35}
+.chip.partial{border-style:dashed}
+.chip[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.mini{display:flex;gap:4px;flex-wrap:wrap;align-items:center}
+.eq{font-family:var(--font-mono);font-size:12px;color:var(--ink-2);background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:6px 9px}
+/* results */
+.results{display:grid;gap:16px;min-width:0}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:grid;gap:4px;min-width:0}
+.card .k{font-size:12px;color:var(--ink-2);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.card .v{font-size:34px;line-height:1.1;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.card .v small{font-size:14px;color:var(--ink-2);font-weight:600;margin-left:6px;letter-spacing:0}
+.card .d{font-size:12px;color:var(--ink-2);font-family:var(--font-mono)}
+.notes{display:grid;gap:8px}
+.note{font-size:13px;border:1px solid var(--warn-line);background:var(--warn-bg);color:var(--warn);border-radius:8px;padding:8px 12px}
+.note.info{border-color:var(--line-strong);background:var(--surface);color:var(--ink-2)}
+.figs{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,460px),1fr));gap:12px}
+.fig{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px;display:grid;gap:8px;min-width:0}
+.fig header{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.figbox{position:relative;line-height:0}
+.figbox svg{width:100%;height:auto;display:block;border-radius:6px}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--surface);font:12px/1.4 var(--font-mono);padding:6px 8px;border-radius:6px;white-space:pre;transform:translate(-50%,-110%);z-index:3}
+.tip[hidden]{display:none}
+.f-bg{fill:var(--fig-bg);stroke:var(--fig-border);stroke-width:1}
+.f-grid{stroke:var(--fig-grid);stroke-width:1}
+.f-axis{stroke:var(--fig-axis);stroke-width:1}
+.f-tick{fill:var(--fig-ink);font-family:var(--font-fig);font-size:15px}
+.f-title{fill:var(--fig-ink);font-family:var(--font-fig);font-size:24px;font-weight:700}
+.f-axt{fill:var(--fig-ink);font-family:var(--font-fig);font-size:16px;font-weight:700}
+.f-line{fill:none;stroke:var(--fig-line);stroke-width:2.2;stroke-linejoin:round;stroke-linecap:round}
+.f-dot{fill:var(--fig-line)}
+.f-target{stroke:var(--fig-target);stroke-width:3}
+.f-box{fill:var(--fig-box)}
+.f-boxt{fill:var(--fig-ink);font-family:var(--font-fig);font-size:16px}
+.f-boxv{fill:var(--fig-ink);font-family:var(--font-fig);font-size:20px;font-weight:700}
+.f-hover{fill:none;stroke:var(--fig-target);stroke-width:2.2}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.tab{border:0;border-bottom:2px solid transparent;border-radius:0;background:none;padding:8px 12px;color:var(--ink-2)}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.tbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+.tblcard{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 16px 16px;display:grid;gap:12px;min-width:0}
+.tablewrap{overflow-x:auto;max-height:520px;overflow-y:auto;border:1px solid var(--line);border-radius:8px}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums;font-size:13px}
+th,td{padding:6px 12px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+thead th{position:sticky;top:0;background:var(--surface-2);font-size:12px;color:var(--ink-2);z-index:1}
+td.mono,.mono{font-family:var(--font-mono);font-size:12.5px}
+tr.hit td{background:var(--accent-soft);font-weight:600}
+tr.gap td{color:var(--muted);text-align:center}
+tr.click{cursor:pointer}
+.tag{font-size:11px;color:var(--warn);border:1px solid var(--warn-line);border-radius:4px;padding:0 4px;margin-left:6px}
+.empty{background:var(--surface);border:1px dashed var(--line-strong);border-radius:12px;padding:32px;text-align:center;color:var(--ink-2)}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--surface);padding:9px 14px;border-radius:8px;font-size:13px;z-index:20;max-width:90vw}
+.toast[hidden]{display:none}
+.method{font-size:12px;color:var(--ink-2);display:grid;gap:6px}
+.method code{font-family:var(--font-mono);font-size:12px;background:var(--surface-2);border:1px solid var(--line);border-radius:4px;padding:0 4px}
+@media (max-width:520px){th,td{padding:6px 8px}.card .v{font-size:30px}}
+@media (prefers-reduced-motion:no-preference){button{transition:border-color .12s,background .12s}}
+</style>
+</head>
+<body>
+<header class="ts-bar">
+  <div class="ts-brand">
+    <a class="ts-logo" href="../../" title="Back to the portfolio"><img src="../../assets/favicon.svg" alt="Mahfujur Rahman Joy &mdash; portfolio" width="34" height="34" /></a>
+    <span class="ts-crumb"><a href="../../"><b>Joy</b></a><span aria-hidden="true">/</span><a href="../../#tools">Tools</a><span aria-hidden="true">/</span><em>Dependability Analyzer</em></span>
+  </div>
+  <div class="ts-actions" style="margin-left:auto">
+    <a class="ts-btn" href="../../#tools">All tools</a>
+    <button class="ts-btn icon" id="tsTheme" type="button" aria-label="Toggle light or dark theme" title="Toggle theme">
+      <svg class="i-sun" viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M11 1h2v3h-2zM11 20h2v3h-2zM1 11h3v2H1zM20 11h3v2h-3zM4.2 5.6l1.4-1.4 2.1 2.1-1.4 1.4zM16.3 17.7l1.4-1.4 2.1 2.1-1.4 1.4zM4.2 18.4l2.1-2.1 1.4 1.4-2.1 2.1zM16.3 6.3l2.1-2.1 1.4 1.4-2.1 2.1zM7 9h2V7h6v2h2v6h-2v2H9v-2H7z"/></svg>
+      <svg class="i-moon" viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M9 2h6v2h-4v2H9v4H7v4h2v4h2v2h4v-2h4v-2h2v-4h-2v2h-2v2h-6v-2H9v-4H7v-2h2V6h2V4H9z"/></svg>
+    </button>
+  </div>
+</header>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<div class="wrap">
+  <div class="intro">
+    <p class="ts-lead"><b>Dependability Analyzer</b> &mdash; dependable water levels, flows and rainfall from long records. Filter years and months, convert the datum, rank with a plotting position, and take report-ready figures and tables into your report.</p>
+    <span class="ts-privacy">&#128274; Runs in your browser &middot; files are never uploaded</span>
+  </div>
+  <div class="banner" id="banner" hidden style="margin-bottom:16px">
+    <span id="bannerText"></span>
+    <button class="primary" id="bannerBtn" type="button">Load your data</button>
+  </div>
+
+  <div class="layout">
+    <aside class="panel" aria-label="Setup">
+      <section class="sec" id="secData">
+        <h2>1 · Data</h2>
+        <label class="drop" id="drop" tabindex="-1">
+          <b>Choose a file or drop it here</b>
+          <span>Excel (.xlsx) or CSV with a date column and a value column</span>
+          <input type="file" id="file" accept=".xlsx,.xls,.xlsm,.csv,.txt,.tsv">
+        </label>
+        <details>
+          <summary>Paste data instead</summary>
+          <textarea id="paste" placeholder="date,value&#10;1990-01-01,2.31&#10;1990-01-02,2.35"></textarea>
+          <div class="mini" style="margin-top:6px"><button type="button" id="btnPaste">Use pasted data</button></div>
+        </details>
+        <div id="dataOpts" class="optgrid">
+        <label class="f" id="sheetWrap" hidden>Sheet<select id="sheet"></select></label>
+        <div class="row">
+          <label class="f">Date column<select id="colDate"></select></label>
+          <label class="f">Value column<select id="colVal"></select></label>
+        </div>
+        <div class="row">
+          <label class="f">Date format
+            <select id="dateFmt">
+              <option value="auto">Auto-detect</option>
+              <option value="dmy">Day / Month / Year</option>
+              <option value="mdy">Month / Day / Year</option>
+              <option value="ymd">Year-Month-Day</option>
+              <option value="serial">Excel serial number</option>
+            </select>
+          </label>
+          <label class="f">Missing-value code<input type="text" id="missing" placeholder="e.g. -999" inputmode="decimal"></label>
+        </div>
+        <div class="row">
+          <label class="f" id="timeWrap" hidden>Time column<select id="colTime"></select></label>
+          <label class="f" id="dayAggWrap" hidden>Several readings a day
+            <select id="dayAgg">
+              <option value="mean">Use the daily mean</option>
+              <option value="min">Use the daily minimum</option>
+              <option value="max">Use the daily maximum</option>
+              <option value="none">Keep every reading</option>
+            </select>
+          </label>
+        </div>
+        <label class="check" id="regWrap" hidden><input type="checkbox" id="regOnly" checked><span>REGULAR rows only<small>BWDB files repeat readings as HIGH / LOW rows; keep only the regular ones</small></span></label>
+        </div>
+        <div class="status" id="dataStatus" role="status"></div>
+        <div class="mini" id="exampleRow" style="justify-content:center"><span class="hint">No data handy?</span><button class="ghost" type="button" id="btnExample">Try an example series</button></div>
+      </section>
+
+      <section class="sec" id="secSeries">
+        <h2>2 · Series</h2>
+        <div class="row">
+          <label class="f">From year<input type="number" id="yFrom" step="1"></label>
+          <label class="f">To year<input type="number" id="yTo" step="1"></label>
+        </div>
+        <div>
+          <div class="mini" style="justify-content:space-between;margin-bottom:6px">
+            <span class="hint">Click a year to leave it out · dashed = incomplete year</span>
+            <span class="mini"><button class="ghost" type="button" id="yAll">All</button><button class="ghost" type="button" id="yFull">Full years only</button></span>
+          </div>
+          <div class="chips" id="yearChips"></div>
+        </div>
+        <div>
+          <div class="mini" style="justify-content:space-between;margin-bottom:6px">
+            <span class="hint">Months to use</span>
+            <span class="mini"><button class="ghost" type="button" id="mAll">All</button></span>
+          </div>
+          <div class="chips" id="monthChips"></div>
+        </div>
+      </section>
+
+      <section class="sec" id="secAnalysis">
+        <h2>3 · Analysis</h2>
+        <div class="row">
+          <label class="f">Quantity
+            <select id="varType">
+              <option value="level">Water level</option>
+              <option value="flow">Discharge (flow)</option>
+              <option value="rain">Rainfall</option>
+              <option value="other">Other</option>
+            </select>
+          </label>
+          <label class="f">Name on figures<input type="text" id="qName" value="Water Level"></label>
+        </div>
+        <div class="row">
+          <label class="f">Dependability P (%)<input type="number" id="P" value="97" min="0.1" max="99.9" step="any"></label>
+          <label class="f">Decimals<input type="number" id="decimals" value="2" min="0" max="6" step="1"></label>
+        </div>
+        <div class="sec" style="gap:8px">
+          <label class="check"><input type="checkbox" id="sideLow" checked><span>Low side<small>Value equalled or exceeded P % of the time (dependable flow, dependable low level)</small></span></label>
+          <label class="check"><input type="checkbox" id="sideHigh" checked><span>High side<small>Value not exceeded P % of the time (dependable high level)</small></span></label>
+        </div>
+        <div class="row">
+          <label class="f">Rank
+            <select id="rankBy">
+              <option value="years">One value per year</option>
+              <option value="values">Every value in the series</option>
+            </select>
+          </label>
+          <label class="f">Split
+            <select id="split">
+              <option value="whole">Whole series</option>
+              <option value="month">Each month separately</option>
+            </select>
+          </label>
+        </div>
+        <div class="row" id="yearStatRow">
+          <label class="f">Value for each year
+            <select id="yearStat">
+              <option value="dep">Dependable value in the year</option>
+              <option value="ext">Minimum / maximum</option>
+              <option value="mean">Mean</option>
+              <option value="sum">Total</option>
+            </select>
+          </label>
+          <label class="f" id="innerPWrap">Within-year P (%)<input type="number" id="innerP" value="97" min="0.1" max="99.9" step="any"></label>
+        </div>
+        <div class="row">
+          <label class="f">Plotting position
+            <select id="pp">
+              <option value="weibull">Weibull, R/(n+1)</option>
+              <option value="gringorten">Gringorten, (R−0.44)/(n+0.12)</option>
+              <option value="cunnane">Cunnane, (R−0.4)/(n+0.2)</option>
+              <option value="hazen">Hazen, (R−0.5)/n</option>
+            </select>
+          </label>
+          <label class="f">Value at P
+            <select id="method">
+              <option value="nearest">Nearest rank (as in the report)</option>
+              <option value="interp">Interpolated between ranks</option>
+            </select>
+          </label>
+        </div>
+        <label class="f">Dependability table (P values, %)<input type="text" id="plist" value="50, 75, 80, 90, 95, 97, 99" inputmode="decimal"></label>
+        <div class="row">
+          <label class="f">Dependency axis
+            <select id="xscale"><option value="log">Logarithmic</option><option value="linear">Linear</option></select>
+          </label>
+          <label class="check" style="align-self:end;padding-bottom:8px"><input type="checkbox" id="smooth" checked><span>Smooth curve</span></label>
+        </div>
+      </section>
+
+      <section class="sec" id="secDatum">
+        <h2>4 · Datum and units</h2>
+        <div class="row">
+          <label class="f">Data unit<input type="text" id="unit" value="mPWD" placeholder="mPWD"></label>
+          <label class="f">Subtract (m)<input type="number" id="offset" value="0" step="any"></label>
+        </div>
+        <div class="row">
+          <label class="f">Result unit<input type="text" id="unitOut" placeholder="mMSL"></label>
+          <label class="f">Unit on labels<input type="text" id="labelUnit" placeholder="m"></label>
+        </div>
+        <div class="eq" id="eq">result = value − 0</div>
+      </section>
+
+      <details class="method">
+        <summary>How the numbers are worked out</summary>
+        <p>Each ranked value gets a plotting position. Weibull (the default, as in the report workbook) is <code>D = R × 100 / (n + 1)</code>; Gringorten, Cunnane and Hazen use <code>D = (R − a) × 100 / (n + 1 − 2a)</code> with a = 0.44, 0.4 and 0.5. Low side is ranked high to low, high side low to high.</p>
+        <p>The value at P is taken at rank <code>ROUND(P/100 × (n + 1 − 2a) + a)</code>, which for Weibull is the report's <code>ROUND(P/100 × (n+1))</code>, or interpolated between ranks if you choose that.</p>
+        <p>With one value per year, "dependable value in the year" uses the same rule inside each year, then the years are ranked.</p>
+        <p>Settings (not your data) are remembered in this browser for next time.</p>
+      </details>
+    </aside>
+
+    <section class="results" id="results" aria-live="polite"></section>
+  </div>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(function(){
+'use strict';
+var $ = function(id){ return document.getElementById(id); };
+var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+var MON_IDX = {jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
+var state = { data:null, table:null, wb:null, fileName:'', example:false, excluded:new Set(), monthsOn:Array(12).fill(true),
+  pickedMonth:0, tab:'values', rankSide:'low', innerTouched:false, last:null };
+
+/* ---------------------------------------------------------------- numbers */
+function roundAbs(a,d){
+  var s = a.toPrecision(15), m = /^([0-9.]+)(?:e([+-]?\d+))?$/i.exec(s);
+  var e = (m[2] ? parseInt(m[2],10) : 0) + d;
+  return Number(Math.round(Number(m[1]+'e'+e)) + 'e' + (-d));
+}
+function fmt(v,d){
+  if (v==null || !isFinite(v)) return '';
+  var a = roundAbs(Math.abs(v), d), t = a.toFixed(d);
+  return (v < 0 && a !== 0) ? '-' + t : t;
+}
+function xround(q){ return q < 0 ? -Math.floor(-q + 0.5) : Math.floor(q + 0.5); }
+function clamp(x,lo,hi){ return Math.min(Math.max(x,lo),hi); }
+function num(id){ var v = parseFloat($(id).value); return isFinite(v) ? v : NaN; }
+
+/* ---------------------------------------------------------------- parsing */
+function mkTime(y,mo,d,h,mi,s){
+  if (y < 100) y += y < 70 ? 2000 : 1900;
+  if (!(mo>=1 && mo<=12 && d>=1 && d<=31)) return NaN;
+  var t = Date.UTC(y,mo-1,d,h||0,mi||0,s||0);
+  return new Date(t).getUTCMonth() === mo-1 ? t : NaN;
+}
+function parseDateText(str, order){
+  var s = String(str).trim(), m;
+  if (!s) return NaN;
+  if ((m = /^(\d{4})[-\/.](\d{1,2})[-\/.](\d{1,2})(?:[ T](\d{1,2}):(\d{2})(?::(\d{2}))?)?/.exec(s))) return mkTime(+m[1],+m[2],+m[3],+m[4],+m[5],+m[6]);
+  if ((m = /^(\d{1,2})[-\/ ]([A-Za-z]{3,9})\.?[-\/ ,]+(\d{2,4})(?:[ T](\d{1,2}):(\d{2}))?/.exec(s))){
+    var mm = MON_IDX[m[2].slice(0,3).toLowerCase()]; return mm==null ? NaN : mkTime(+m[3],mm+1,+m[1],+m[4],+m[5]);
+  }
+  if ((m = /^([A-Za-z]{3,9})\.? (\d{1,2}),? (\d{4})/.exec(s))){
+    var m2 = MON_IDX[m[1].slice(0,3).toLowerCase()]; return m2==null ? NaN : mkTime(+m[3],m2+1,+m[2]);
+  }
+  if ((m = /^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{2,4})(?:[ T](\d{1,2}):(\d{2})(?::(\d{2}))?)?/.exec(s)))
+    return order === 'mdy' ? mkTime(+m[3],+m[1],+m[2],+m[4],+m[5],+m[6]) : mkTime(+m[3],+m[2],+m[1],+m[4],+m[5],+m[6]);
+  if ((m = /^(\d{4})(\d{2})(\d{2})$/.exec(s))) return mkTime(+m[1],+m[2],+m[3]);
+  return NaN;
+}
+function serialToTime(n, minSerial){ return (n >= minSerial && n < 2958466) ? Math.round((n - 25569) * 86400000) : NaN; }
+function toTime(v, mode, order){
+  if (v == null || v === '') return NaN;
+  if (v instanceof Date) return v.getTime();
+  if (typeof v === 'number') return serialToTime(v, mode === 'serial' ? 1 : 20000);
+  var s = String(v).trim();
+  if (mode === 'serial' || /^\d{5}(\.\d+)?$/.test(s)) { var n = Number(s); return isFinite(n) ? serialToTime(n, mode==='serial'?1:20000) : NaN; }
+  return parseDateText(s, order);
+}
+function toNumber(v){
+  if (typeof v === 'number') return v;
+  if (v == null) return NaN;
+  var s = String(v).trim().replace(/\s/g,'');
+  if (s === '' ) return NaN;
+  if (/^-?\d+,\d+$/.test(s)) s = s.replace(',', '.');
+  else s = s.replace(/,/g,'');
+  return /^[-+]?(\d+\.?\d*|\.\d+)(e[-+]?\d+)?$/i.test(s) ? Number(s) : NaN;
+}
+function detectOrder(strings){
+  var iso = 0, dmy = 0, mdy = 0, n = 0;
+  for (var i=0;i<strings.length && n<3000;i++){
+    var s = String(strings[i]).trim(), m;
+    if (/^\d{4}[-\/.]\d{1,2}[-\/.]\d{1,2}/.test(s)) { iso++; n++; continue; }
+    if ((m = /^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{2,4})/.exec(s))) { n++; if (+m[1] > 12) dmy++; if (+m[2] > 12) mdy++; }
+  }
+  if (dmy && !mdy) return {order:'dmy', sure:true};
+  if (mdy && !dmy) return {order:'mdy', sure:true};
+  if (dmy && mdy) return {order:'dmy', sure:false};
+  return {order:'dmy', sure:iso>0 || n===0};
+}
+function parseDelimited(text){
+  var first = text.split(/\r?\n/, 5).join('\n');
+  var counts = {',':0, ';':0, '\t':0};
+  Object.keys(counts).forEach(function(d){ counts[d] = (first.match(new RegExp(d === '\t' ? '\t' : '\\' + d, 'g')) || []).length; });
+  var delim = counts['\t'] >= counts[','] && counts['\t'] >= counts[';'] ? '\t' : (counts[';'] > counts[','] ? ';' : ',');
+  var rows = [], row = [], cur = '', q = false, i, c;
+  for (i=0;i<text.length;i++){
+    c = text[i];
+    if (q){
+      if (c === '"'){ if (text[i+1] === '"'){ cur += '"'; i++; } else q = false; } else cur += c;
+    } else if (c === '"') q = true;
+    else if (c === delim){ row.push(cur); cur = ''; }
+    else if (c === '\n' || c === '\r'){
+      if (c === '\r' && text[i+1] === '\n') i++;
+      row.push(cur); cur = '';
+      if (row.some(function(x){ return x !== ''; })) rows.push(row);
+      row = [];
+    } else cur += c;
+  }
+  row.push(cur);
+  if (row.some(function(x){ return x !== ''; })) rows.push(row);
+  return rows.map(function(r){ return r.map(function(x){ return x === '' ? null : x.trim(); }); });
+}
+function colLetter(i){ var s=''; i++; while(i>0){ var r=(i-1)%26; s=String.fromCharCode(65+r)+s; i=Math.floor((i-1)/26);} return s; }
+
+function isTextCell(c){ return typeof c === 'string' && c.trim() !== '' && isNaN(toNumber(c)) && isNaN(parseDateText(c,'dmy')); }
+// Header row: files such as BWDB downloads start with a letterhead / station block. The header is the first
+// all-text row followed by rows that hold a date and a number; -1 if there is no such row.
+function findHeaderRow(rows){
+  var lim = Math.min(rows.length - 2, 60);
+  for (var r=0;r<lim;r++){
+    var cells = rows[r].filter(function(c){ return c !== null && c !== ''; });
+    if (cells.length < 2 || !cells.every(isTextCell)) continue;
+    var next = rows.slice(r+1, r+4);
+    if (next.length && next.every(function(nr){ return nr.some(function(c){ return !isNaN(toTime(c,'auto','dmy')); }) && nr.some(function(c){ return !isNaN(toNumber(c)); }); })) return r;
+  }
+  return -1;
+}
+// time of day in ms from a separate Time column: Excel fraction (0.25), "06:00", "6:00 PM"
+function timeOf(v){
+  if (v == null || v === '') return 0;
+  if (typeof v === 'number') return v >= 0 && v < 1 ? Math.round(v * 86400000) : 0;
+  var m = /^(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(am|pm)?$/i.exec(String(v).trim());
+  if (!m) return 0;
+  var hh = +m[1]; if (m[4]){ var ap = m[4].toLowerCase(); if (ap === 'pm' && hh < 12) hh += 12; if (ap === 'am' && hh === 12) hh = 0; }
+  return ((hh*60 + +m[2])*60 + +(m[3]||0))*1000;
+}
+function isTimeCell(v){ return v == null || v === '' || (typeof v === 'number' && v >= 0 && v < 1) || /^\d{1,2}:\d{2}(:\d{2})?\s*(am|pm)?$/i.test(String(v).trim()); }
+
+function loadTable(rows, name){
+  rows = rows.filter(function(r){ return r && r.some(function(x){ return x !== null && x !== ''; }); });
+  if (rows.length < 2){ setStatus('No data rows were found in that file.', true); return; }
+  var hr = findHeaderRow(rows), skippedTop = hr > 0 ? hr : 0, header;
+  if (hr >= 0){ rows = rows.slice(hr); header = true; }
+  else {
+    var r0 = rows[0].filter(function(c){ return c !== null && c !== ''; });
+    header = r0.filter(isTextCell).length >= Math.ceil(r0.length / 2);
+  }
+  var width = 0; rows.forEach(function(r){ if (r.length > width) width = r.length; });
+  state.table = { rows: rows, header: header, width: width, name: name, skippedTop: skippedTop, typeCol: -1, timeCol: -1 };
+  updateFresh();
+  var heads = [];
+  for (var j=0;j<width;j++){
+    var h = header && rows[0][j] != null ? String(rows[0][j]) : '';
+    heads.push('Column ' + colLetter(j) + (h ? ' · ' + h : ''));
+  }
+  ['colDate','colVal'].forEach(function(id){
+    $(id).innerHTML = heads.map(function(h,i){ return '<option value="'+i+'">'+h.replace(/</g,'&lt;')+'</option>'; }).join('');
+  });
+  $('colTime').innerHTML = '<option value="-1">None (dates only)</option>' + heads.map(function(h,i){ return '<option value="'+i+'">'+h.replace(/</g,'&lt;')+'</option>'; }).join('');
+  // BWDB-style "DATA TYPE" column with HIGH / LOW / REGULAR rows, and a separate time-of-day column
+  var tb0 = state.table, hds = header ? rows[0].map(function(c){ return c == null ? '' : String(c).trim(); }) : [];
+  hds.forEach(function(h, j){
+    if (tb0.typeCol < 0 && /type/i.test(h) && rows.slice(1, 201).some(function(r){ return /^regular$/i.test(String(r[j] == null ? '' : r[j]).trim()); })) tb0.typeCol = j;
+    if (tb0.timeCol < 0 && /time|hour|hh:mm/i.test(h) && !/date/i.test(h) && rows.slice(1, 60).every(function(r){ return isTimeCell(r[j]); })) tb0.timeCol = j;
+  });
+  $('regWrap').hidden = tb0.typeCol < 0;
+  $('timeWrap').hidden = tb0.timeCol < 0;
+  $('colTime').value = String(tb0.timeCol);
+  // auto-pick columns: date = first column that reads as dates; value = last numeric column that is not a year/month/id column
+  var start = header ? 1 : 0, sample = rows.slice(start, start + 300), best = {date:-1, val:-1}, info = [];
+  for (var k=0;k<width;k++){
+    var nNum=0, nDate=0, tot=0, allInt=true, lo=Infinity, hi=-Infinity;
+    sample.forEach(function(r){ var v = r[k]; if (v == null) return; tot++;
+      var x = toNumber(v); if (!isNaN(x)){ nNum++; if (x !== Math.floor(x)) allInt = false; if (x < lo) lo = x; if (x > hi) hi = x; }
+      if (!isNaN(toTime(v,'auto','dmy'))) nDate++; });
+    var hd = header && rows[0][k] != null ? String(rows[0][k]).trim() : '';
+    info.push({tot:tot, num:tot ? nNum/tot : 0, date:tot ? nDate/tot : 0, hd:hd, yearLike:allInt && lo >= 1800 && hi <= 2200 && hi - lo < 300});
+  }
+  for (k=0;k<width;k++) if (best.date < 0 && info[k].date >= 0.9 && !/^(year|month|day)$/i.test(info[k].hd)) best.date = k;
+  for (k=0;k<width;k++) if (k !== best.date && k !== tb0.timeCol && k !== tb0.typeCol && info[k].num >= 0.9 && !info[k].yearLike && !/^(year|month|day|date|time|id|no|sl|sn)\.?$/i.test(info[k].hd)) best.val = k;
+  if (best.date < 0) best.date = 0;
+  if (best.val < 0) best.val = Math.min(1, width-1);
+  $('colDate').value = String(best.date); $('colVal').value = String(best.val);
+  buildData(true);
+}
+
+function buildData(resetFilters){
+  var tb = state.table; if (!tb) return;
+  var iD = +$('colDate').value, iV = +$('colVal').value, mode = $('dateFmt').value;
+  var start = tb.header ? 1 : 0, rows = tb.rows;
+  var strs = [];
+  for (var i=start;i<rows.length && strs.length<3000;i++){ var dv = rows[i][iD]; if (typeof dv === 'string') strs.push(dv); }
+  var det = detectOrder(strs), order = mode === 'mdy' ? 'mdy' : (mode === 'dmy' ? 'dmy' : det.order);
+  var missRaw = $('missing').value.trim(), missCode = missRaw === '' ? null : parseFloat(missRaw);
+  var iT = +$('colTime').value, iTy = tb.typeCol >= 0 && $('regOnly').checked ? tb.typeCol : -1;
+  var T=[], V=[], bad=0, miss=0, empty=0, skippedType=0;
+  for (var r=start;r<rows.length;r++){
+    var row = rows[r], d = row[iD], v = row[iV];
+    if (d == null && v == null) continue;
+    if (iTy >= 0 && !/^regular$/i.test(String(row[iTy] == null ? '' : row[iTy]).trim())){ skippedType++; continue; }
+    var t = toTime(d, mode, order);
+    if (isNaN(t)){ bad++; continue; }
+    if (iT >= 0){ var dd = new Date(t); t = Date.UTC(dd.getUTCFullYear(), dd.getUTCMonth(), dd.getUTCDate()) + timeOf(row[iT]); }
+    var x = toNumber(v);
+    if (isNaN(x) || (missCode !== null && x === missCode)){ miss++; continue; }
+    T.push(t); V.push(x);
+  }
+  // several readings a day (e.g. 6-hourly gauge readings): offer daily mean / min / max so every day counts once
+  var dayKey = function(t){ return Math.floor(t / 86400000); }, days = new Map();
+  for (var p=0;p<T.length;p++){ var kd = dayKey(T[p]), g = days.get(kd); if (!g){ g = []; days.set(kd, g); } g.push(V[p]); }
+  var subDaily = T.length > days.size * 1.2, readings = T.length, agg = $('dayAgg').value;
+  $('dayAggWrap').hidden = !subDaily;
+  if (subDaily && agg !== 'none'){
+    T = []; V = [];
+    Array.from(days.keys()).sort(function(a,b){ return a-b; }).forEach(function(kd){
+      var a = days.get(kd), val;
+      if (agg === 'min') val = Math.min.apply(null, a); else if (agg === 'max') val = Math.max.apply(null, a);
+      else { var s2 = 0; for (var q2=0;q2<a.length;q2++) s2 += a[q2]; val = s2 / a.length; }
+      T.push(kd * 86400000); V.push(val);
+    });
+  }
+  if (!T.length){
+    state.data = null; render();
+    setStatus('No rows could be read. Check the date and value columns' + (bad ? ' (' + bad + ' dates unreadable)' : '') + '.', true);
+    return;
+  }
+  var n = T.length, Y = new Int32Array(n), M = new Uint8Array(n), cnt = {}, firstT = Infinity, lastT = -Infinity;
+  for (var q=0;q<n;q++){ var dt = new Date(T[q]); Y[q] = dt.getUTCFullYear(); M[q] = dt.getUTCMonth(); cnt[Y[q]] = (cnt[Y[q]]||0) + 1;
+    if (T[q] < firstT) firstT = T[q]; if (T[q] > lastT) lastT = T[q]; }
+  var years = Object.keys(cnt).map(Number).sort(function(a,b){ return a-b; }).map(function(y){ return {y:y, n:cnt[y]}; });
+  var sorted = years.map(function(y){ return y.n; }).sort(function(a,b){ return a-b; }), med = sorted[Math.floor(sorted.length/2)];
+  years.forEach(function(y){ y.partial = y.n < 0.9 * med; });
+  state.data = { n:n, T:T, V:V, Y:Y, M:M, years:years, first:firstT, last:lastT, bad:bad, miss:miss, med:med,
+    subDaily:subDaily, agg:subDaily ? agg : 'none', readings:readings, skippedType:skippedType };
+  if (resetFilters){
+    state.excluded = new Set(); state.monthsOn = Array(12).fill(true);
+    $('yFrom').value = years[0].y; $('yTo').value = years[years.length-1].y;
+  }
+  var iso = function(t){ return new Date(t).toISOString().slice(0,10); };
+  var msg = n.toLocaleString() + ' values · ' + iso(firstT) + ' to ' + iso(lastT) + ' · ' + years.length + ' years';
+  if (subDaily && agg !== 'none') msg += '\n' + readings.toLocaleString() + ' readings combined into daily ' + ({mean:'means', min:'minima', max:'maxima'}[agg]);
+  else if (subDaily) msg += '\nSeveral readings a day: every reading is ranked';
+  if (tb.skippedTop) msg += '\n' + tb.skippedTop + ' title row' + (tb.skippedTop > 1 ? 's' : '') + ' above the table skipped';
+  if (skippedType) msg += '\n' + skippedType.toLocaleString() + ' HIGH / LOW rows skipped (REGULAR only)';
+  if (miss) msg += '\n' + miss + ' blank or missing values skipped';
+  if (bad) msg += '\n' + bad + ' rows with unreadable dates skipped';
+  if (mode === 'auto' && typeof strs[0] === 'string' && /^\d{1,2}[-\/.]\d{1,2}[-\/.]\d{2,4}/.test(strs[0]) && !det.sure) msg += '\nDates read as day/month/year. Change the date format if that is wrong.';
+  setStatus(msg, bad > 0 && bad > n*0.05);
+  buildChips();
+  render();
+}
+function setStatus(msg, err){ var s = $('dataStatus'); s.textContent = msg; s.className = 'status' + (err ? ' err' : ''); }
+
+/* ---------------------------------------------------------------- example data */
+function makeExample(){
+  var s = 20261017;
+  function rnd(){ s |= 0; s = s + 0x6D2B79F5 | 0; var t = Math.imul(s ^ s >>> 15, 1 | s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }
+  function gauss(){ var u = 0, v = 0; while (!u) u = rnd(); while (!v) v = rnd(); return Math.sqrt(-2*Math.log(u)) * Math.cos(2*Math.PI*v); }
+  var rows = [['Date','Water level (mPWD)']], ar = 0;
+  for (var y=1985;y<=2023;y++){
+    var yf = clamp(1 + 0.24*gauss(), 0.55, 1.65), dry = clamp(1 + 0.3*gauss(), 0.45, 1.6);
+    var end = y === 2023 ? Date.UTC(y,8,30) : Date.UTC(y,11,31);
+    for (var t = Date.UTC(y,0,1); t <= end; t += 86400000){
+      var doy = Math.round((t - Date.UTC(y,0,1)) / 86400000);
+      var seas = 0.7 + 0.5*dry + 3.7*yf*Math.exp(-Math.pow((doy-226)/46,2)) + 0.45*Math.exp(-Math.pow((doy-140)/16,2));
+      ar = 0.95*ar + 0.06*gauss();
+      rows.push([new Date(t).toISOString().slice(0,10), Math.round((seas+ar)*1e4)/1e4]);
+    }
+  }
+  return rows;
+}
+function loadExample(){
+  state.example = true; state.fileName = 'Example';
+  $('unit').value = 'mPWD'; $('offset').value = '0'; $('unitOut').value = '';
+  loadTable(makeExample(), 'Example series');
+  updateBanner();
+}
+function updateFresh(){
+  var L = document.querySelector('.layout'); if (L) L.classList.toggle('fresh', !state.table);
+  $('exampleRow').hidden = !!state.table;
+}
+function updateBanner(){
+  var b = $('banner');
+  if (state.example){ b.hidden = false; $('bannerText').textContent = 'Showing a made-up example series, not real measurements.'; }
+  else b.hidden = true;
+}
+
+/* ---------------------------------------------------------------- settings */
+function settings(){
+  var type = $('varType').value;
+  var S = { P:num('P'), innerP:num('innerP'), dec:clamp(Math.round(num('decimals')||2),0,6), yFrom:num('yFrom'), yTo:num('yTo'),
+    months:state.monthsOn.slice(), type:type, name:$('qName').value.trim() || 'Value',
+    low:$('sideLow').checked, high:$('sideHigh').checked, rankBy:$('rankBy').value, split:$('split').value,
+    yearStat:$('yearStat').value, method:$('method').value, xscale:$('xscale').value, smooth:$('smooth').checked,
+    unit:$('unit').value.trim(), offset:isFinite(num('offset')) ? num('offset') : 0, unitOut:$('unitOut').value.trim(),
+    pp:$('pp').value, plist:parsePList($('plist').value) };
+  S.a = PP[S.pp] ? PP[S.pp].a : 0;
+  S.unitEff = S.unitOut || S.unit;
+  var lu = $('labelUnit').value.trim();
+  S.labelUnit = lu || (/^m[A-Z]/.test(S.unitEff) ? 'm' : S.unitEff);
+  return S;
+}
+
+/* ---------------------------------------------------------------- engine */
+function includedYears(S){
+  var set = new Set(); if (!state.data) return set;
+  state.data.years.forEach(function(y){ if (y.y >= S.yFrom && y.y <= S.yTo && !state.excluded.has(y.y)) set.add(y.y); });
+  return set;
+}
+// Plotting positions D = (R − a) × 100 / (n + 1 − 2a); Weibull (a = 0) is the report workbook's R × 100 / (n + 1)
+var PP = { weibull:{a:0, name:'Weibull', f:'D = R × 100 / (n + 1)'}, gringorten:{a:0.44, name:'Gringorten', f:'D = (R − 0.44) × 100 / (n + 0.12)'},
+  cunnane:{a:0.4, name:'Cunnane', f:'D = (R − 0.4) × 100 / (n + 0.2)'}, hazen:{a:0.5, name:'Hazen', f:'D = (R − 0.5) × 100 / n'} };
+function parsePList(s){
+  var seen = {}, out = [];
+  String(s || '').split(/[,;\s]+/).forEach(function(t){ var v = parseFloat(t); if (v > 0 && v < 100 && !seen[v]){ seen[v] = 1; out.push(v); } });
+  return out.sort(function(a,b){ return a-b; });
+}
+function sortEntries(arr, side, a){
+  a = a || 0;
+  arr.sort(side === 'low' ? function(x,y){ return y.v - x.v; } : function(x,y){ return x.v - y.v; });
+  var n = arr.length;
+  for (var i=0;i<n;i++){ arr[i].rank = i+1; arr[i].D = (i+1-a)*100/(n+1-2*a); }
+  return arr;
+}
+function pickAt(entries, P, method, a){
+  a = a || 0;
+  var n = entries.length; if (!n) return null;
+  var q = P/100*(n+1-2*a) + a, Dof = function(r){ return (r-a)*100/(n+1-2*a); };
+  if (method === 'interp'){
+    var qq = clamp(q,1,n), i0 = Math.floor(qq), i1 = Math.ceil(qq), f = qq - i0;
+    var v = entries[i0-1].v*(1-f) + entries[i1-1].v*f;
+    return { value:v, D:Dof(qq), rank:null, rankLo:i0, rankHi:i1, label:f===0 ? entries[i0-1].label : entries[i0-1].label + ' – ' + entries[i1-1].label, clipped:(q>n||q<1), interp:true, n:n };
+  }
+  var r = xround(q), clipped = r < 1 || r > n; r = clamp(r,1,n);
+  return { value:entries[r-1].v, D:Dof(r), rank:r, rankLo:r, rankHi:r, label:entries[r-1].label, clipped:clipped, interp:false, n:n };
+}
+function analyzeOne(S, monthIdx){
+  var D = state.data, inc = includedYears(S), byYear = new Map(), flat = [];
+  for (var i=0;i<D.n;i++){
+    var y = D.Y[i]; if (!inc.has(y)) continue;
+    var m = D.M[i]; if (monthIdx !== null ? m !== monthIdx : !S.months[m]) continue;
+    var v = D.V[i] - S.offset;
+    if (S.rankBy === 'years'){ var a = byYear.get(y); if (!a){ a = []; byYear.set(y,a); } a.push(v); }
+    else flat.push({v:v, label:new Date(D.T[i]).toISOString().slice(0,16).replace('T',' ').replace(/ 00:00$/,'')});
+  }
+  var out = { month:monthIdx, n:0, perYear:null, low:null, high:null, partial:[] };
+  if (S.rankBy === 'years'){
+    var rows = [], years = Array.from(byYear.keys()).sort(function(a,b){ return a-b; });
+    var cntMed = (function(){ var c = years.map(function(y){ return byYear.get(y).length; }).sort(function(a,b){ return a-b; }); return c.length ? c[Math.floor(c.length/2)] : 0; })();
+    years.forEach(function(y){
+      var vals = byYear.get(y), n = vals.length, a = Float64Array.from(vals).sort(), lo, hi;
+      if (S.yearStat === 'dep'){ var r = clamp(xround(S.innerP/100*(n+1-2*S.a) + S.a),1,n); lo = a[n-r]; hi = a[r-1]; }
+      else if (S.yearStat === 'ext'){ lo = a[0]; hi = a[n-1]; }
+      else { var sum = 0; for (var k=0;k<n;k++) sum += a[k]; lo = hi = (S.yearStat === 'mean' ? sum/n : sum); }
+      var part = n < 0.9*cntMed;
+      if (part) out.partial.push({y:y, n:n, med:cntMed});
+      rows.push({ y:y, n:n, low:lo, high:hi, partial:part });
+    });
+    out.perYear = rows; out.n = rows.length;
+    if (S.low) out.low  = rankSide(rows.map(function(r){ return {v:r.low,  label:String(r.y)}; }), 'low', S);
+    if (S.high) out.high = rankSide(rows.map(function(r){ return {v:r.high, label:String(r.y)}; }), 'high', S);
+  } else {
+    out.n = flat.length;
+    if (S.low) out.low = rankSide(flat.map(function(e){ return {v:e.v, label:e.label}; }), 'low', S);
+    if (S.high) out.high = rankSide(flat.map(function(e){ return {v:e.v, label:e.label}; }), 'high', S);
+  }
+  return out;
+}
+function rankSide(items, side, S){
+  var entries = sortEntries(items, side, S.a);
+  return { side:side, entries:entries, n:entries.length, at:pickAt(entries, S.P, S.method, S.a) };
+}
+function analyze(S){
+  if (!state.data) return null;
+  var res = { S:S, views:{} };
+  if (S.split === 'month'){
+    for (var m=0;m<12;m++) if (S.months[m]) res.views[m] = analyzeOne(S, m);
+  } else res.views.all = analyzeOne(S, null);
+  return res;
+}
+
+/* ---------------------------------------------------------------- figure */
+function niceAxis(lo, hi, head){
+  var span = hi - lo; if (!(span > 0)) span = Math.abs(hi)*0.1 || 1;
+  var lo2 = lo - 0.04*span, hi2 = hi + head*span, raw = (hi2 - lo2)/5, mag = Math.pow(10, Math.floor(Math.log10(raw))), step = mag;
+  [1,2,2.5,5,10].some(function(c){ if (c*mag >= raw - 1e-12){ step = c*mag; return true; } return false; });
+  var mn = Math.floor(lo2/step + 1e-9)*step, mx = Math.ceil(hi2/step - 1e-9)*step, ticks = [];
+  for (var v = mn; v <= mx + step*1e-6; v += step) ticks.push(Number(v.toFixed(10)));
+  var dec = 0; while (dec < 6 && Math.abs(step*Math.pow(10,dec) - Math.round(step*Math.pow(10,dec))) > 1e-7) dec++;
+  return { min:mn, max:mx, ticks:ticks, dec:dec };
+}
+function f1(x){ return (Math.round(x*10)/10).toString(); }
+function smoothPath(P){
+  if (P.length < 3) return 'M' + P.map(function(p){ return f1(p[0])+','+f1(p[1]); }).join('L');
+  var d = 'M' + f1(P[0][0]) + ',' + f1(P[0][1]);
+  for (var i=0;i<P.length-1;i++){
+    var p0 = P[i-1] || P[i], p1 = P[i], p2 = P[i+1], p3 = P[i+2] || P[i+1];
+    d += 'C' + f1(p1[0]+(p2[0]-p0[0])/6) + ',' + f1(p1[1]+(p2[1]-p0[1])/6) + ' ' + f1(p2[0]-(p3[0]-p1[0])/6) + ',' + f1(p2[1]-(p3[1]-p1[1])/6) + ' ' + f1(p2[0]) + ',' + f1(p2[1]);
+  }
+  return d;
+}
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function figureTitle(side, S){
+  var both = S.low && S.high;
+  if (S.type === 'level' || both) return 'Dependable ' + (side === 'high' ? 'Maximum' : 'Minimum') + ' ' + S.name + ' Curve';
+  return 'Dependable ' + S.name + ' Curve';
+}
+function axisTitle(side, S){
+  var both = S.low && S.high, pre = (S.type === 'level' || both) ? (side === 'high' ? 'Max. ' : 'Min. ') : '';
+  return pre + S.name + ' (' + S.unitEff + ')';
+}
+var EXPORT_CSS = '.f-bg{fill:#fff;stroke:#D9D9D9;stroke-width:1}.f-grid{stroke:#D9D9D9;stroke-width:1}.f-axis{stroke:#BFBFBF;stroke-width:1}' +
+  '.f-tick{fill:#000;font-family:Cambria,Caladea,Georgia,serif;font-size:15px}.f-title{fill:#000;font-family:Cambria,Caladea,Georgia,serif;font-size:24px;font-weight:700}' +
+  '.f-axt{fill:#000;font-family:Cambria,Caladea,Georgia,serif;font-size:16px;font-weight:700}.f-line{fill:none;stroke:#1BA1E2;stroke-width:2.2;stroke-linejoin:round;stroke-linecap:round}' +
+  '.f-dot{fill:#1BA1E2}.f-target{stroke:#A0228C;stroke-width:3}.f-box{fill:#CDEBF7}.f-boxt{fill:#000;font-family:Cambria,Caladea,Georgia,serif;font-size:16px}' +
+  '.f-boxv{fill:#000;font-family:Cambria,Caladea,Georgia,serif;font-size:20px;font-weight:700}';
+function buildFigure(sr, S, forExport){
+  var W = 1002, H = 602, L = 93, R = 957, T = 78, B = 510, entries = sr.entries, n = entries.length, at = sr.at;
+  var vmin = Infinity, vmax = -Infinity, dmin = Infinity, i;
+  for (i=0;i<n;i++){ var e = entries[i]; if (e.v < vmin) vmin = e.v; if (e.v > vmax) vmax = e.v; if (e.D < dmin) dmin = e.D; }
+  var ax = niceAxis(vmin, vmax, 0.24), log = S.xscale === 'log';
+  var xlo = log ? Math.pow(10, Math.floor(Math.log10(dmin))) : 0, xhi = 100;
+  function X(D){ return log ? L + (Math.log10(D) - Math.log10(xlo)) / (Math.log10(xhi) - Math.log10(xlo)) * (R-L) : L + (D - xlo)/(xhi - xlo)*(R-L); }
+  function Yp(v){ return B - (v - ax.min)/(ax.max - ax.min)*(B - T); }
+  var xt = X(at.D), pts = new Array(n);
+  for (i=0;i<n;i++) pts[i] = [X(entries[i].D), Yp(entries[i].v)];
+  var g = [];
+  g.push('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + esc(figureTitle(sr.side, S)) + '">');
+  if (forExport) g.push('<style>' + EXPORT_CSS + '</style>');
+  g.push('<rect class="f-bg" x="0.5" y="0.5" width="' + (W-1) + '" height="' + (H-1) + '"/>');
+  g.push('<text class="f-title" x="' + W/2 + '" y="36" text-anchor="middle" dy="0.35em">' + esc(figureTitle(sr.side, S)) + '</text>');
+  ax.ticks.forEach(function(t){ var y = Yp(t);
+    g.push('<line class="f-grid" x1="' + L + '" x2="' + R + '" y1="' + f1(y) + '" y2="' + f1(y) + '"/>');
+    g.push('<text class="f-tick" x="' + (L-10) + '" y="' + f1(y) + '" text-anchor="end" dy="0.35em">' + t.toFixed(ax.dec) + '</text>'); });
+  var xticks = [];
+  if (log){ for (var k = Math.round(Math.log10(xlo)); k <= 2; k++) xticks.push(Math.pow(10,k)); } else xticks = [0,20,40,60,80,100];
+  xticks.forEach(function(t){ var x = X(t || 1e-9);
+    if (t !== xlo || log) g.push('<line class="f-grid" x1="' + f1(x) + '" x2="' + f1(x) + '" y1="' + T + '" y2="' + B + '"/>');
+    g.push('<text class="f-tick" x="' + f1(x) + '" y="' + (B+24) + '" text-anchor="middle">' + (t >= 1 ? String(t) : String(Number(t.toPrecision(3)))) + '</text>'); });
+  g.push('<line class="f-axis" x1="' + L + '" x2="' + L + '" y1="' + T + '" y2="' + B + '"/><line class="f-axis" x1="' + L + '" x2="' + R + '" y1="' + B + '" y2="' + B + '"/>');
+  g.push('<text class="f-axt" x="' + (L+R)/2 + '" y="568" text-anchor="middle">Dependency (%)</text>');
+  g.push('<text class="f-axt" transform="translate(26 ' + (T+B)/2 + ') rotate(-90)" text-anchor="middle">' + esc(axisTitle(sr.side, S)) + '</text>');
+  var dots = n <= 150;
+  g.push('<path class="f-line" d="' + (S.smooth && n <= 200 ? smoothPath(pts) : 'M' + pts.map(function(p){ return f1(p[0]) + ',' + f1(p[1]); }).join('L')) + '"/>');
+  if (dots) g.push('<g>' + pts.map(function(p){ return '<circle class="f-dot" cx="' + f1(p[0]) + '" cy="' + f1(p[1]) + '" r="4.4"/>'; }).join('') + '</g>');
+  g.push('<line class="f-target" x1="' + f1(xt) + '" x2="' + f1(xt) + '" y1="' + T + '" y2="' + B + '"/>');
+  // label box, moved to a free spot if the curve is in the way
+  var valTxt = fmt(at.value, S.dec) + ' ' + S.labelUnit, subTxt = 'at ' + (Math.round(S.P*100)/100) + '% dependency';
+  var bw = Math.max(218, Math.max(valTxt.length*11.5, subTxt.length*8.4) + 44), bh = 66, cands = [], cx = (L + xt)/2;
+  [[xt-14-bw, T+12],[xt-14-bw, B-12-bh],[xt-14-bw-0.3*(xt-L-bw), T+12],[cx-bw/2, T+12],[cx-bw/2, B-12-bh],[L+20, T+12],[L+20, B-12-bh],[xt+14, T+12],[xt+14, B-12-bh]]
+    .forEach(function(c){ if (c[0] >= L+4 && c[0]+bw <= R-4) cands.push(c); });
+  var pos = cands[0] || [L+20, T+12];
+  for (var ci=0; ci<cands.length; ci++){
+    var c = cands[ci], hit = false;
+    for (var pi=0; pi<n && !hit; pi++){ var p = pts[pi]; if (p[0] > c[0]-10 && p[0] < c[0]+bw+10 && p[1] > c[1]-10 && p[1] < c[1]+bh+10) hit = true; }
+    if (!hit && n > 1) for (pi=0; pi<n-1 && !hit; pi++){ var a = pts[pi], b = pts[pi+1];
+      for (var s=1;s<6;s++){ var px = a[0]+(b[0]-a[0])*s/6, py = a[1]+(b[1]-a[1])*s/6; if (px > c[0]-6 && px < c[0]+bw+6 && py > c[1]-6 && py < c[1]+bh+6){ hit = true; break; } } }
+    if (!hit){ pos = c; break; }
+  }
+  g.push('<rect class="f-box" x="' + f1(pos[0]) + '" y="' + f1(pos[1]) + '" width="' + f1(bw) + '" height="' + bh + '"/>');
+  g.push('<text class="f-boxv" x="' + f1(pos[0]+bw/2) + '" y="' + f1(pos[1]+24) + '" text-anchor="middle" dy="0.35em">' + esc(valTxt) + '</text>');
+  g.push('<text class="f-boxt" x="' + f1(pos[0]+bw/2) + '" y="' + f1(pos[1]+47) + '" text-anchor="middle" dy="0.35em">' + esc(subTxt) + '</text>');
+  if (!forExport) g.push('<circle class="f-hover" id="hov-' + sr.side + '" r="8" cx="-50" cy="-50"/>');
+  g.push('</svg>');
+  return { svg:g.join(''), pts:pts, W:W, H:H };
+}
+
+/* ---------------------------------------------------------------- render */
+function sideName(side, S){
+  var both = S.low && S.high;
+  if (S.type === 'level' || both) return (side === 'high' ? 'maximum ' : 'minimum ') + S.name.toLowerCase();
+  return S.name.toLowerCase();
+}
+function pnum(P){ return String(Math.round(P*100)/100); }
+function currentView(res){
+  var S = res.S;
+  if (S.split === 'month'){
+    var keys = Object.keys(res.views).map(Number).sort(function(a,b){ return a-b; });
+    if (!keys.length) return null;
+    if (!(state.pickedMonth in res.views)) state.pickedMonth = keys[0];
+    return res.views[state.pickedMonth];
+  }
+  return res.views.all;
+}
+function validate(S){
+  if (!state.data) return 'Load a file to start.';
+  if (!(S.P > 0 && S.P < 100)) return 'Dependability P must be between 0 and 100.';
+  if (S.rankBy === 'years' && S.yearStat === 'dep' && !(S.innerP > 0 && S.innerP < 100)) return 'Within-year P must be between 0 and 100.';
+  if (!S.low && !S.high) return 'Tick at least one side (low or high).';
+  if (!isFinite(S.yFrom) || !isFinite(S.yTo)) return 'Enter the first and last year.';
+  return null;
+}
+
+function render(){
+  var host = $('results'), S = settings();
+  syncControls(S);
+  saveSettings();
+  var err = validate(S);
+  if (err){ host.innerHTML = '<div class="empty">' + esc(err) + '</div>'; state.last = null; return; }
+  var res = analyze(S); state.last = res;
+  var view = currentView(res);
+  if (!view || !view.n || (!view.low && !view.high)){
+    host.innerHTML = '<div class="empty">No values in this selection. Widen the years or months.</div>'; return;
+  }
+  var h = [], notes = [];
+  // month picker
+  if (S.split === 'month'){
+    h.push('<div class="tblcard"><div class="tbar"><h3>Month</h3><span class="hint">Pick a month to see its curve and values</span></div><div class="chips" id="monthPick">' +
+      Object.keys(res.views).map(Number).sort(function(a,b){return a-b;}).map(function(m){
+        return '<button class="chip" type="button" data-m="' + m + '" aria-pressed="' + (m === state.pickedMonth) + '">' + MONTHS[m] + '</button>'; }).join('') + '</div></div>');
+  }
+  // cards
+  h.push('<div class="cards">');
+  ['low','high'].forEach(function(side){
+    var sr = view[side]; if (!sr) return;
+    var at = sr.at;
+    var detail = at.interp ? 'interpolated, ranks ' + at.rankLo + '–' + at.rankHi + ' of ' + at.n : 'rank ' + at.rank + ' of ' + at.n;
+    detail += ' · D = ' + fmt(at.D, 2) + '%';
+    var src = at.label ? '<div class="d">' + (S.rankBy === 'years' ? 'from ' : 'on ') + esc(at.label) + '</div>' : '';
+    h.push('<div class="card"><div class="k">' + esc(pnum(S.P) + '% dependable ' + sideName(side, S)) + (S.split === 'month' ? ' · ' + MONTHS[state.pickedMonth] : '') + '</div>' +
+      '<div class="v">' + fmt(at.value, S.dec) + '<small>' + esc(S.unitEff) + '</small></div><div class="d">' + detail + '</div>' + src + '</div>');
+    if (at.clipped) notes.push('With ' + at.n + ' ranked values the plotting position cannot reach ' + pnum(S.P) + '%, so the ' + side + '-side value uses the last rank (D = ' + fmt(at.D,2) + '%).');
+  });
+  h.push('</div>');
+  h.push('<div class="mini" style="justify-content:flex-end;margin-top:-6px"><span class="hint">A methods paragraph with these numbers, ready for the report</span><button type="button" data-act="report">Copy report text</button></div>');
+  if (S.pp !== 'weibull') notes.push('Plotting position: ' + PP[S.pp].name + ' (' + PP[S.pp].f + '). The report workbook uses Weibull.');
+  if (view.partial && view.partial.length && S.rankBy === 'years' && S.yearStat !== 'sum')
+    notes.push('Incomplete year' + (view.partial.length>1?'s':'') + ' included: ' + view.partial.map(function(p){ return p.y + ' (' + p.n + ' of about ' + p.med + ' values)'; }).join(', ') + '. Use “Full years only” to leave ' + (view.partial.length>1?'them':'it') + ' out.');
+  if (view.partial && view.partial.length && S.rankBy === 'years' && S.yearStat === 'sum')
+    notes.push('Totals for incomplete year' + (view.partial.length>1?'s':'') + ' are understated: ' + view.partial.map(function(p){ return p.y; }).join(', ') + '.');
+  if (S.rankBy === 'years' && view.n < 10) notes.push('Only ' + view.n + ' years are ranked. Dependable values near ' + pnum(S.P) + '% are not reliable with so few years.');
+  if (S.offset !== 0) notes.push('Values are converted before ranking: ' + S.unit + ' − ' + S.offset + ' = ' + S.unitEff + '.');
+  if (notes.length) h.push('<div class="notes">' + notes.map(function(t,i){ return '<div class="note' + (/^(Values are converted|Plotting position)/.test(t) ? ' info' : '') + '">' + esc(t) + '</div>'; }).join('') + '</div>');
+  // figures
+  h.push('<div class="figs">');
+  var figs = {};
+  ['high','low'].forEach(function(side){
+    var sr = view[side]; if (!sr) return;
+    var fg = buildFigure(sr, S, false); figs[side] = fg;
+    h.push('<div class="fig"><header><h3>' + esc(figureTitle(side, S)) + '</h3><button type="button" data-png="' + side + '">Save PNG</button></header>' +
+      '<div class="figbox" id="figbox-' + side + '">' + fg.svg + '<div class="tip" id="tip-' + side + '" hidden></div></div></div>');
+  });
+  h.push('</div>');
+  // tables
+  var tabs = [];
+  if (S.rankBy === 'years') tabs.push(['values','Values by year']);
+  tabs.push(['ranked','Ranked list']);
+  if (S.plist.length) tabs.push(['dtable','Dependability table']);
+  if (S.split === 'month') tabs.push(['months','All months']);
+  if (!tabs.some(function(t){ return t[0] === state.tab; })) state.tab = tabs[0][0];
+  h.push('<div class="tblcard"><div class="tabs" role="tablist">' + tabs.map(function(t){
+    return '<button class="tab" role="tab" type="button" data-tab="' + t[0] + '" aria-selected="' + (t[0] === state.tab) + '">' + t[1] + '</button>'; }).join('') + '</div>');
+  var tbl = tableFor(state.tab, res, view, S);
+  h.push('<div class="tbar"><span class="hint">' + esc(tbl.caption) + '</span><span class="mini">' + tbl.extra +
+    '<button type="button" data-act="copy">Copy table</button><button type="button" data-act="csv">CSV</button><button class="primary" type="button" data-act="xlsx">Excel workbook</button></span></div>' +
+    '<div class="tablewrap">' + tbl.html + '</div></div>');
+  host.innerHTML = h.join('');
+  state.tbl = tbl; state.figs = figs;
+  wireResults(view, S, figs);
+}
+
+function headLabels(S){
+  if (S.yearStat === 'mean' || S.yearStat === 'sum') return {low:S.yearStat === 'mean' ? 'Mean' : 'Total', high:S.yearStat === 'mean' ? 'Mean' : 'Total'};
+  if (S.type === 'level') return {high:'Max WL', low:'Min WL'};
+  return {high:'High', low:'Low'};
+}
+// value at each P in the dependability-table list, for each side; rows = [P, low value, low source, high value, high source]
+function depTable(view, S){
+  var sides = ['low','high'].filter(function(s){ return view[s]; });
+  var cap = function(s){ return s.charAt(0).toUpperCase() + s.slice(1); };
+  var head = ['P (%)'];
+  sides.forEach(function(s){ head.push(cap(sideName(s, S)) + ' (' + S.unitEff + ')', S.rankBy === 'years' ? 'Year' : 'Date'); });
+  var clipped = false;
+  var rows = S.plist.map(function(P){
+    var r = [P];
+    sides.forEach(function(s){ var at = pickAt(view[s].entries, P, S.method, S.a); if (at && at.clipped) clipped = true;
+      r.push(at ? at.value : '', at ? at.label + (at.clipped ? ' *' : '') : ''); });
+    return r;
+  });
+  return { head:head, rows:rows, sides:sides, clipped:clipped };
+}
+function tableFor(kind, res, view, S){
+  var d = S.dec, unit = S.unitEff, rows = [], head = [], html, caption = '', extra = '';
+  if (kind === 'values'){
+    var hl = headLabels(S), single = (S.yearStat === 'mean' || S.yearStat === 'sum');
+    head = ['Year', 'Values']; if (single){ head.push(hl.low); } else { if (S.high) head.push(hl.high); if (S.low) head.push(hl.low); }
+    view.perYear.forEach(function(r){
+      var row = [String(r.y), String(r.n)];
+      if (single) row.push(fmt(S.low ? r.low : r.high, d)); else { if (S.high) row.push(fmt(r.high, d)); if (S.low) row.push(fmt(r.low, d)); }
+      row._partial = r.partial; rows.push(row);
+    });
+    caption = 'One value per year · ' + unit + (S.split === 'month' ? ' · ' + MONTHS[state.pickedMonth] : '');
+  } else if (kind === 'ranked'){
+    var sides = ['low','high'].filter(function(s){ return view[s]; });
+    if (sides.indexOf(state.rankSide) < 0) state.rankSide = sides[0];
+    var sr = view[state.rankSide], at = sr.at, n = sr.n;
+    head = ['Rank', 'D (%)', S.rankBy === 'years' ? 'Year' : 'Date', 'Value (' + unit + ')'];
+    var show = new Set();
+    if (n <= 70) for (var i=1;i<=n;i++) show.add(i);
+    else { for (i=1;i<=8;i++) show.add(i); for (i=n-7;i<=n;i++) show.add(i); for (i=at.rankLo-12;i<=at.rankHi+12;i++) if (i>=1 && i<=n) show.add(i); }
+    var prev = 0;
+    sr.entries.forEach(function(e){
+      if (!show.has(e.rank)) return;
+      if (prev && e.rank - prev > 1){ var g = ['…','','','']; g._gap = true; rows.push(g); }
+      var row = [String(e.rank), fmt(e.D, 2), e.label, fmt(e.v, d)]; row._hit = e.rank >= at.rankLo && e.rank <= at.rankHi; rows.push(row); prev = e.rank;
+    });
+    caption = (state.rankSide === 'low' ? 'Low side, ranked high to low' : 'High side, ranked low to high') + ' · highlighted = value at P';
+    if (sides.length > 1) extra = '<span class="mini">' + sides.map(function(s){ return '<button class="chip" type="button" data-rs="' + s + '" aria-pressed="' + (s === state.rankSide) + '">' + (s === 'low' ? 'Low side' : 'High side') + '</button>'; }).join('') + '</span>';
+  } else if (kind === 'dtable'){
+    var dt = depTable(view, S);
+    head = dt.head;
+    dt.rows.forEach(function(r){ var row = r.map(function(c, i){ return i === 0 ? pnum(c) : (typeof c === 'number' ? fmt(c, d) : c); }); row._hit = r[0] === S.P; rows.push(row); });
+    caption = 'Values at several dependability levels · ' + unit + (S.split === 'month' ? ' · ' + MONTHS[state.pickedMonth] : '') + ' · highlighted = P in use' +
+      (dt.clipped ? ' · * beyond the record: the last rank is used' : '');
+  } else {
+    head = ['Month', 'Ranked']; if (S.low) head.push('Low @ ' + pnum(S.P) + '%'); if (S.high) head.push('High @ ' + pnum(S.P) + '%');
+    Object.keys(res.views).map(Number).sort(function(a,b){return a-b;}).forEach(function(m){
+      var v = res.views[m], row = [MONTHS[m], String(v.n)];
+      if (S.low) row.push(v.low ? fmt(v.low.at.value, d) : ''); if (S.high) row.push(v.high ? fmt(v.high.at.value, d) : '');
+      row._m = m; rows.push(row); });
+    caption = 'Dependable values for each month · ' + unit;
+  }
+  html = '<table><thead><tr>' + head.map(function(h){ return '<th>' + esc(h) + '</th>'; }).join('') + '</tr></thead><tbody>' +
+    rows.map(function(r){ return '<tr' + (r._hit ? ' class="hit"' : '') + (r._gap ? ' class="gap"' : '') + (r._m != null ? ' class="click" data-m="' + r._m + '"' : '') + '>' +
+      r.map(function(c,i){ return '<td' + (i>0 ? ' class="mono"' : '') + '>' + esc(c) + (i === 0 && r._partial ? '<span class="tag">incomplete</span>' : '') + '</td>'; }).join('') + '</tr>'; }).join('') + '</tbody></table>';
+  return { head:head, rows:rows, html:html, caption:caption, extra:extra, kind:kind };
+}
+
+function wireResults(view, S, figs){
+  var host = $('results');
+  host.querySelectorAll('[data-tab]').forEach(function(b){ b.addEventListener('click', function(){ state.tab = b.getAttribute('data-tab'); render(); }); });
+  host.querySelectorAll('[data-rs]').forEach(function(b){ b.addEventListener('click', function(){ state.rankSide = b.getAttribute('data-rs'); render(); }); });
+  host.querySelectorAll('[data-m]').forEach(function(b){ b.addEventListener('click', function(){ state.pickedMonth = +b.getAttribute('data-m'); render(); }); });
+  host.querySelectorAll('[data-png]').forEach(function(b){ b.addEventListener('click', function(){ savePNG(b.getAttribute('data-png')); }); });
+  host.querySelectorAll('[data-act]').forEach(function(b){ b.addEventListener('click', function(){
+    var a = b.getAttribute('data-act'); if (a === 'copy') copyTable(); else if (a === 'csv') saveCSV(); else if (a === 'report') copyReport(); else saveXLSX(); }); });
+  Object.keys(figs).forEach(function(side){
+    var box = $('figbox-' + side), tip = $('tip-' + side), svg = box.querySelector('svg'), hov = $('hov-' + side), pts = figs[side].pts, entries = view[side].entries;
+    function move(ev){
+      var r = svg.getBoundingClientRect(), sx = 1002 / r.width, px = (ev.clientX - r.left)*sx, py = (ev.clientY - r.top)*sx, best = -1, bd = 24*24;
+      for (var i=0;i<pts.length;i++){ var dx = pts[i][0]-px, dy = pts[i][1]-py, dd = dx*dx+dy*dy; if (dd < bd){ bd = dd; best = i; } }
+      if (best < 0){ tip.hidden = true; hov.setAttribute('cx', -50); return; }
+      var e = entries[best];
+      hov.setAttribute('cx', pts[best][0]); hov.setAttribute('cy', pts[best][1]);
+      tip.textContent = 'Rank ' + e.rank + ' of ' + entries.length + '\nD = ' + fmt(e.D,2) + '%\n' + e.label + ': ' + fmt(e.v, S.dec) + ' ' + S.unitEff;
+      tip.style.left = (pts[best][0]/1002*100) + '%'; tip.style.top = (pts[best][1]/602*100) + '%'; tip.hidden = false;
+    }
+    svg.addEventListener('pointermove', move);
+    svg.addEventListener('pointerleave', function(){ tip.hidden = true; hov.setAttribute('cx', -50); });
+  });
+}
+
+/* ---------------------------------------------------------------- controls */
+function syncControls(S){
+  $('yearStatRow').hidden = S.rankBy !== 'years';
+  $('innerPWrap').hidden = !(S.rankBy === 'years' && S.yearStat === 'dep');
+  if (!state.innerTouched) $('innerP').value = $('P').value;
+  $('eq').textContent = S.offset === 0 ? 'result = value (no datum shift)' : 'result = value ' + (S.offset > 0 ? '− ' : '+ ') + Math.abs(S.offset) + '   (' + (S.unit || 'data') + ' → ' + (S.unitOut || S.unit || 'result') + ')';
+  document.querySelectorAll('#yearChips .chip').forEach(function(c){
+    var y = +c.getAttribute('data-y'), inRange = y >= S.yFrom && y <= S.yTo, on = inRange && !state.excluded.has(y);
+    c.setAttribute('aria-pressed', String(on)); c.classList.toggle('out', !inRange); if (!inRange) c.setAttribute('aria-pressed','false');
+  });
+  document.querySelectorAll('#monthChips .chip').forEach(function(c){ c.setAttribute('aria-pressed', String(state.monthsOn[+c.getAttribute('data-m')])); });
+}
+function buildChips(){
+  var D = state.data; if (!D) return;
+  $('yearChips').innerHTML = D.years.map(function(y){
+    return '<button type="button" class="chip' + (y.partial ? ' partial' : '') + '" data-y="' + y.y + '" aria-pressed="true" title="' + y.n + ' values' + (y.partial ? ' (incomplete)' : '') + '">' + y.y + '</button>'; }).join('');
+  $('yearChips').querySelectorAll('.chip').forEach(function(c){ c.addEventListener('click', function(){
+    var y = +c.getAttribute('data-y'); if (state.excluded.has(y)) state.excluded.delete(y); else state.excluded.add(y);
+    var S = settings(); if (y < S.yFrom) $('yFrom').value = y; if (y > S.yTo) $('yTo').value = y;
+    render(); }); });
+  $('monthChips').innerHTML = MONTHS.map(function(m,i){ return '<button type="button" class="chip" data-m="' + i + '" aria-pressed="true">' + m + '</button>'; }).join('');
+  $('monthChips').querySelectorAll('.chip').forEach(function(c){ c.addEventListener('click', function(){
+    var m = +c.getAttribute('data-m'); state.monthsOn[m] = !state.monthsOn[m]; render(); }); });
+}
+function applyPreset(){
+  var t = $('varType').value;
+  var p = { level:{name:'Water Level', low:true, high:true, rank:'years', stat:'dep'},
+            flow:{name:'Discharge', low:true, high:false, rank:'values', stat:'dep', unit:'m\u00B3/s'},
+            rain:{name:'Rainfall', low:true, high:false, rank:'years', stat:'sum', unit:'mm'},
+            other:{name:'Value', low:true, high:false, rank:'years', stat:'dep', unit:''} }[t];
+  if (p.unit != null){ $('unit').value = p.unit; $('offset').value = '0'; $('unitOut').value = ''; $('labelUnit').value = ''; }
+  else if (!$('unit').value.trim()) $('unit').value = 'mPWD';
+  $('qName').value = p.name; $('sideLow').checked = p.low; $('sideHigh').checked = p.high; $('rankBy').value = p.rank; $('yearStat').value = p.stat;
+}
+
+/* ---------------------------------------------------------------- export */
+var toastTimer;
+function toast(msg){ var t = $('toast'); t.textContent = msg; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(function(){ t.hidden = true; }, 3200); }
+async function saveFile(name, data){
+  try {
+    var blob = data instanceof Blob ? data : new Blob([data]), a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove(); toast('Saved ' + name);
+  } catch (e2){ toast('Saving is not available in this view.'); }
+}
+function baseName(S){ return 'Dependability_' + pnum(S.P).replace('.','p') + 'pct_' + (S.unitEff || 'value').replace(/[^A-Za-z0-9]+/g,''); }
+function tsv(tbl){ return [tbl.head].concat(tbl.rows.filter(function(r){ return !r._gap; })).map(function(r){ return Array.prototype.slice.call(r).join('\t'); }).join('\n'); }
+function csvText(tbl){
+  function q(c){ c = String(c); return /[",\n]/.test(c) ? '"' + c.replace(/"/g,'""') + '"' : c; }
+  return [tbl.head].concat(tbl.rows.filter(function(r){ return !r._gap; })).map(function(r){ return Array.prototype.slice.call(r).map(q).join(','); }).join('\r\n');
+}
+async function copyTable(){
+  if (!state.tbl) return; var text = tsv(state.tbl);
+  try { await navigator.clipboard.writeText(text); toast('Table copied. Paste it into Word or Excel.'); }
+  catch (e){ var ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); toast('Table copied.'); } catch (e2){ toast('Copy is blocked here. Use the CSV button.'); } ta.remove(); }
+}
+// A methods paragraph for the report, written from the settings and the values on screen
+function reportText(){
+  var res = state.last; if (!res) return '';
+  var S = res.S, view = currentView(res), D = state.data; if (!view) return '';
+  var src = state.example ? 'a made-up example series' : (state.table ? state.table.name : 'the record');
+  var excl = Array.from(state.excluded).filter(function(y){ return y >= S.yFrom && y <= S.yTo; }).sort(function(a,b){ return a-b; });
+  var monthsOn = MONTHS.filter(function(m,i){ return S.months[i]; });
+  var pp = PP[S.pp] || PP.weibull, name = S.name.toLowerCase(), t = [];
+  t.push('Dependable ' + name + ' values were derived from ' + src + ' for ' + S.yFrom + '–' + S.yTo +
+    (excl.length ? ' (excluding ' + excl.join(', ') + ')' : '') + (monthsOn.length < 12 ? ', using ' + monthsOn.join(', ') : '') + '.');
+  if (D.agg && D.agg !== 'none') t.push('Several readings a day were first reduced to the daily ' + {mean:'mean', min:'minimum', max:'maximum'}[D.agg] + '.');
+  if (S.offset !== 0) t.push('Values were converted from ' + (S.unit || 'the data datum') + ' to ' + S.unitEff + ' by ' + (S.offset > 0 ? 'subtracting ' : 'adding ') + Math.abs(S.offset) + ' m.');
+  if (S.split === 'month') t.push('Each calendar month was analysed separately; the values below are for ' + MONTHS[state.pickedMonth] + '.');
+  if (S.rankBy === 'years'){
+    var how = {dep:'the ' + pnum(S.innerP) + '% dependable value within the year was determined', ext:'the annual minimum and maximum were taken',
+      mean:'the annual mean was taken', sum:'the annual total was taken'}[S.yearStat];
+    t.push('For each year ' + how + ', and the ' + view.n + ' annual values were ranked and assigned ' + pp.name + ' plotting positions (' + pp.f + ').');
+  } else t.push('All ' + view.n.toLocaleString() + ' values were ranked and assigned ' + pp.name + ' plotting positions (' + pp.f + ').');
+  t.push('The value at ' + pnum(S.P) + '% dependability was ' + (S.method === 'interp' ? 'interpolated between the neighbouring ranks' : 'taken at the nearest rank, ROUND(P/100 × (n + 1))') + '.');
+  var parts = [];
+  ['low','high'].forEach(function(side){
+    var sr = view[side]; if (!sr) return; var at = sr.at;
+    parts.push('the ' + pnum(S.P) + '% dependable ' + sideName(side, S) + ' is ' + fmt(at.value, S.dec) + ' ' + S.unitEff +
+      (at.label ? ' (' + (S.rankBy === 'years' ? 'year ' : '') + at.label + (at.interp ? '' : ', rank ' + at.rank + ' of ' + at.n) + ')' : ''));
+  });
+  if (parts.length){ var s = parts.join(', and '); t.push(s.charAt(0).toUpperCase() + s.slice(1) + '.'); }
+  return t.join(' ');
+}
+async function copyReport(){
+  var text = reportText(); if (!text) return;
+  try { await navigator.clipboard.writeText(text); toast('Report text copied. Paste it into your report and edit as needed.'); }
+  catch (e){ var ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); toast('Report text copied.'); } catch (e2){ toast('Copy is blocked here.'); } ta.remove(); }
+}
+function saveCSV(){ if (!state.last || !state.tbl) return; saveFile(baseName(state.last.S) + '_' + state.tbl.kind + '.csv', '﻿' + csvText(state.tbl)); }
+function savePNG(side){
+  var res = state.last; if (!res) return; var view = currentView(res), sr = view[side]; if (!sr) return;
+  var fg = buildFigure(sr, res.S, true), img = new Image();
+  var url = URL.createObjectURL(new Blob([fg.svg], {type:'image/svg+xml'}));
+  img.onload = function(){
+    var c = document.createElement('canvas'); c.width = 2004; c.height = 1204; var cx = c.getContext('2d');
+    cx.fillStyle = '#fff'; cx.fillRect(0,0,c.width,c.height); cx.drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(url);
+    c.toBlob(function(b){ if (!b){ toast('Could not make the image.'); return; }
+      saveFile(baseName(res.S) + '_' + (side === 'high' ? 'max' : 'min') + (res.S.split === 'month' ? '_' + MONTHS[state.pickedMonth] : '') + '.png', b); }, 'image/png');
+  };
+  img.onerror = function(){ toast('Could not make the image.'); };
+  img.src = url;
+}
+function saveXLSX(){
+  var res = state.last; if (!res){ return; }
+  if (!window.XLSX){ toast('Excel export did not load. Use the CSV button.'); return; }
+  var S = res.S, wb = XLSX.utils.book_new(), D = state.data, dec = '0.' + new Array(S.dec + 1).join('0'); if (S.dec === 0) dec = '0';
+  function sheet(name, aoa, widths){ var ws = XLSX.utils.aoa_to_sheet(aoa); if (widths) ws['!cols'] = widths.map(function(w){ return {wch:w}; });
+    XLSX.utils.book_append_sheet(wb, ws, name.slice(0,31)); return ws; }
+  function nz(v){ return {t:'n', v:v, z:dec}; }
+  var excl = Array.from(state.excluded).sort(function(a,b){return a-b;});
+  sheet('Settings', [
+    ['Dependability analysis'], [],
+    ['Source', state.example ? 'Example series (made up)' : (state.table ? state.table.name : '')],
+    ['Period', S.yFrom + ' to ' + S.yTo], ['Years left out', excl.length ? excl.join(', ') : 'none'],
+    ['Months used', MONTHS.filter(function(m,i){ return S.months[i]; }).join(', ')],
+    ['Quantity', S.name], ['Dependability P (%)', S.P], ['Sides', (S.low ? 'low (exceeded P% of the time)' : '') + (S.low && S.high ? ' + ' : '') + (S.high ? 'high (not exceeded P% of the time)' : '')],
+    ['Ranking', S.rankBy === 'years' ? 'one value per year (' + {dep:'dependable value at ' + pnum(S.innerP) + '% in the year', ext:'minimum / maximum', mean:'mean', sum:'total'}[S.yearStat] + ')' : 'every value'],
+    ['Split', S.split === 'month' ? 'each month separately' : 'whole series'],
+    ['Plotting position', PP[S.pp].name + ', ' + PP[S.pp].f], ['Value at P', S.method === 'interp' ? 'interpolated' : 'nearest rank, ROUND(P/100 x (n+1-2a)+a)'],
+    ['Readings per day', D.agg && D.agg !== 'none' ? 'daily ' + D.agg + ' of ' + D.readings + ' readings' : (D.subDaily ? 'every reading' : 'one per day or coarser')],
+    ['Datum', S.offset === 0 ? 'no shift' : S.unit + ' − ' + S.offset + ' = ' + S.unitEff], ['Result unit', S.unitEff],
+    ['Generated', new Date().toISOString().slice(0,10) + ' · Dependability Analyzer, https://meawman.github.io/tools/dependability/'],
+    [], ['Report text', reportText()]
+  ], [24, 70]);
+  var keys = S.split === 'month' ? Object.keys(res.views).map(Number).sort(function(a,b){return a-b;}) : ['all'];
+  if (S.split === 'month'){
+    var aoa = [['Month','Ranked'].concat(S.low ? ['Low @ ' + pnum(S.P) + '% (' + S.unitEff + ')'] : [], S.high ? ['High @ ' + pnum(S.P) + '% (' + S.unitEff + ')'] : [])];
+    keys.forEach(function(m){ var v = res.views[m]; aoa.push([MONTHS[m], v.n].concat(S.low ? [v.low ? nz(v.low.at.value) : ''] : [], S.high ? [v.high ? nz(v.high.at.value) : ''] : [])); });
+    sheet('Monthly summary', aoa, [12, 10, 22, 22]);
+  }
+  keys.forEach(function(k){
+    var v = res.views[k], tag = S.split === 'month' ? ' ' + MONTHS[k] : '';
+    if (v.perYear){
+      var hl = headLabels(S), single = S.yearStat === 'mean' || S.yearStat === 'sum';
+      var a = [['Year','Values'].concat(single ? [hl.low + ' (' + S.unitEff + ')'] : [].concat(S.high ? [hl.high + ' (' + S.unitEff + ')'] : [], S.low ? [hl.low + ' (' + S.unitEff + ')'] : []))];
+      v.perYear.forEach(function(r){ a.push([r.y, r.n].concat(single ? [nz(S.low ? r.low : r.high)] : [].concat(S.high ? [nz(r.high)] : [], S.low ? [nz(r.low)] : []))); });
+      sheet('By year' + tag, a, [10, 10, 16, 16]);
+    }
+    if (S.plist.length){
+      var dt = depTable(v, S), dta = [dt.head];
+      dt.rows.forEach(function(r){ dta.push(r.map(function(c, i){ return i === 0 ? c : (typeof c === 'number' ? nz(c) : (S.rankBy === 'years' && /^\d{4}$/.test(c) ? Number(c) : c)); })); });
+      sheet('Dependability table' + tag, dta, [10, 22, 12, 22, 12]);
+    }
+    ['high','low'].forEach(function(side){
+      var sr = v[side]; if (!sr) return;
+      var b = [['Rank','D (%)', S.rankBy === 'years' ? 'Year' : 'Date', 'Value (' + S.unitEff + ')']];
+      sr.entries.forEach(function(e){ b.push([e.rank, {t:'n', v:e.D, z:'0.00'}, S.rankBy === 'years' ? Number(e.label) : e.label, nz(e.v)]); });
+      b.push([]); b.push(['Value at ' + pnum(S.P) + '%', {t:'n', v:sr.at.D, z:'0.00'}, sr.at.label, nz(sr.at.value)]);
+      sheet((side === 'high' ? 'Ranked high' : 'Ranked low') + tag, b, [10, 10, 18, 18]);
+    });
+  });
+  var cov = [['Year','Values','Incomplete']]; D.years.forEach(function(y){ cov.push([y.y, y.n, y.partial ? 'yes' : '']); });
+  sheet('Data coverage', cov, [10, 10, 12]);
+  var out = XLSX.write(wb, {bookType:'xlsx', type:'array'});
+  saveFile(baseName(S) + '.xlsx', out);
+}
+
+/* ---------------------------------------------------------------- wiring */
+async function handleFile(file){
+  if (!file) return;
+  var ext = (file.name.split('.').pop() || '').toLowerCase();
+  state.example = false; state.fileName = file.name; updateBanner();
+  setStatus('Reading ' + file.name + '…');
+  try {
+    if (['xlsx','xls','xlsm'].indexOf(ext) >= 0){
+      if (!window.XLSX){ setStatus('Excel files could not be read here. Save the sheet as CSV and load that.', true); return; }
+      var buf = await file.arrayBuffer();
+      state.wb = XLSX.read(buf, {type:'array', cellDates:false});
+      var names = state.wb.SheetNames, best = names[0], bestRows = -1;
+      names.forEach(function(nm){ var ref = state.wb.Sheets[nm]['!ref']; if (!ref) return; var rg = XLSX.utils.decode_range(ref), rows = rg.e.r - rg.s.r; if (rows > bestRows){ bestRows = rows; best = nm; } });
+      $('sheet').innerHTML = names.map(function(nm){ return '<option>' + esc(nm) + '</option>'; }).join('');
+      $('sheet').value = best; $('sheetWrap').hidden = names.length < 2;
+      loadSheet(best, file.name);
+    } else {
+      $('sheetWrap').hidden = true; state.wb = null;
+      loadTable(parseDelimited(await file.text()), file.name);
+    }
+  } catch (e){ setStatus('That file could not be read: ' + (e && e.message ? e.message : e), true); }
+}
+function loadSheet(name, fileName){
+  var rows = XLSX.utils.sheet_to_json(state.wb.Sheets[name], {header:1, raw:true, defval:null, blankrows:false});
+  loadTable(rows, (fileName || state.fileName) + ' · ' + name);
+}
+function init(){
+  $('file').addEventListener('change', function(e){ handleFile(e.target.files[0]); });
+  var drop = $('drop');
+  ['dragenter','dragover'].forEach(function(t){ drop.addEventListener(t, function(e){ e.preventDefault(); drop.classList.add('over'); }); });
+  ['dragleave','drop'].forEach(function(t){ drop.addEventListener(t, function(e){ e.preventDefault(); drop.classList.remove('over'); }); });
+  drop.addEventListener('drop', function(e){ if (e.dataTransfer && e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
+  $('bannerBtn').addEventListener('click', function(){ $('file').click(); });
+  $('btnPaste').addEventListener('click', function(){
+    var t = $('paste').value; if (!t.trim()){ setStatus('Paste some rows first.', true); return; }
+    state.example = false; state.fileName = 'Pasted data'; updateBanner(); $('sheetWrap').hidden = true; loadTable(parseDelimited(t), 'Pasted data'); });
+  $('sheet').addEventListener('change', function(){ loadSheet($('sheet').value); });
+  ['colDate','colVal','dateFmt','missing'].forEach(function(id){ $(id).addEventListener('change', function(){ buildData(true); }); });
+  ['colTime','dayAgg','regOnly'].forEach(function(id){ $(id).addEventListener('change', function(){ buildData(false); }); });
+  $('varType').addEventListener('change', function(){ applyPreset(); render(); });
+  ['qName','P','decimals','yFrom','yTo','sideLow','sideHigh','rankBy','split','yearStat','innerP','method','xscale','smooth','unit','offset','unitOut','labelUnit','pp','plist'].forEach(function(id){
+    $(id).addEventListener('input', function(){ if (id === 'innerP') state.innerTouched = true; render(); });
+    $(id).addEventListener('change', function(){ render(); });
+  });
+  $('yAll').addEventListener('click', function(){ state.excluded = new Set(); var y = state.data.years; $('yFrom').value = y[0].y; $('yTo').value = y[y.length-1].y; render(); });
+  $('yFull').addEventListener('click', function(){ state.excluded = new Set(state.data.years.filter(function(y){ return y.partial; }).map(function(y){ return y.y; })); render(); });
+  $('mAll').addEventListener('click', function(){ state.monthsOn = Array(12).fill(true); render(); });
+  $('btnExample').addEventListener('click', loadExample);
+  restoreSettings();
+  updateFresh(); updateBanner();
+}
+// Analysis and datum settings (never the data) are remembered in this browser, so a datum shift such as 1.135 m stays set
+var SAVE_IDS = ['varType','qName','P','decimals','sideLow','sideHigh','rankBy','split','yearStat','innerP','method','pp','plist','xscale','smooth',
+  'unit','offset','unitOut','labelUnit','dayAgg','regOnly','dateFmt','missing'], SAVE_KEY = 'mrj_dependability_v1';
+function saveSettings(){
+  var o = {}; SAVE_IDS.forEach(function(id){ var el = $(id); o[id] = el.type === 'checkbox' ? el.checked : el.value; });
+  o.innerTouched = state.innerTouched;
+  try { localStorage.setItem(SAVE_KEY, JSON.stringify(o)); } catch (e){ /* private mode: nothing to keep */ }
+}
+function restoreSettings(){
+  var o = null; try { o = JSON.parse(localStorage.getItem(SAVE_KEY) || 'null'); } catch (e){ o = null; }
+  if (!o) return;
+  SAVE_IDS.forEach(function(id){ if (!(id in o)) return; var el = $(id); if (el.type === 'checkbox') el.checked = !!o[id]; else el.value = o[id]; });
+  state.innerTouched = !!o.innerTouched;
+}
+window.__dep = { state:state, settings:settings, analyze:analyze, fmt:fmt, buildFigure:buildFigure, loadTable:loadTable, render:render };
+init();
+})();
+</script>
+<script src="../../assets/js/tool-shell.js"></script>
+
+</body>
+</html>
