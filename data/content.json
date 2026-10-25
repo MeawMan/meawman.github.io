@@ -3,7 +3,7 @@
     "title": "Mahfujur Rahman Joy — Water Resources Engineer & Researcher",
     "description": "Portfolio of Mahfujur Rahman Joy: Research Consultant at CEGIS, M.Sc. (WRD) candidate at BUET. Hydrodynamic modeling, GIS & remote sensing, CMIP6 downscaling and machine learning for floods and droughts.",
     "siteUrl": "https://meawman.github.io/",
-    "updated": "2026-10-18"
+    "updated": "2026-10-25"
   },
   "settings": {
     "showPhone": false,
@@ -92,17 +92,6 @@
   ],
   "tools": [
     {
-      "name": "Hydro ML Studio",
-      "tagline": "Machine learning for water level, discharge & rainfall",
-      "description": "Train and compare eight machine-learning models to simulate or forecast a hydrological series: automatic lag, rolling and seasonal features, cross-validation, Grid / Random / Bayesian tuning, NSE · KGE · PBIAS with Moriasi ratings, gap filling and Excel export.",
-      "url": "tools/hydro-ml/",
-      "icon": "ml",
-      "accent": "amber",
-      "status": "live",
-      "features": ["SVR, random forest, extra trees, gradient boosting, neural network, KNN, tree, Lasso", "Save & reload trained models", "One-click zip of all results & plots", "n-fold time-series cross-validation", "Grid, random & Bayesian hyper-parameter tuning", "Importance, partial dependence, duration curves", "Recursive gap filling & prediction on new files", "Methods paragraph + full Excel report"],
-      "tags": ["Machine learning", "Forecasting", "Gap filling"]
-    },
-    {
       "name": "GapLens",
       "tagline": "Find, fill & compare gaps in hydroclimate records",
       "description": "Load a streamflow, water-level, rainfall or groundwater record with its neighbours and GapLens maps the gaps, recommends methods, ranks 70+ filling methods by hiding real observations and scoring how well each one restores them, and fills the record. Includes a rating-curve editor with automatic segments and year-by-year curves. Real Python (Pyodide) running in your browser.",
@@ -110,29 +99,9 @@
       "icon": "gap",
       "accent": "pink",
       "status": "beta",
+      "updated": "2026-10-18",
       "features": ["70+ methods: interpolation, seasonal, regression, neighbour stations, ML, state-space", "Hold-out comparison: NSE, KGE, RMSE over a ladder of gap lengths", "Recommends methods from the gap pattern and the data at hand", "Rating curves: live editor, automatic breaks (BIC), year-by-year curves", "Reads Excel and BWDB files: title rows, REGULAR rows, daily means", "Python in the browser: about 40 MB on first start, then cached"],
       "tags": ["Gap filling", "Rating curve", "Python"]
-    },    {
-      "name": "Dependability Analyzer",
-      "tagline": "Dependable water level, flow & rainfall for reports",
-      "description": "Rank a long record with the Weibull plotting position (or Gringorten, Cunnane, Hazen) and read off dependable low and high values at any P. Filter years and months, convert the datum (e.g. mPWD to mMSL), and export report-style figures, a dependability table, a methods paragraph and an Excel workbook.",
-      "url": "tools/dependability/",
-      "icon": "depend",
-      "accent": "lime",
-      "status": "live",
-      "features": ["Dependable low and high values at any P", "One value per year or every value, whole series or by month", "Year and month filters, incomplete-year warnings", "Datum conversion, e.g. mPWD to mMSL", "Reads BWDB files: title rows, REGULAR rows, daily mean of readings", "Report-style figures (PNG), dependability table, Excel and report text"],
-      "tags": ["Dependable flow", "Water level", "Reports"]
-    },
-    {
-      "name": "Min-Max-Avg Terminal",
-      "tagline": "Daily, monthly & yearly statistics from any time series",
-      "description": "Load a water-level, discharge or rainfall record and get the minimum, maximum and average for every day, month and year — with an interactive range chart, a sortable table and Excel export.",
-      "url": "tools/hydro-series/#minmax",
-      "icon": "band",
-      "accent": "cyan",
-      "status": "live",
-      "features": ["Reads .xlsx, .csv, .txt or rows pasted from Excel", "Finds the date and value columns automatically", "Min–max band chart with hover values", "Export results to .xlsx"],
-      "tags": ["Water level", "Discharge", "Statistics"]
     },
     {
       "name": "Series Generator",
@@ -142,8 +111,57 @@
       "icon": "extend",
       "accent": "violet",
       "status": "live",
+      "updated": "2026-10-17",
       "features": ["Gap filling: model, random, linear or seasonal", "Extend by years: statistical model or resampled years", "Built-in accuracy test for filled holes", "Multi-sheet workbooks, plots and Excel export"],
       "tags": ["Gap filling", "Synthetic series", "Discharge"]
+    },
+    {
+      "name": "Min-Max-Avg Terminal",
+      "tagline": "Daily, monthly & yearly statistics from any time series",
+      "description": "Load a water-level, discharge or rainfall record and get the minimum, maximum and average for every day, month and year — with an interactive range chart, a sortable table and Excel export.",
+      "url": "tools/hydro-series/#minmax",
+      "icon": "band",
+      "accent": "cyan",
+      "status": "live",
+      "updated": "2026-10-17",
+      "features": ["Reads .xlsx, .csv, .txt or rows pasted from Excel", "Finds the date and value columns automatically", "Min–max band chart with hover values", "Export results to .xlsx"],
+      "tags": ["Water level", "Discharge", "Statistics"]
+    },
+    {
+      "name": "Dependability Analyzer",
+      "tagline": "Dependable water level, flow & rainfall for reports",
+      "description": "Rank a long record with the Weibull plotting position (or Gringorten, Cunnane, Hazen) and read off dependable low and high values at any P. Filter years and months, convert the datum (e.g. mPWD to mMSL), and export report-style figures, a dependability table, a methods paragraph and an Excel workbook.",
+      "url": "tools/dependability/",
+      "icon": "depend",
+      "accent": "lime",
+      "status": "live",
+      "updated": "2026-10-18",
+      "features": ["Dependable low and high values at any P", "One value per year or every value, whole series or by month", "Year and month filters, incomplete-year warnings", "Datum conversion, e.g. mPWD to mMSL", "Reads BWDB files: title rows, REGULAR rows, daily mean of readings", "Report-style figures (PNG), dependability table, Excel and report text"],
+      "tags": ["Dependable flow", "Water level", "Reports"]
+    },
+    {
+      "name": "Hydro ML Studio",
+      "tagline": "Machine learning for water level, discharge & rainfall",
+      "description": "Train and compare eight machine-learning models to simulate or forecast a hydrological series: automatic lag, rolling and seasonal features, cross-validation, Grid / Random / Bayesian tuning, NSE · KGE · PBIAS with Moriasi ratings, gap filling and Excel export.",
+      "url": "tools/hydro-ml/",
+      "icon": "ml",
+      "accent": "amber",
+      "status": "live",
+      "updated": "2026-10-17",
+      "features": ["SVR, random forest, extra trees, gradient boosting, neural network, KNN, tree, Lasso", "Save & reload trained models", "One-click zip of all results & plots", "n-fold time-series cross-validation", "Grid, random & Bayesian hyper-parameter tuning", "Importance, partial dependence, duration curves", "Recursive gap filling & prediction on new files", "Methods paragraph + full Excel report"],
+      "tags": ["Machine learning", "Forecasting", "Gap filling"]
+    },
+    {
+      "name": "DSBC Studio",
+      "tagline": "Downscaling & bias correction of climate data",
+      "description": "Statistical downscaling and bias correction of daily, weekly or monthly climate series. Screen predictors with partial informational correlation, train and honestly validate 11 regression models, then correct climate-model runs with 10 univariate and 5 multivariate methods, checking that each correction keeps the model's projected change. Real Python (Pyodide) running in your browser.",
+      "url": "tools/dsbc/",
+      "icon": "dsbc",
+      "accent": "blue",
+      "status": "live",
+      "updated": "2026-10-25",
+      "features": ["Predictor screening: correlation, mutual information, stepwise PIC", "11 downscaling models with grid, random or Bayesian tuning", "Blocked-year cross-validation, scored against the seasonal cycle", "QM, QDM, SDM, CDF-t, NBC and more, calibrated on the past only", "Multivariate: MRNBC, MBCp, MBCr, MBCn, R2D2", "Checks that the projected climate change is kept"],
+      "tags": ["Climate change", "Downscaling", "Bias correction"]
     }
   ],
   "focusAreas": [

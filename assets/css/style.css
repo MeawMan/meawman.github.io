@@ -545,6 +545,7 @@ body.is-preview::before { content: 'PREVIEW · DRAFT'; position: fixed; bottom: 
 .tb-panel { display: grid; grid-template-columns: 1.35fr .65fr; gap: 24px; padding: 22px 24px; align-items: center; min-height: 0; }
 .tb-kicker { font-size: 11px; color: var(--tc); margin-bottom: 6px; }
 .tb-st.live { color: var(--accent-3); } .tb-st.beta { color: var(--accent-2); } .tb-st.soon { color: var(--dim); }
+.tb-upd { color: var(--dim); white-space: nowrap; }
 .tb-info h3 { font-size: 22px; margin-bottom: 6px; }
 .tb-desc { color: var(--muted); font-size: 14.5px; }
 .tb-feat { list-style: none; margin: 14px 0 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 6px 18px; font-size: 13.5px; color: var(--muted); }
@@ -570,6 +571,7 @@ body.is-preview::before { content: 'PREVIEW · DRAFT'; position: fixed; bottom: 
 .ta-dot { fill: var(--violet); }
 .ta-train { fill: color-mix(in srgb, var(--tc) 8%, transparent); }
 .ta-obs { fill: none; stroke: var(--text); stroke-width: 1.6; stroke-linejoin: round; opacity: .85; }
+.ta-raw { fill: none; stroke: var(--dim); stroke-width: 1.6; stroke-dasharray: 5 4; stroke-linejoin: round; }
 @keyframes draw { to { stroke-dashoffset: 0; } }
 
 /* ---------- companion buddy ---------- */

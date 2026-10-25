@@ -165,7 +165,7 @@
   }
 
   // ------------------------------------------------------------ tools
-  const TOOL_COLORS = { cyan: 'var(--accent)', violet: 'var(--violet)', amber: 'var(--accent-2)', lime: 'var(--accent-3)', pink: 'var(--pink)' };
+  const TOOL_COLORS = { cyan: 'var(--accent)', violet: 'var(--violet)', amber: 'var(--accent-2)', lime: 'var(--accent-3)', pink: 'var(--pink)', blue: 'var(--blue, #4f8cff)' };
   const TOOL_ICONS = {
     band: '<path d="M3 15c2-3 4-6 7-4s4 4 7 1 3-5 4-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M3 19c2-2 4-4 7-3s4 2 7 0 3-3 4-4M3 11c2-4 4-7 7-6s4 3 7 0 3-5 4-6" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".55"/>',
     extend: '<path d="M3 16c1.5-2 3-5 5-4s3 3 4 1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M12 13c2-3 3-6 5-4s2 3 4 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="2 2.5"/><path d="M12 4v16" stroke="currentColor" stroke-width="1" opacity=".5"/>',
@@ -175,6 +175,7 @@
     wave: '<path d="M2 9c2.5 0 2.5-3 5-3s2.5 3 5 3 2.5-3 5-3 2.5 3 5 3M2 16c2.5 0 2.5-3 5-3s2.5 3 5 3 2.5-3 5-3 2.5 3 5 3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
     depend: '<path d="M3 4c3 1 5 4 8 7s5 5 10 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M18 3v18" stroke="currentColor" stroke-width="1.6" stroke-dasharray="2 2"/><path d="M3 21h18" stroke="currentColor" stroke-width="1.2" opacity=".55"/>',
     gap: '<circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5.5 14l2.5-3.5 2 2.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M14 11.5l2 3.5 2.5-2.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M10 13l4-1.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-dasharray="1.6 1.6" opacity=".7"/>',
+    dsbc: '<rect x="2.5" y="5.5" width="8" height="8" rx="1" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M6.5 5.5v8M2.5 9.5h8" stroke="currentColor" stroke-width="1.2" opacity=".6"/><path d="M11.5 9.5h1.8m0 0-1.4-1.4m1.4 1.4-1.4 1.4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><rect x="14.5" y="4.5" width="7" height="10" rx="1" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M16.8 4.5v10M19.2 4.5v10M14.5 7.8h7M14.5 11.2h7" stroke="currentColor" stroke-width=".9" opacity=".6"/><path d="M3 20c2-2.2 4-2.2 6 0s4 2.2 6 0 4-2.2 6 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
   };
   // Small decorative preview drawn from a seeded pseudo-random series
   function toolArt(kind) {
@@ -214,6 +215,14 @@
         '<path d="' + line(pts, a, b + 1) + '" class="ta-gen"/>' +
         '<text x="' + (+x(a) + 6) + '" y="' + (pad + 12) + '" class="ta-lbl">filled</text></svg>';
     }
+    if (kind === 'dsbc') {
+      // observed series, the climate model's biased run (too high, too smooth) and the corrected run on top of the observed
+      const raw = pts.map((v, i) => 0.62 + 0.55 * (v - 0.5) + 0.04 * Math.sin(i / 3)), cor = pts.map((v, i) => v + 0.03 * Math.sin(i / 2.3));
+      return '<svg viewBox="0 0 ' + W + ' ' + H + '" aria-hidden="true">' + g +
+        '<path d="' + line(raw, 0, N) + '" class="ta-raw"/><path d="' + line(pts, 0, N) + '" class="ta-obs"/><path d="' + line(cor, 0, N) + '" class="ta-avg"/>' +
+        '<text x="' + (pad + 6) + '" y="' + (pad + 12) + '" class="ta-lbl2">- - raw model</text>' +
+        '<text x="' + (pad + 6) + '" y="' + (H - pad - 6) + '" class="ta-lbl2">corrected = observed</text></svg>';
+    }
     if (kind === 'extend') {
       const cut = 18;
       return '<svg viewBox="0 0 ' + W + ' ' + H + '" aria-hidden="true">' + g +
@@ -245,8 +254,12 @@
       panel.setAttribute('aria-labelledby', 'tbt-' + i);
       panel.style.setProperty('--tc', TOOL_COLORS[t.accent] || TOOL_COLORS.cyan);
       const st = t.status || 'live', live = st !== 'soon' && t.url;
+      // "updated" is a yyyy-mm-dd date set in the admin panel; shown as e.g. 25 OCT 2026
+      const ud = /^(\d{4})-(\d{2})-(\d{2})$/.exec(t.updated || '');
+      const upd = ud ? (+ud[3]) + ' ' + ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'][+ud[2] - 1] + ' ' + ud[1] : '';
       panel.innerHTML = '<div class="tb-info">' +
-        '<p class="pixel tb-kicker">TOOL ' + String(i + 1).padStart(2, '0') + ' · <span class="tb-st ' + st + '">' + (STATUS_T[st] || st.toUpperCase()) + '</span></p>' +
+        '<p class="pixel tb-kicker">TOOL ' + String(i + 1).padStart(2, '0') + ' · <span class="tb-st ' + st + '">' + (STATUS_T[st] || st.toUpperCase()) + '</span>' +
+          (upd ? ' · <time class="tb-upd" datetime="' + esc(t.updated) + '">UPDATED ' + esc(upd) + '</time>' : '') + '</p>' +
         '<h3>' + esc(t.name) + '</h3><p class="tb-desc">' + esc(t.description || '') + '</p>' +
         ((t.features || []).length ? '<ul class="tb-feat">' + t.features.map((f) => '<li>' + esc(f) + '</li>').join('') + '</ul>' : '') +
         '<div class="tb-foot"><div class="tags">' + (t.tags || []).map((g) => '<span class="tag">' + esc(g) + '</span>').join('') + '</div>' +
