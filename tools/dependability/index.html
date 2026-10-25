@@ -199,7 +199,7 @@ tr.click{cursor:pointer}
         <h2>1 · Data</h2>
         <label class="drop" id="drop" tabindex="-1">
           <b>Choose a file or drop it here</b>
-          <span>Excel (.xlsx) or CSV with a date column and a value column</span>
+          <span>Excel (.xlsx) or CSV: daily, monthly or yearly values with a date column, Year and Month columns, or a Year × Jan…Dec table</span>
           <input type="file" id="file" accept=".xlsx,.xls,.xlsm,.csv,.txt,.tsv">
         </label>
         <details>
@@ -255,7 +255,7 @@ tr.click{cursor:pointer}
           </div>
           <div class="chips" id="yearChips"></div>
         </div>
-        <div>
+        <div id="monthWrap">
           <div class="mini" style="justify-content:space-between;margin-bottom:6px">
             <span class="hint">Months to use</span>
             <span class="mini"><button class="ghost" type="button" id="mAll">All</button></span>
@@ -292,7 +292,7 @@ tr.click{cursor:pointer}
               <option value="values">Every value in the series</option>
             </select>
           </label>
-          <label class="f">Split
+          <label class="f" id="splitWrap">Split
             <select id="split">
               <option value="whole">Whole series</option>
               <option value="month">Each month separately</option>
@@ -406,7 +406,42 @@ function parseDateText(str, order){
   if ((m = /^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{2,4})(?:[ T](\d{1,2}):(\d{2})(?::(\d{2}))?)?/.exec(s)))
     return order === 'mdy' ? mkTime(+m[3],+m[1],+m[2],+m[4],+m[5],+m[6]) : mkTime(+m[3],+m[2],+m[1],+m[4],+m[5],+m[6]);
   if ((m = /^(\d{4})(\d{2})(\d{2})$/.exec(s))) return mkTime(+m[1],+m[2],+m[3]);
+  // month-level dates of monthly series (2005-03, 03/2005, Mar-2005, March 2005, Mar-05, 2005 Mar): the 1st of the month
+  if ((m = /^(\d{4})[-\/.](\d{1,2})$/.exec(s))) return mkTime(+m[1],+m[2],1);
+  if ((m = /^(\d{1,2})[-\/.](\d{4})$/.exec(s))) return mkTime(+m[2],+m[1],1);
+  if ((m = /^([A-Za-z]{3,9})\.?[-\/ ,]+(\d{4}|\d{2})$/.exec(s))) { var m3 = monthOfName(m[1]); return m3 < 0 ? NaN : mkTime(+m[2],m3+1,1); }
+  if ((m = /^(\d{4})[-\/ ]([A-Za-z]{3,9})\.?$/.exec(s))) { var m4 = monthOfName(m[2]); return m4 < 0 ? NaN : mkTime(+m[1],m4+1,1); }
   return NaN;
+}
+// "Mar", "March", "Sept." -> 2; -1 if not a month name
+var MONTH_NAMES = ['january','february','march','april','may','june','july','august','september','october','november','december'];
+function monthOfName(v){
+  var s = String(v == null ? '' : v).trim().replace(/\.$/, '').toLowerCase();
+  if (!/^[a-z]{3,9}$/.test(s)) return -1;
+  var i = MON_IDX[s.slice(0,3)];
+  return i == null || MONTH_NAMES[i].indexOf(s) !== 0 ? -1 : i;
+}
+// month from a Month column: 1-12 or a month name; NaN otherwise
+function monthOf(v){
+  var n = toNumber(v);
+  if (!isNaN(n)) return n === Math.floor(n) && n >= 1 && n <= 12 ? n : NaN;
+  var i = monthOfName(v); return i < 0 ? NaN : i + 1;
+}
+function yearOf(v){ var n = toNumber(v); return n === Math.floor(n) && n >= 1800 && n <= 2200 ? n : NaN; }
+// Year x month table (Year, Jan ... Dec, perhaps Total): one row per month instead, dated the 1st of the month
+function wideToLong(rows){
+  var head = rows[0], mcol = {}, nm = 0, yc = -1;
+  head.forEach(function(h, j){ var i = monthOfName(h); if (i >= 0 && !(i in mcol)){ mcol[i] = j; nm++; } });
+  if (nm < 10) return null;
+  head.forEach(function(h, j){ if (yc < 0 && /^(year|yr|years|hydrological year)$/i.test(String(h == null ? '' : h).trim())) yc = j; });
+  if (yc < 0) for (var j=0;j<head.length && yc<0;j++) if (rows.slice(1, 30).filter(function(r){ return r[j] != null; }).every(function(r){ return !isNaN(yearOf(r[j])); })) yc = j;
+  if (yc < 0) return null;
+  var out = [['Date', 'Value']], years = 0;
+  rows.slice(1).forEach(function(r){
+    var y = yearOf(r[yc]); if (isNaN(y)) return; years++;
+    for (var i=0;i<12;i++) if (i in mcol) out.push([y + '-' + String(i+1).padStart(2,'0') + '-01', r[mcol[i]]]);
+  });
+  return years ? { rows: out, years: years, months: nm } : null;
 }
 function serialToTime(n, minSerial){ return (n >= minSerial && n < 2958466) ? Math.round((n - 25569) * 86400000) : NaN; }
 function toTime(v, mode, order){
@@ -496,8 +531,14 @@ function loadTable(rows, name){
     var r0 = rows[0].filter(function(c){ return c !== null && c !== ''; });
     header = r0.filter(isTextCell).length >= Math.ceil(r0.length / 2);
   }
+  // the header of a Year x month table is not found above (no date in the rows below it), so look at the first rows too
+  var wide = null;
+  for (var w=0; w<Math.min(rows.length - 1, 30); w++){
+    wide = wideToLong(rows.slice(w));
+    if (wide){ skippedTop += w; rows = wide.rows; header = true; break; }
+  }
   var width = 0; rows.forEach(function(r){ if (r.length > width) width = r.length; });
-  state.table = { rows: rows, header: header, width: width, name: name, skippedTop: skippedTop, typeCol: -1, timeCol: -1 };
+  state.table = { rows: rows, header: header, width: width, name: name, skippedTop: skippedTop, typeCol: -1, timeCol: -1, wide: wide };
   updateFresh();
   var heads = [];
   for (var j=0;j<width;j++){
@@ -528,19 +569,39 @@ function loadTable(rows, name){
     info.push({tot:tot, num:tot ? nNum/tot : 0, date:tot ? nDate/tot : 0, hd:hd, yearLike:allInt && lo >= 1800 && hi <= 2200 && hi - lo < 300});
   }
   for (k=0;k<width;k++) if (best.date < 0 && info[k].date >= 0.9 && !/^(year|month|day)$/i.test(info[k].hd)) best.date = k;
-  for (k=0;k<width;k++) if (k !== best.date && k !== tb0.timeCol && k !== tb0.typeCol && info[k].num >= 0.9 && !info[k].yearLike && !/^(year|month|day|date|time|id|no|sl|sn)\.?$/i.test(info[k].hd)) best.val = k;
-  if (best.date < 0) best.date = 0;
+  // no date column: a Year column, with a Month column (1-12 or names) for monthly data, or alone for yearly data
+  var yc = -1, mc = -1;
+  if (best.date < 0){
+    for (k=0;k<width;k++) if (yc < 0 && info[k].num >= 0.9 && info[k].yearLike && !/^(month|mon|mm|day)$/i.test(info[k].hd)) yc = k;
+    for (k=0;k<width;k++){
+      if (k === yc || mc >= 0) continue;
+      // a Month column: named so, month names, or (no header) whole numbers 1-12 that run through most of the year
+      var ok = 0, tot2 = 0, seen = {}; sample.forEach(function(r){ if (r[k] == null) return; tot2++; var mv = monthOf(r[k]); if (!isNaN(mv)){ ok++; seen[mv] = 1; } });
+      if (tot2 && ok / tot2 >= 0.9 && (/^(month|mon|mm|mo)\.?$/i.test(info[k].hd) || ok / tot2 === 1 && (info[k].num < 0.9 || !info[k].hd && Object.keys(seen).length >= 6))) mc = k;
+    }
+    if (mc < 0) for (k=0;k<width;k++) if (k !== yc && mc < 0 && /^(month|mon|mm|mo)\.?$/i.test(info[k].hd)) mc = k;
+  }
+  if (yc >= 0){
+    var nm = function(i){ return 'column ' + colLetter(i) + (info[i].hd ? ' · ' + info[i].hd.replace(/&/g, '&amp;').replace(/</g, '&lt;') : ''); }, extra = '';
+    if (mc >= 0) extra += '<option value="ym:' + yc + ':' + mc + '">Year (' + nm(yc) + ') + Month (' + nm(mc) + ')</option>';
+    extra += '<option value="y:' + yc + '">Year only (' + nm(yc) + '): yearly values</option>';
+    $('colDate').insertAdjacentHTML('afterbegin', extra);
+  }
+  for (k=0;k<width;k++) if (k !== best.date && k !== yc && k !== mc && k !== tb0.timeCol && k !== tb0.typeCol && info[k].num >= 0.9 && !info[k].yearLike && !/^(year|month|day|date|time|id|no|sl|sn)\.?$/i.test(info[k].hd)) best.val = k;
   if (best.val < 0) best.val = Math.min(1, width-1);
-  $('colDate').value = String(best.date); $('colVal').value = String(best.val);
+  $('colDate').value = yc >= 0 ? (mc >= 0 ? 'ym:' + yc + ':' + mc : 'y:' + yc) : String(best.date < 0 ? 0 : best.date);
+  $('colVal').value = String(best.val);
   buildData(true);
 }
 
 function buildData(resetFilters){
   var tb = state.table; if (!tb) return;
-  var iD = +$('colDate').value, iV = +$('colVal').value, mode = $('dateFmt').value;
+  // the date comes from one column (index), or from Year + Month columns ("ym:Y:M") or a Year column alone ("y:Y")
+  var dsel = $('colDate').value, ym = /^(ym|y):(\d+)(?::(\d+))?$/.exec(dsel);
+  var iD = ym ? +ym[2] : +dsel, iV = +$('colVal').value, mode = $('dateFmt').value;
   var start = tb.header ? 1 : 0, rows = tb.rows;
   var strs = [];
-  for (var i=start;i<rows.length && strs.length<3000;i++){ var dv = rows[i][iD]; if (typeof dv === 'string') strs.push(dv); }
+  for (var i=start;i<rows.length && strs.length<3000 && !ym;i++){ var dv = rows[i][iD]; if (typeof dv === 'string') strs.push(dv); }
   var det = detectOrder(strs), order = mode === 'mdy' ? 'mdy' : (mode === 'dmy' ? 'dmy' : det.order);
   var missRaw = $('missing').value.trim(), missCode = missRaw === '' ? null : parseFloat(missRaw);
   var iT = +$('colTime').value, iTy = tb.typeCol >= 0 && $('regOnly').checked ? tb.typeCol : -1;
@@ -549,7 +610,7 @@ function buildData(resetFilters){
     var row = rows[r], d = row[iD], v = row[iV];
     if (d == null && v == null) continue;
     if (iTy >= 0 && !/^regular$/i.test(String(row[iTy] == null ? '' : row[iTy]).trim())){ skippedType++; continue; }
-    var t = toTime(d, mode, order);
+    var t = ym ? mkTime(yearOf(d), ym[1] === 'ym' ? monthOf(row[+ym[3]]) : 1, 1) : toTime(d, mode, order);
     if (isNaN(t)){ bad++; continue; }
     if (iT >= 0){ var dd = new Date(t); t = Date.UTC(dd.getUTCFullYear(), dd.getUTCMonth(), dd.getUTCDate()) + timeOf(row[iT]); }
     var x = toNumber(v);
@@ -581,14 +642,25 @@ function buildData(resetFilters){
   var years = Object.keys(cnt).map(Number).sort(function(a,b){ return a-b; }).map(function(y){ return {y:y, n:cnt[y]}; });
   var sorted = years.map(function(y){ return y.n; }).sort(function(a,b){ return a-b; }), med = sorted[Math.floor(sorted.length/2)];
   years.forEach(function(y){ y.partial = y.n < 0.9 * med; });
+  // time step from the typical spacing of the dates: daily (or finer), monthly or yearly
+  var ut = Array.from(new Set(T)).sort(function(a,b){ return a-b; }), gaps = [];
+  for (var g2=1; g2<ut.length; g2++) gaps.push((ut[g2] - ut[g2-1]) / 86400000);
+  gaps.sort(function(a,b){ return a-b; });
+  var gapMed = gaps.length ? gaps[Math.floor(gaps.length/2)] : 365, step = gapMed >= 300 ? 'year' : gapMed >= 27 ? 'month' : 'day';
   state.data = { n:n, T:T, V:V, Y:Y, M:M, years:years, first:firstT, last:lastT, bad:bad, miss:miss, med:med,
-    subDaily:subDaily, agg:subDaily ? agg : 'none', readings:readings, skippedType:skippedType };
+    subDaily:subDaily, agg:subDaily ? agg : 'none', readings:readings, skippedType:skippedType, step:step };
+  // yearly values: there is nothing to filter or split by month
+  $('monthWrap').hidden = step === 'year';
+  $('splitWrap').hidden = step === 'year';
+  if (step === 'year') $('split').value = 'whole';
   if (resetFilters){
     state.excluded = new Set(); state.monthsOn = Array(12).fill(true);
     $('yFrom').value = years[0].y; $('yTo').value = years[years.length-1].y;
   }
   var iso = function(t){ return new Date(t).toISOString().slice(0,10); };
-  var msg = n.toLocaleString() + ' values · ' + iso(firstT) + ' to ' + iso(lastT) + ' · ' + years.length + ' years';
+  var msg = n.toLocaleString() + ' ' + ({day:'', month:'monthly ', year:'yearly '}[step]) + 'values · ' + iso(firstT) + ' to ' + iso(lastT) + ' · ' + years.length + ' years';
+  if (tb.wide) msg += '\nYear × month table (' + tb.wide.years + ' years, ' + tb.wide.months + ' month columns) read as one monthly series';
+  if (step === 'year') msg += '\nYearly values: every year gives one value, so both ranking options give the same result';
   if (subDaily && agg !== 'none') msg += '\n' + readings.toLocaleString() + ' readings combined into daily ' + ({mean:'means', min:'minima', max:'maxima'}[agg]);
   else if (subDaily) msg += '\nSeveral readings a day: every reading is ranked';
   if (tb.skippedTop) msg += '\n' + tb.skippedTop + ' title row' + (tb.skippedTop > 1 ? 's' : '') + ' above the table skipped';

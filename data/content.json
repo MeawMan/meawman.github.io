@@ -135,8 +135,8 @@
       "icon": "depend",
       "accent": "lime",
       "status": "live",
-      "updated": "2026-10-18",
-      "features": ["Dependable low and high values at any P", "One value per year or every value, whole series or by month", "Year and month filters, incomplete-year warnings", "Datum conversion, e.g. mPWD to mMSL", "Reads BWDB files: title rows, REGULAR rows, daily mean of readings", "Report-style figures (PNG), dependability table, Excel and report text"],
+      "updated": "2026-10-25",
+      "features": ["Dependable low and high values at any P", "One value per year or every value, whole series or by month", "Year and month filters, incomplete-year warnings", "Datum conversion, e.g. mPWD to mMSL", "Daily, monthly or yearly data, incl. Year × Jan…Dec tables", "Reads BWDB files: title rows, REGULAR rows, daily mean of readings", "Report-style figures (PNG), dependability table, Excel and report text"],
       "tags": ["Dependable flow", "Water level", "Reports"]
     },
     {
