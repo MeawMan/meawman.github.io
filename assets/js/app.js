@@ -820,6 +820,22 @@
   }
 
   // ------------------------------------------------------------ boot
+  // Opening a link such as /#tools: the browser jumps before the sections are built, and the content then
+  // rendered above (publications, timeline) pushes the target down. Jump again once the page is laid out and
+  // after the web fonts load, unless the visitor has already started scrolling.
+  function jumpToHash() {
+    const id = decodeURIComponent(location.hash.slice(1));
+    const el = id && document.getElementById(id);
+    if (!el || el.hidden || id === 'home') return;
+    let moved = false;
+    const stop = () => { moved = true; };
+    ['wheel', 'touchstart', 'keydown'].forEach((t) => addEventListener(t, stop, { once: true, passive: true }));
+    const go = () => { if (!moved) el.scrollIntoView({ behavior: 'instant', block: 'start' }); };
+    requestAnimationFrame(() => requestAnimationFrame(go));
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(go);
+    if (document.readyState === 'complete') setTimeout(go, 300); else addEventListener('load', () => setTimeout(go, 50), { once: true });
+  }
+
   function boot(enabled) {
     const el = $('#boot');
     let seen = false;
@@ -909,7 +925,7 @@
     renderPubTabs(); renderPubs(); renderSkills(); renderEducation(); renderLeadership(); renderContact();
     const actions = initAvatar();
     bindGlobal(); initPalette(actions); initBuddy(actions); initModal(); initTerminal(actions); konami(actions);
-    countUp(); reveal(); scrollSpy(); tilt();
+    countUp(); reveal(); scrollSpy(); tilt(); jumpToHash();
     if (document.body.classList.contains('is-preview')) toast('Preview mode — showing your unsaved draft');
   }
 
