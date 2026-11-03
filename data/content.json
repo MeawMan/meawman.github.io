@@ -144,6 +144,19 @@
       "tags": ["Dependable flow", "Water level", "Reports"]
     },
     {
+      "name": "OpenFFA",
+      "group": "Analysis",
+      "tagline": "Flood frequency analysis, validated against Bulletin 17C",
+      "description": "Load annual maximum floods or daily flows (with water-year extraction, e.g. April–March) and find out whether stationary frequency analysis is defensible, fit 11 distributions by L-moments, maximum likelihood, moments or the Bulletin 17C Expected Moments Algorithm, compare them, and read design floods with confidence intervals. Peaks over threshold and a non-stationary GEV are included, and every estimator is tested against R, SciPy and the Bulletin 17C worked examples.",
+      "url": "tools/openffa/",
+      "icon": "ffa",
+      "accent": "orange",
+      "status": "live",
+      "updated": "2026-11-03",
+      "features": ["Checks first: Mann-Kendall, Pettitt, independence, homogeneity, Grubbs-Beck and MGBT", "11 distributions: GEV, Gumbel, LP3, Pearson III, LN2/LN3, GLO, GPA and more", "L-moments, maximum likelihood, moments, PWM and Bulletin 17C EMA", "Historic floods, zero flows and low outliers handled by censoring", "Bootstrap goodness of fit, AICc/BIC ranking and L-moment ratio diagram", "Design floods with bootstrap, delta-method or profile-likelihood intervals", "Peaks over threshold, non-stationary GEV, report, Excel and project file"],
+      "tags": ["Flood frequency", "Design floods", "Bulletin 17C"]
+    },
+    {
       "name": "Brishti IDF",
       "group": "Analysis",
       "tagline": "Rainfall IDF curves with every method under your control",

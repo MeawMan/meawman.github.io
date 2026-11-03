@@ -575,6 +575,7 @@ body.is-preview::before { content: 'PREVIEW · DRAFT'; position: fixed; bottom: 
 .ta-dot { fill: var(--violet); }
 .ta-train { fill: color-mix(in srgb, var(--tc) 8%, transparent); }
 .ta-obs { fill: none; stroke: var(--text); stroke-width: 1.6; stroke-linejoin: round; opacity: .85; }
+.ta-pt { fill: var(--text); opacity: .85; }
 .ta-raw { fill: none; stroke: var(--dim); stroke-width: 1.6; stroke-dasharray: 5 4; stroke-linejoin: round; }
 @keyframes draw { to { stroke-dashoffset: 0; } }
 

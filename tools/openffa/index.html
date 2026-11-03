@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>OpenFFA — flood frequency analysis · Mahfujur Rahman Joy</title>
+<meta name="description" content="Browser-based flood frequency analysis: data checks, 11 distributions, L-moments, ML, EMA (Bulletin 17C), bootstrap goodness of fit and confidence intervals. Runs entirely in your browser.">
+<meta property="og:title" content="OpenFFA · Mahfujur Rahman Joy">
+<meta property="og:description" content="Flood frequency analysis in your browser: checks, 11 distributions, Bulletin 17C EMA, design floods with uncertainty.">
+<meta property="og:image" content="https://meawman.github.io/assets/og-image.png">
+<link rel="canonical" href="https://meawman.github.io/tools/openffa/">
+<link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../../assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css">
+<link rel="stylesheet" href="css/portfolio.css">
+<script>
+  // Same theme key as the portfolio, so the tool opens in the theme the visitor already chose.
+  (function () {
+    var t = null; try { t = localStorage.getItem('mrj_theme'); } catch (e) {}
+    if (t !== 'light' && t !== 'dark') t = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+    document.documentElement.dataset.theme = t;
+  })();
+</script>
+<script src="vendor/plotly.min.js" defer></script>
+<script src="vendor/xlsx.core.min.js" defer></script>
+<script type="module" src="src/ui/app.js"></script>
+</head>
+<body class="guided">
+<header class="topbar">
+  <div class="brand pf-brand">
+    <a class="pf-logo" href="../../" title="Back to the portfolio"><img src="../../assets/favicon.svg" alt="Mahfujur Rahman Joy — portfolio" width="34" height="34"></a>
+    <span class="pf-crumb"><a href="../../"><b>Joy</b></a><span aria-hidden="true">/</span><a href="../../#tools">Tools</a><span aria-hidden="true">/</span><em>OpenFFA</em></span>
+    <small>flood frequency analysis</small>
+  </div>
+  <span class="site-name" id="siteName"></span>
+  <span class="spacer"></span>
+  <div class="seg" role="group" aria-label="Interface mode">
+    <button type="button" data-mode="guided" aria-pressed="true" title="Recommended settings and explanations">Guided</button>
+    <button type="button" data-mode="expert" aria-pressed="false" title="All methods and options">Expert</button>
+  </div>
+  <button class="btn quiet" type="button" id="openProjectBtn">Open project</button>
+  <button class="btn secondary" type="button" id="saveProjectBtn">Save project</button>
+  <a class="pf-btn pf-all" href="../../#tools">All tools</a>
+  <button class="pf-btn icon" type="button" id="themeBtn" aria-label="Toggle light or dark theme" title="Toggle theme">
+    <svg class="i-sun" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M11 1h2v3h-2zM11 20h2v3h-2zM1 11h3v2H1zM20 11h3v2h-3zM4.2 5.6l1.4-1.4 2.1 2.1-1.4 1.4zM16.3 17.7l1.4-1.4 2.1 2.1-1.4 1.4zM4.2 18.4l2.1-2.1 1.4 1.4-2.1 2.1zM16.3 6.3l2.1-2.1 1.4 1.4-2.1 2.1zM7 9h2V7h6v2h2v6h-2v2H9v-2H7z"/></svg>
+    <svg class="i-moon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M9 2h6v2h-4v2H9v4H7v4h2v4h2v2h4v-2h4v-2h2v-4h-2v2h-2v2h-6v-2H9v-4H7v-2h2V6h2V4H9z"/></svg>
+  </button>
+  <input type="file" id="projectFile" accept=".json,application/json" hidden>
+</header>
+
+<div class="app">
+  <nav class="staff" aria-label="Analysis steps">
+    <ol id="steps">
+      <span class="pole" aria-hidden="true"></span><span class="water" id="water" aria-hidden="true"></span>
+      <li><button class="step" data-page="data"><span class="mark">1</span>Data<span class="sub">enter or upload a record</span></button></li>
+      <li><button class="step" data-page="checks"><span class="mark">2</span>Checks<span class="sub">trend, independence, outliers</span></button></li>
+      <li><button class="step" data-page="fit"><span class="mark">3</span>Fit<span class="sub">distributions and methods</span></button></li>
+      <li><button class="step" data-page="design"><span class="mark">4</span>Design floods<span class="sub">quantiles and uncertainty</span></button></li>
+      <li><button class="step" data-page="report"><span class="mark">5</span>Report<span class="sub">tables, figures, methods</span></button></li>
+    </ol>
+    <div class="extras">
+      <h3>Further analyses</h3>
+      <button class="step" data-page="pot">Peaks over threshold</button>
+      <button class="step" data-page="nonstat">Non-stationary GEV</button>
+      <button class="step" data-page="about">About and validation</button>
+    </div>
+    <div class="foot" id="versionFoot"></div>
+  </nav>
+
+  <main id="main">
+    <section class="page" id="page-data" aria-labelledby="h-data"></section>
+    <section class="page" id="page-checks" aria-labelledby="h-checks" hidden></section>
+    <section class="page" id="page-fit" aria-labelledby="h-fit" hidden></section>
+    <section class="page" id="page-design" aria-labelledby="h-design" hidden></section>
+    <section class="page" id="page-report" aria-labelledby="h-report" hidden></section>
+    <section class="page" id="page-pot" aria-labelledby="h-pot" hidden></section>
+    <section class="page" id="page-nonstat" aria-labelledby="h-nonstat" hidden></section>
+    <section class="page" id="page-about" aria-labelledby="h-about" hidden></section>
+  </main>
+</div>
+<div id="live" class="visually-hidden" aria-live="polite" style="position:absolute;left:-9999px"></div>
+<noscript><p style="padding:2rem">OpenFFA needs JavaScript. It runs entirely in your browser; no data leave your computer.</p></noscript>
+</body>
+</html>

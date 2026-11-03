@@ -165,7 +165,7 @@
   }
 
   // ------------------------------------------------------------ tools
-  const TOOL_COLORS = { cyan: 'var(--accent)', violet: 'var(--violet)', amber: 'var(--accent-2)', lime: 'var(--accent-3)', pink: 'var(--pink)', blue: 'var(--blue, #4f8cff)', teal: 'var(--teal, #2dd4bf)' };
+  const TOOL_COLORS = { cyan: 'var(--accent)', violet: 'var(--violet)', amber: 'var(--accent-2)', lime: 'var(--accent-3)', pink: 'var(--pink)', blue: 'var(--blue, #4f8cff)', teal: 'var(--teal, #2dd4bf)', orange: 'var(--orange, #fb923c)' };
   const TOOL_ICONS = {
     band: '<path d="M3 15c2-3 4-6 7-4s4 4 7 1 3-5 4-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M3 19c2-2 4-4 7-3s4 2 7 0 3-3 4-4M3 11c2-4 4-7 7-6s4 3 7 0 3-5 4-6" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".55"/>',
     extend: '<path d="M3 16c1.5-2 3-5 5-4s3 3 4 1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M12 13c2-3 3-6 5-4s2 3 4 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="2 2.5"/><path d="M12 4v16" stroke="currentColor" stroke-width="1" opacity=".5"/>',
@@ -176,6 +176,7 @@
     depend: '<path d="M3 4c3 1 5 4 8 7s5 5 10 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M18 3v18" stroke="currentColor" stroke-width="1.6" stroke-dasharray="2 2"/><path d="M3 21h18" stroke="currentColor" stroke-width="1.2" opacity=".55"/>',
     gap: '<circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5.5 14l2.5-3.5 2 2.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M14 11.5l2 3.5 2.5-2.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M10 13l4-1.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-dasharray="1.6 1.6" opacity=".7"/>',
     dsbc: '<rect x="2.5" y="5.5" width="8" height="8" rx="1" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M6.5 5.5v8M2.5 9.5h8" stroke="currentColor" stroke-width="1.2" opacity=".6"/><path d="M11.5 9.5h1.8m0 0-1.4-1.4m1.4 1.4-1.4 1.4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><rect x="14.5" y="4.5" width="7" height="10" rx="1" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M16.8 4.5v10M19.2 4.5v10M14.5 7.8h7M14.5 11.2h7" stroke="currentColor" stroke-width=".9" opacity=".6"/><path d="M3 20c2-2.2 4-2.2 6 0s4 2.2 6 0 4-2.2 6 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
+    ffa: '<path d="M3 3v18h18" fill="none" stroke="currentColor" stroke-width="1.4" opacity=".55"/><path d="M5 18C9 15.5 13 11 20 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="7" cy="16.3" r="1.3" fill="currentColor"/><circle cx="10.5" cy="14.6" r="1.3" fill="currentColor"/><circle cx="13" cy="11.2" r="1.3" fill="currentColor"/><circle cx="16.5" cy="8.6" r="1.3" fill="currentColor"/><path d="M15 20.5c1-.9 2-.9 3 0s2 .9 3 0" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" opacity=".7"/>',
     idf: '<path d="M4 5c1 6 3 9 7 11s7 2.5 10 3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M4 10c1.5 4 3.5 6.5 7 7.5s6 1.6 10 2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" opacity=".6"/><path d="M8 2.5c-1.2 1.8-1.8 2.9-1.8 3.7a1.8 1.8 0 0 0 3.6 0c0-.8-.6-1.9-1.8-3.7z" fill="currentColor"/>',
   };
   // Small decorative preview drawn from a seeded pseudo-random series
@@ -206,6 +207,19 @@
         '<line x1="' + x(cut) + '" x2="' + x(cut) + '" y1="' + pad + '" y2="' + (H - pad) + '" class="ta-div"/>' +
         '<circle cx="' + x(cut) + '" cy="' + y(ranked[cut]) + '" r="4" class="ta-dot"/>' +
         '<text x="' + (+x(cut) - 6) + '" y="' + (H - pad - 6) + '" text-anchor="end" class="ta-lbl">97% dependable</text></svg>';
+    }
+    if (kind === 'ffa') {
+      // flood frequency plot: ranked annual floods against return period (log axis), fitted curve and its band
+      const n = 18, xs = Array.from({ length: n }, (_, i) => -Math.log(-Math.log((i + 1 - 0.44) / (n + 0.12)))); // Gringorten, Gumbel variate
+      const X = (v) => (pad + ((v + 1.6) / 5.6) * (W - 2 * pad)).toFixed(1), Y = (q) => (H - pad - q * (H - 2 * pad)).toFixed(1);
+      const fit = (v) => 0.14 + 0.13 * (v + 1.3), pts = xs.map((v, i) => fit(v) + (rnd() - 0.5) * 0.09 + (i === n - 1 ? 0.06 : 0));
+      const vs = Array.from({ length: 24 }, (_, i) => -1.4 + (i * 5.3) / 23);
+      const band = vs.map((v, i) => (i ? 'L' : 'M') + X(v) + ' ' + Y(fit(v) + 0.03 + 0.012 * (v + 1.4) ** 1.5)).join(' ') + ' ' +
+        vs.slice().reverse().map((v) => 'L' + X(v) + ' ' + Y(Math.max(0.02, fit(v) - 0.03 - 0.009 * (v + 1.4) ** 1.5))).join(' ') + ' Z';
+      return '<svg viewBox="0 0 ' + W + ' ' + H + '" aria-hidden="true">' + g + '<path d="' + band + '" class="ta-band"/>' +
+        '<path d="' + vs.map((v, i) => (i ? 'L' : 'M') + X(v) + ' ' + Y(fit(v))).join(' ') + '" class="ta-avg"/>' +
+        xs.map((v, i) => '<circle cx="' + X(v) + '" cy="' + Y(pts[i]) + '" r="2.6" class="ta-pt"/>').join('') +
+        '<text x="' + (pad + 6) + '" y="' + (pad + 12) + '" class="ta-lbl2">annual floods vs return period</text></svg>';
     }
     if (kind === 'idf') {
       // IDF curves: intensity falling with duration, one curve per return period, rarer storms on top

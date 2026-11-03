@@ -1,0 +1,51 @@
+/* portfolio.css — OpenFFA inside meawman.github.io.
+   Loaded after app.css. Maps OpenFFA's colour tokens to the portfolio palette for both themes, uses the
+   portfolio's body font, and styles the portfolio breadcrumb, "All tools" link and theme icon in the top bar.
+   OpenFFA's own look (gauge-staff step rail, Barlow headings) is kept. */
+
+:root[data-theme="light"] {
+  --paper: #f2f4f9; --sheet: #ffffff; --ink: #0b1222; --muted: #4a5672; --grid: #d3dbe8;
+  --river: #0786ad; --river-soft: #dff1f7; --plot-bg: #ffffff;
+  --danger: #c0264d; --danger-soft: #fdeef2; --caution: #8a4b00; --caution-soft: #fff4e3; --ok: #2c8a22; --ok-soft: #e7f5e4;
+  color-scheme: light;
+}
+:root[data-theme="dark"] {
+  --paper: #06080f; --sheet: #0d1322; --ink: #eef3fb; --muted: #a7b3cb; --grid: #24334f;
+  --river: #5be7ff; --river-soft: rgba(91, 231, 255, .12); --plot-bg: #0d1322;
+  --danger: #ff6b8b; --danger-soft: rgba(255, 107, 139, .1); --caution: #ffc857; --caution-soft: rgba(255, 200, 87, .08);
+  --ok: #9dff6b; --ok-soft: rgba(157, 255, 107, .08);
+  color-scheme: dark;
+}
+:root { --font-body: 'Space Grotesk', 'Public Sans', system-ui, sans-serif; }
+
+/* bright accent in the dark theme: dark text on filled buttons */
+:root[data-theme="dark"] button.btn:not(.secondary):not(.quiet):not(.danger),
+:root[data-theme="dark"] .seg button[aria-pressed="true"] { color: #04141a; }
+button.btn, .seg { border-radius: 8px; }
+
+/* ---- portfolio breadcrumb in OpenFFA's top bar ---- */
+.topbar { min-height: 3.2rem; padding-block: .45rem; }
+.pf-brand { align-items: center; gap: .75rem; font-family: var(--font-body); font-weight: 400; font-size: 1rem; min-width: 0; }
+.pf-logo { display: block; flex: none; border-radius: 9px; box-shadow: 0 0 0 1px color-mix(in srgb, var(--river) 55%, transparent); }
+.pf-logo img { display: block; width: 32px; height: 32px; border-radius: 9px; image-rendering: pixelated; }
+.pf-crumb { display: flex; align-items: center; gap: .5rem; font-size: .875rem; color: var(--muted); white-space: nowrap; }
+.pf-crumb a { color: var(--muted); text-decoration: none; }
+.pf-crumb a:hover { color: var(--river); }
+.pf-crumb b { color: var(--ink); font-weight: 700; }
+.pf-crumb em { font-style: normal; color: var(--ink); font-weight: 600; font-family: var(--font-gauge); font-size: 1.15rem; }
+.pf-btn { display: inline-flex; align-items: center; justify-content: center; height: 34px; padding: 0 12px; border-radius: 8px; border: 1px solid var(--grid);
+  background: var(--sheet); color: var(--ink); font: 500 13px var(--font-body); text-decoration: none; cursor: pointer; }
+.pf-btn:hover { border-color: var(--river); color: var(--river); }
+.pf-btn.icon { width: 34px; padding: 0; }
+:root[data-theme="light"] .i-moon, :root[data-theme="dark"] .i-sun { display: none; }
+
+@media (max-width: 860px) {
+  .pf-crumb > a:first-child, .pf-crumb > span:first-of-type, .pf-brand small, .pf-all { display: none; }
+  .topbar { position: static; gap: .5rem .6rem; } /* wrapped bar would cover a fifth of a phone screen if it stayed pinned */
+}
+@media print { .pf-logo, .pf-btn { display: none !important; } }
+/* the rail sits right under the bar; keep the two heights in step on wide screens */
+@media (min-width: 861px) {
+  .topbar { height: 54px; }
+  .staff { top: 54px; height: calc(100vh - 54px); }
+}
