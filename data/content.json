@@ -494,11 +494,11 @@
     }
   ],
   "skills": [
-    { "group": "GIS & Remote Sensing", "items": ["ArcGIS Pro", "QGIS", "Google Earth Engine", "Flood Inundation Mapping", "LULC Classification"] },
-    { "group": "Hydrodynamic Modeling", "items": ["SOBEK 1D/2D", "Delft3D", "EPA SWMM", "Model Calibration & Validation"] },
-    { "group": "Climate & Hydro-Statistics", "items": ["CMIP6 Statistical Downscaling", "Bias Correction (NBC · MBC · QBC)", "Copula-Based Drought Analysis", "Hydroclimatic Trend Analysis"] },
-    { "group": "Machine Learning & Coding", "items": ["Python", "Earth Engine JavaScript API", "Random Forest · SVM · KNN", "LSTM · CNN Deep Learning"] },
-    { "group": "Engineering Design", "items": ["AutoCAD", "ETABS", "Sewer Network Design"] }
+    { "group": "GIS & Remote Sensing", "items": ["ArcGIS Pro", "QGIS", "Google Earth Engine", "Sentinel-2 & Landsat imagery", "Flood inundation mapping", "Land-cover classification", "River planform & erosion analysis", "MCDA site suitability"] },
+    { "group": "Hydrodynamic Modeling", "items": ["SOBEK 1D/2D", "Delft3D", "EPA SWMM", "Calibration & validation"] },
+    { "group": "Climate & Hydro-Statistics", "items": ["CMIP6 statistical downscaling", "Bias correction (NBC, MBC, QBC)", "Flood & rainfall frequency analysis", "Copula drought analysis", "Trend tests (Mann–Kendall, Sen's slope)"] },
+    { "group": "Machine Learning & Coding", "items": ["Python", "JavaScript", "Random forest, SVM, KNN", "LSTM & CNN deep learning", "Browser-based analysis tools"] },
+    { "group": "Engineering Design", "items": ["AutoCAD", "ETABS", "Sewer network design"] }
   ],
   "certifications": [
     { "title": "Geospatial Data Analysis and Management (Intermediate)", "issuer": "Esri & EDGE", "date": "Apr – May 2026", "credentialId": "", "url": "" },

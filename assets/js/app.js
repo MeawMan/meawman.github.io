@@ -12,8 +12,8 @@
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const SECTIONS = [
-    ['about', 'About'], ['experience', 'Experience'], ['education', 'Education'], ['skills', 'Skills'], ['tools', 'Tools'],
-    ['research', 'Research'], ['map', 'Map'], ['leadership', 'Leadership'], ['contact', 'Contact'],
+    ['about', 'About'], ['education', 'Education'], ['experience', 'Experience'], ['tools', 'Tools'], ['map', 'Map'],
+    ['research', 'Research'], ['skills', 'Skills'], ['leadership', 'Leadership'], ['contact', 'Contact'],
   ];
 
   const ICONS = {
@@ -441,10 +441,25 @@
     }).join('');
   }
 
+  // Skill areas as aligned rows in one panel: icon, name and count on the left, the skills as pills on the right.
+  // The icon is picked from the area's name; each row takes the next accent colour.
+  const SKILL_ICONS = [
+    [/gis|remote|spatial|mapping/i, () => TOOL_ICONS.map],
+    [/climate|statist|drought/i, () => TOOL_ICONS.chart], // before "hydro": "Climate & Hydro-Statistics"
+    [/hydro|river|flood|model/i, () => TOOL_ICONS.wave],
+    [/machine|learning|coding|program|data/i, () => TOOL_ICONS.ml],
+    [/engineer|design|cad|struct/i, () => '<path d="M3 17L17 3l4 4L7 21z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M7.5 12.5l2 2M10.5 9.5l2 2M13.5 6.5l2 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>'],
+  ];
+  const SKILL_COLORS = ['var(--accent)', 'var(--violet)', 'var(--accent-2)', 'var(--accent-3)', 'var(--pink)'];
   function renderSkills() {
-    $('#inventory').innerHTML = DATA.skills.map((g, i) =>
-      '<div class="card inv reveal" style="--d:' + i * 60 + 'ms"><p class="pixel inv-title">' + esc(g.group) + '</p>' +
-      '<div class="slots">' + g.items.map((s) => '<span class="slot">' + esc(s) + '</span>').join('') + '</div></div>').join('');
+    const icon = (name) => (SKILL_ICONS.find(([re]) => re.test(name)) || [, () => TOOL_ICONS.chart])[1]();
+    $('#inventory').innerHTML = '<div class="card skills-panel reveal">' + DATA.skills.map((g, i) => {
+      const items = g.items || [];
+      return '<div class="sk-row" style="--c:' + SKILL_COLORS[i % SKILL_COLORS.length] + '">' +
+        '<div class="sk-head"><span class="sk-ico">' + svg(icon(g.group), 20) + '</span>' +
+        '<div><h3>' + esc(g.group) + '</h3><small>' + items.length + ' skill' + (items.length === 1 ? '' : 's') + '</small></div></div>' +
+        '<ul class="sk-items">' + items.map((s) => '<li>' + esc(s) + '</li>').join('') + '</ul></div>';
+    }).join('') + '</div>';
     $('#certCount').textContent = DATA.certifications.length + ' / ' + DATA.certifications.length;
     $('#achievements').innerHTML = DATA.certifications.map((c, i) =>
       '<article class="card ach reveal" style="--d:' + (i % 4) * 50 + 'ms">' +
