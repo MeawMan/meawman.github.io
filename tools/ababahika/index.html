@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ababahika &mdash; catchment slope, land cover &amp; soil statistics &middot; Mahfujur Rahman Joy</title>
+<meta name="description" content="A GIS in your browser for catchment work: slope from a DEM, land-cover and soil-texture area and percentage for every catchment, plus project, clip, merge, dissolve and export with GDAL. Streams GeoTIFFs of any size; files are never uploaded.">
+<meta property="og:title" content="Ababahika &middot; Mahfujur Rahman Joy">
+<meta property="og:description" content="Catchment slope, land cover and soil statistics with a map, in your browser. Any-size GeoTIFFs, GDAL geoprocessing, Excel export.">
+<meta property="og:image" content="https://meawman.github.io/assets/og-image.png">
+<link rel="canonical" href="https://meawman.github.io/tools/ababahika/">
+<link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../../assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Silkscreen&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/css/tool-shell.css">
+<link rel="stylesheet" href="dist/app.css">
+<link rel="stylesheet" href="css/app.css">
+<script>
+  (function () {
+    var t = null; try { t = localStorage.getItem('mrj_theme'); } catch (e) {}
+    if (t !== 'light' && t !== 'dark') t = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', t);
+  })();
+</script>
+<script type="module" src="dist/app.js"></script>
+</head>
+<body class="gis">
+<header class="ts-bar">
+  <div class="ts-brand">
+    <a class="ts-logo" href="../../" title="Back to the portfolio"><img src="../../assets/favicon.svg" alt="Mahfujur Rahman Joy — portfolio" width="34" height="34"></a>
+    <span class="ts-crumb"><a href="../../"><b>Joy</b></a><span aria-hidden="true">/</span><a href="../../#tools">Tools</a><span aria-hidden="true">/</span><em>Ababahika</em></span>
+    <small class="tagline">catchment GIS</small>
+  </div>
+  <div class="ts-actions">
+    <span class="ts-privacy">● files stay on your computer</span>
+    <button class="ts-btn" type="button" id="helpBtn">Help</button>
+    <a class="ts-btn" href="../../#tools">All tools</a>
+    <button class="ts-btn icon" type="button" id="themeBtn" aria-label="Toggle light or dark theme" title="Toggle theme">
+      <svg class="i-sun" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M11 1h2v3h-2zM11 20h2v3h-2zM1 11h3v2H1zM20 11h3v2h-3zM4.2 5.6l1.4-1.4 2.1 2.1-1.4 1.4zM16.3 17.7l1.4-1.4 2.1 2.1-1.4 1.4zM4.2 18.4l2.1-2.1 1.4 1.4-2.1 2.1zM16.3 6.3l2.1-2.1 1.4 1.4-2.1 2.1zM7 9h2V7h6v2h2v6h-2v2H9v-2H7z"/></svg>
+      <svg class="i-moon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M9 2h6v2h-4v2H9v4H7v4h2v4h2v2h4v-2h4v-2h2v-4h-2v2h-2v2h-6v-2H9v-4H7v-2h2V6h2V4H9z"/></svg>
+    </button>
+  </div>
+</header>
+
+<div class="gis-app">
+  <!-- Contents -->
+  <aside class="contents" id="contents" aria-label="Contents">
+    <div class="ph">
+      <h2>Layers</h2>
+      <button class="addbtn" type="button" id="addBtn" title="Add data (or drop files on the map)">＋ Add data</button>
+      <input type="file" id="fileInput" multiple hidden accept=".tif,.tiff,.zip,.shp,.dbf,.prj,.cpg,.shx,.geojson,.json,.kml,.kmz,.gpkg,.gml,.gpx,.img,.asc,.hgt,.vrt,.jp2,.nc">
+    </div>
+    <ul class="layers" id="layerList"></ul>
+    <div class="empty" id="emptyLayers">
+      <p><b>Drop files on the map</b> or use <b>＋ Add data</b>.</p>
+      <p class="hint">GeoTIFF (any size) · shapefile (.zip, or .shp + .dbf + .prj together) · GeoJSON · GeoPackage · KML</p>
+      <button class="link" type="button" id="demoBtn">Load demo data</button>
+    </div>
+    <p class="hint tip">Drag layers to reorder · double-click to zoom · click the map to identify</p>
+  </aside>
+
+  <!-- Map -->
+  <main class="mapwrap" id="mapWrap">
+    <div id="map" class="map" tabindex="0" aria-label="Map"></div>
+    <div class="maptools">
+      <button class="ib" type="button" id="contentsToggle" title="Show/hide layers" aria-label="Show or hide layers"><svg viewBox="0 0 24 24" width="16" height="16"><path d="M12 3l9 5-9 5-9-5 9-5zM3 13l9 5 9-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></button>
+      <button class="ib" type="button" id="zoomAllBtn" title="Zoom to all layers" aria-label="Zoom to all layers"><svg viewBox="0 0 24 24" width="16" height="16"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></button>
+      <div class="bm">
+        <button class="ib" type="button" id="basemapBtn" title="Basemap" aria-label="Basemap"><svg viewBox="0 0 24 24" width="16" height="16"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></button>
+        <div class="bm-menu" id="basemapMenu" hidden><b>Basemap</b><div id="basemaps"></div></div>
+      </div>
+    </div>
+    <div class="dropzone" aria-hidden="true"><span>Drop to add layers</span></div>
+    <div id="popup" class="popup"><button class="x" id="popupClose" type="button" aria-label="Close">×</button><div id="popupBody"></div></div>
+    <div class="statusbar"><span id="coords">Move over the map for coordinates</span><span id="scale"></span><span id="ver"></span></div>
+    <section class="drawer" id="drawer" hidden>
+      <header><h3 id="drawerTitle"></h3><div class="dtools" id="drawerTools"></div><button class="ib" type="button" id="drawerClose" aria-label="Close table">×</button></header>
+      <div class="dbody" id="drawerBody"></div>
+    </section>
+  </main>
+
+  <!-- Side panel -->
+  <aside class="side" id="side" aria-label="Panels">
+    <nav class="stabs" id="sideTabs" role="tablist">
+      <button type="button" role="tab" data-tab="analysis">Catchment stats</button>
+      <button type="button" role="tab" data-tab="tools">Tools</button>
+      <button type="button" role="tab" data-tab="layer">Layer</button>
+      <button class="ib collapse" type="button" id="sideToggle" title="Collapse panel" aria-label="Collapse panel">›</button>
+    </nav>
+    <div class="sidepane" id="pane-analysis"></div>
+    <div class="sidepane" id="pane-tools" hidden></div>
+    <div class="sidepane" id="pane-layer" hidden></div>
+  </aside>
+</div>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+<noscript><p style="padding:2rem">Ababahika needs JavaScript. It runs entirely in your browser; no data leave your computer.</p></noscript>
+</body>
+</html>

@@ -165,7 +165,7 @@
   }
 
   // ------------------------------------------------------------ tools
-  const TOOL_COLORS = { cyan: 'var(--accent)', violet: 'var(--violet)', amber: 'var(--accent-2)', lime: 'var(--accent-3)', pink: 'var(--pink)', blue: 'var(--blue, #4f8cff)', teal: 'var(--teal, #2dd4bf)', orange: 'var(--orange, #fb923c)' };
+  const TOOL_COLORS = { cyan: 'var(--accent)', violet: 'var(--violet)', amber: 'var(--accent-2)', lime: 'var(--accent-3)', pink: 'var(--pink)', blue: 'var(--blue, #4f8cff)', teal: 'var(--teal, #2dd4bf)', orange: 'var(--orange, #fb923c)', earth: 'var(--earth, #d6a066)' };
   const TOOL_ICONS = {
     band: '<path d="M3 15c2-3 4-6 7-4s4 4 7 1 3-5 4-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M3 19c2-2 4-4 7-3s4 2 7 0 3-3 4-4M3 11c2-4 4-7 7-6s4 3 7 0 3-5 4-6" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".55"/>',
     extend: '<path d="M3 16c1.5-2 3-5 5-4s3 3 4 1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M12 13c2-3 3-6 5-4s2 3 4 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="2 2.5"/><path d="M12 4v16" stroke="currentColor" stroke-width="1" opacity=".5"/>',
@@ -176,6 +176,7 @@
     depend: '<path d="M3 4c3 1 5 4 8 7s5 5 10 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M18 3v18" stroke="currentColor" stroke-width="1.6" stroke-dasharray="2 2"/><path d="M3 21h18" stroke="currentColor" stroke-width="1.2" opacity=".55"/>',
     gap: '<circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5.5 14l2.5-3.5 2 2.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M14 11.5l2 3.5 2.5-2.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M10 13l4-1.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-dasharray="1.6 1.6" opacity=".7"/>',
     dsbc: '<rect x="2.5" y="5.5" width="8" height="8" rx="1" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M6.5 5.5v8M2.5 9.5h8" stroke="currentColor" stroke-width="1.2" opacity=".6"/><path d="M11.5 9.5h1.8m0 0-1.4-1.4m1.4 1.4-1.4 1.4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><rect x="14.5" y="4.5" width="7" height="10" rx="1" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M16.8 4.5v10M19.2 4.5v10M14.5 7.8h7M14.5 11.2h7" stroke="currentColor" stroke-width=".9" opacity=".6"/><path d="M3 20c2-2.2 4-2.2 6 0s4 2.2 6 0 4-2.2 6 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
+    catchment: '<path d="M4.5 9.5C5 5.5 9 3 13 3.6c4.2.6 7 3.8 6.6 7.6-.3 3.4-2.8 4.4-4 6.6-1.1 2-3.2 3.6-5.6 3-3.4-.8-6.1-6.4-5.5-11.3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M8 9.5c1.6-2.2 5-2.6 7.2-.8M8.6 13.2c1.3-1.4 3.7-1.6 5.4-.3" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".55"/><path d="M12.5 5.5c-.6 3.4.4 6.6-.6 10.4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
     ffa: '<path d="M3 3v18h18" fill="none" stroke="currentColor" stroke-width="1.4" opacity=".55"/><path d="M5 18C9 15.5 13 11 20 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="7" cy="16.3" r="1.3" fill="currentColor"/><circle cx="10.5" cy="14.6" r="1.3" fill="currentColor"/><circle cx="13" cy="11.2" r="1.3" fill="currentColor"/><circle cx="16.5" cy="8.6" r="1.3" fill="currentColor"/><path d="M15 20.5c1-.9 2-.9 3 0s2 .9 3 0" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" opacity=".7"/>',
     idf: '<path d="M4 5c1 6 3 9 7 11s7 2.5 10 3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M4 10c1.5 4 3.5 6.5 7 7.5s6 1.6 10 2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" opacity=".6"/><path d="M8 2.5c-1.2 1.8-1.8 2.9-1.8 3.7a1.8 1.8 0 0 0 3.6 0c0-.8-.6-1.9-1.8-3.7z" fill="currentColor"/>',
   };
@@ -207,6 +208,19 @@
         '<line x1="' + x(cut) + '" x2="' + x(cut) + '" y1="' + pad + '" y2="' + (H - pad) + '" class="ta-div"/>' +
         '<circle cx="' + x(cut) + '" cy="' + y(ranked[cut]) + '" r="4" class="ta-dot"/>' +
         '<text x="' + (+x(cut) - 6) + '" y="' + (H - pad - 6) + '" text-anchor="end" class="ta-lbl">97% dependable</text></svg>';
+    }
+    if (kind === 'catchment') {
+      // catchment outline over slope classes: shaded bands (steeper = deeper), contours and the main stream
+      const cx = W / 2, cy = H / 2 + 4;
+      const ring = (s, wob) => Array.from({ length: 40 }, (_, i) => {
+        const a = (i / 40) * Math.PI * 2, r = s * (1 + 0.18 * Math.sin(3 * a + 0.6) + 0.1 * Math.cos(5 * a) + wob * Math.sin(7 * a));
+        return (i ? 'L' : 'M') + (cx + r * 1.75 * Math.cos(a)).toFixed(1) + ' ' + (cy + r * 0.92 * Math.sin(a)).toFixed(1);
+      }).join(' ') + ' Z';
+      const bands = [[56, 0.1], [42, 0.18], [30, 0.3], [17, 0.45]].map(([s, o]) => '<path d="' + ring(s, 0.04) + '" class="ta-slope" style="fill-opacity:' + o + '"/>').join('');
+      return '<svg viewBox="0 0 ' + W + ' ' + H + '" aria-hidden="true">' + g + bands +
+        '<path d="' + ring(56, 0.04) + '" class="ta-avg" style="stroke-dasharray:none;animation:none"/>' +
+        '<path d="M' + (cx + 6) + ' ' + (cy + 52) + ' C ' + (cx - 10) + ' ' + (cy + 24) + ' ' + (cx + 14) + ' ' + (cy + 4) + ' ' + (cx - 4) + ' ' + (cy - 22) + ' S ' + (cx + 10) + ' ' + (cy - 40) + ' ' + (cx - 2) + ' ' + (cy - 48) + '" class="ta-stream"/>' +
+        '<text x="' + (pad + 6) + '" y="' + (pad + 12) + '" class="ta-lbl2">slope classes per catchment</text></svg>';
     }
     if (kind === 'ffa') {
       // flood frequency plot: ranked annual floods against return period (log axis), fitted curve and its band

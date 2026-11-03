@@ -582,6 +582,8 @@ body.is-preview::before { content: 'PREVIEW · DRAFT'; position: fixed; bottom: 
 .ta-dot { fill: var(--violet); }
 .ta-train { fill: color-mix(in srgb, var(--tc) 8%, transparent); }
 .ta-obs { fill: none; stroke: var(--text); stroke-width: 1.6; stroke-linejoin: round; opacity: .85; }
+.ta-slope { fill: var(--tc); stroke: none; }
+.ta-stream { fill: none; stroke: var(--lo, #6db7ff); stroke-width: 2; stroke-linecap: round; }
 .ta-pt { fill: var(--text); opacity: .85; }
 .ta-raw { fill: none; stroke: var(--dim); stroke-width: 1.6; stroke-dasharray: 5 4; stroke-linejoin: round; }
 @keyframes draw { to { stroke-dashoffset: 0; } }
@@ -614,6 +616,9 @@ body.is-preview::before { content: 'PREVIEW · DRAFT'; position: fixed; bottom: 
   .tb-tabs:has(> .tb-tab:nth-of-type(4)) { overflow: visible; }
   .tb-tabs:has(> .tb-tab:nth-of-type(4)) .tb-tab { min-width: 0; grid-template-columns: 1fr; justify-items: center; text-align: center; gap: 8px; padding: 12px 6px; }
   .tb-tabs:has(> .tb-tab:nth-of-type(4)) .tb-txt b { font-size: 13.5px; line-height: 1.3; white-space: normal; }
+  /* seven or more tools: one row gets too narrow; use a grid of icon + name, about four per row */
+  .tb-tabs:has(> .tb-tab:nth-of-type(7)) { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); }
+  .tb-tabs:has(> .tb-tab:nth-of-type(7)) .tb-tab { grid-template-columns: 30px 1fr; justify-items: start; text-align: left; gap: 10px; padding: 10px; }
   .tb-more, .tb-group { display: none; }
   .tb-panel { grid-template-columns: 1fr; min-height: 0; }
   .tb-art { order: -1; }

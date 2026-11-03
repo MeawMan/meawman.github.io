@@ -35,7 +35,7 @@
       blank: { name: '', group: '', tagline: '', description: '', url: '', icon: 'chart', accent: 'cyan', status: 'live', updated: '', features: [], tags: [] },
       help: 'Tools shown in the homepage Toolbox. “Link” can be a page in this site (e.g. tools/my-tool/) or any web address. Status “soon” shows the card without a launch button. The homepage shows tools in this order (move them with ↑ ↓); change “Last updated” when you publish a new version of a tool.',
       fields: [f('name', 'Tool name'), f('group', 'Group heading (tools next to each other with the same group sit under one heading)'), f('tagline', 'One-line tagline'), f('description', 'Description', 'textarea'), f('url', 'Link (e.g. tools/hydro-series/#minmax)'),
-        f('icon', 'Icon', 'select', ['band', 'extend', 'ml', 'depend', 'gap', 'dsbc', 'idf', 'ffa', 'chart', 'map', 'wave']), f('accent', 'Colour', 'select', ['cyan', 'violet', 'amber', 'lime', 'pink', 'blue', 'teal', 'orange']),
+        f('icon', 'Icon', 'select', ['band', 'extend', 'ml', 'depend', 'gap', 'dsbc', 'idf', 'ffa', 'catchment', 'chart', 'map', 'wave']), f('accent', 'Colour', 'select', ['cyan', 'violet', 'amber', 'lime', 'pink', 'blue', 'teal', 'orange', 'earth']),
         f('status', 'Status', 'select', ['live', 'beta', 'soon']), f('updated', 'Last updated (shown on the card)', 'date'), f('features', 'Key features — one per line', 'list'), f('tags', 'Tags — comma separated', 'csv')] },
     { key: 'focusAreas', label: 'Focus areas', kind: 'array', title: (i) => i.title, blank: { icon: 'chip', title: '', text: '' },
       fields: [f('title', 'Title'), f('icon', 'Icon', 'select', ['wave', 'satellite', 'cloud', 'chip']), f('text', 'Description', 'textarea')] },
