@@ -12,8 +12,8 @@
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const SECTIONS = [
-    ['about', 'About'], ['research', 'Research'], ['experience', 'Experience'], ['tools', 'Tools'], ['map', 'Map'],
-    ['skills', 'Skills'], ['education', 'Education'], ['leadership', 'Leadership'], ['contact', 'Contact'],
+    ['about', 'About'], ['experience', 'Experience'], ['education', 'Education'], ['skills', 'Skills'], ['tools', 'Tools'],
+    ['research', 'Research'], ['map', 'Map'], ['leadership', 'Leadership'], ['contact', 'Contact'],
   ];
 
   const ICONS = {
@@ -340,12 +340,26 @@
       const now = new Date();
       years = Math.max(1, Math.round(((now.getFullYear() - y) * 12 + now.getMonth() + 1 - m) / 12));
     }
+    // Summary blocks under the hero: one number per section, each a link to it (years is a plain tile).
+    // A block whose section is switched off in the admin panel, or whose count is 0, is left out.
+    const shown = (id) => { const el = document.getElementById(id); return el && !el.closest('section')?.hidden; };
     const stats = [
-      [pubs.length, 'Publications'], [journals, 'Journal articles'], [DATA.certifications.length, 'Certifications'],
-    ];
-    if (years) stats.push([years, 'Years in research']);
-    $('#stats').innerHTML = stats.map(([n, l]) =>
-      '<div class="stat"><b data-count="' + n + '">' + n + '</b><span>' + esc(l) + '</span></div>').join('');
+      [years, 'Years in research', null],
+      [DATA.experience.length, 'Roles', 'experience'],
+      [DATA.education.filter((e) => !/certificate/i.test(e.degree || '')).length, 'Degrees', 'education'],
+      [DATA.skills.reduce((s, g) => s + (g.items || []).length, 0), 'Skills', 'skills'],
+      [DATA.certifications.length, 'Certifications', 'achievements'],
+      [(DATA.tools || []).filter((t) => t.name && t.status !== 'soon').length, 'Tools built', 'tools'],
+      [pubs.length, 'Publications', 'research'],
+      [journals, 'Journal articles', 'research'],
+      [(DATA.studyAreas || []).length, 'Study areas', 'map'],
+      [(DATA.leadership || []).length, 'Leadership roles', 'leadership'],
+    ].filter(([n, , id]) => n && (!id || shown(id)));
+    $('#stats').innerHTML = stats.map(([n, l, id]) => {
+      const inner = '<b data-count="' + n + '">' + n + '</b><span>' + esc(l) + '</span>';
+      return id ? '<a class="stat" href="#' + id + '" title="Go to ' + esc(l.toLowerCase()) + '">' + inner + '<i class="stat-go" aria-hidden="true">→</i></a>'
+        : '<div class="stat">' + inner + '</div>';
+    }).join('');
     $('#sceneMode').textContent = 'CLASS: HYDRO · ' + pubs.length + ' PAPERS';
   }
 
