@@ -21,6 +21,7 @@
 //                 (station-skew MSE from the Bulletin 17B approximation).
 
 import { DISTRIBUTIONS, PE3, pe3Internal } from './distributions.js';
+import { bootLimits } from './bootci.js';
 import { RNG } from './rng.js';
 import { nelderMead } from './optim.js';
 import { gammaP, lgamma } from './special.js';
@@ -211,7 +212,7 @@ export function weightedSkew(G, n, Gr, mseR) {
  * This is NOT the Bulletin 17C analytical EMA interval (Cohn et al. 2001); it is a simulation
  * alternative that reflects the same censoring and is stated as such in the report.
  */
-export function bootstrapCensoredQuantiles(fit, design, Fs, { nBoot = 500, seed = 1, level = 0.9, opts = {}, onProgress } = {}) {
+export function bootstrapCensoredQuantiles(fit, design, Fs, { nBoot = 500, seed = 1, level = 0.9, opts = {}, onProgress, correction = 'percentile' } = {}) {
   const dist = DISTRIBUTIONS[fit.distId], rng = new RNG(seed);
   const reps = Fs.map(() => []);
   let failed = 0;
@@ -231,14 +232,14 @@ export function bootstrapCensoredQuantiles(fit, design, Fs, { nBoot = 500, seed 
     Fs.forEach((F, j) => { const q = dist.quantile(F, r.params); if (Number.isFinite(q)) reps[j].push(q); });
     if (onProgress && b % 10 === 0) onProgress(b / nBoot);
   }
-  const a = (1 - level) / 2;
-  const intervals = reps.map((r) => {
+  const corr = correction === 'bca' ? 'bc' : correction; // no jackknife for censored designs
+  const intervals = reps.map((r, j) => {
     const s = Float64Array.from(r).sort();
     if (s.length < 20) return { lo: NaN, hi: NaN, se: NaN };
-    const q = (p) => { const h = (s.length - 1) * p, lo = Math.floor(h); return s[lo] + (h - lo) * (s[Math.ceil(h)] - s[lo]); };
     let m = 0; for (const v of s) m += v; m /= s.length;
     let v2 = 0; for (const v of s) v2 += (v - m) ** 2;
-    return { lo: q(a), hi: q(1 - a), se: Math.sqrt(v2 / (s.length - 1)) };
+    const lim = bootLimits(s, dist.quantile(Fs[j], fit.params), level, corr);
+    return { lo: lim.lo, hi: lim.hi, se: Math.sqrt(v2 / (s.length - 1)), z0: lim.z0 };
   });
-  return { intervals, nBoot, failed, method: 'boot-param-censored', level };
+  return { intervals, nBoot, failed, method: 'boot-param-censored', correction: corr, level };
 }

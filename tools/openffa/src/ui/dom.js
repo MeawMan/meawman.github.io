@@ -58,7 +58,8 @@ export function table(head, rows, { classes = [], rowAttrs = () => ({}) } = {}) 
 }
 
 export function field(label, control, hint, helpKey) {
-  return h('label', { class: 'field' }, h('span', {}, label, helpKey ? helpButton(helpKey) : null), control, hint ? h('span', { class: 'hint' }, hint) : null);
+  const key = helpKey ?? (HELP[label] ? label : null); // every field with an entry in help.js gets a ? button
+  return h('label', { class: 'field' }, h('span', {}, label, key ? helpButton(key) : null), control, hint ? h('span', { class: 'hint' }, hint) : null);
 }
 
 // help popovers -----------------------------------------------------------------------------

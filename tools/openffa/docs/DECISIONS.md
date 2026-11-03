@@ -121,3 +121,58 @@ censored data are ranked only against other censored fits.
   the families used in Bangladesh studies with the B17C, FEH and ARR choices.
 * Plotly's basic bundle (1.1 MB) is used instead of the full one (4.8 MB).
 * Fonts (Public Sans, Barlow Semi Condensed) are vendored for offline use.
+
+## D18. Portfolio release, v0.2.0 (2026-11-03)
+OpenFFA is published as a page of meawman.github.io (`tools/openffa/`). It uses the portfolio header, fonts and
+palette and the portfolio's theme key (`mrj_theme`). The paper-only documents (gap analysis, paper outline,
+research brief) were removed from the shipped folder; validation, validation notes, decisions and limitations stay.
+Further analyses and the Methods page stay reachable on phones (they were hidden below 860 px).
+
+## D19. Bootstrap limits: percentile, BC and BCa
+`src/core/bootci.js` adds bias-corrected (BC) and bias-corrected-and-accelerated (BCa, jackknife acceleration;
+Efron 1987) limits to every bootstrap (BCa needs re-fits of leave-one-out samples, so it applies to the
+non-parametric bootstrap; other bootstraps use BC). A simulation study (n = 30, 90 % nominal, 100-year flood;
+`tests/bootci.test.js`) found: parametric percentile 86–87 % coverage, BC within 1 point of it; non-parametric
+percentile 74–79 %, BCa 77–85 %. On the Bulletin 17C EMA examples BC moved the intervals towards PeakFQ for
+Santa Cruz River but away for Orestimba Creek. Percentile stays the default; the help text recommends the
+parametric bootstrap, or BCa with the non-parametric one.
+
+## D20. POT intervals include the event-rate uncertainty
+v0.1 bootstrapped the exceedances with λ held fixed, which understates the uncertainty at short return periods.
+`potBootstrap` now draws the number of events from Poisson(λ·years), simulates and refits the GPA (threshold
+fixed), and evaluates each replicate's return level with its own λ*. Tested: wider than the fixed-λ bootstrap at
+T = 1 yr, nearly the same at T = 100 yr.
+
+## D21. Help on every option
+`field()` in `src/ui/dom.js` attaches a ? button whenever `src/ui/help.js` has an entry for the field's label
+(or a key passed explicitly), so every form field now has an explanation. The About page became “Methods and
+references”: equations for every check, distribution, estimator, statistic, interval and further analysis, the
+validation summary, limitations and references; the distribution/method table is read from the code.
+
+## D22. Methods audit, v0.3.0 (2026-11-03)
+A line-by-line review of the estimators, intervals and POT code against the standard references. The distribution
+functions, L-moment/moment/ML estimators, EMA, MGBT, bootstrap limits and the trend/change-point tests were found
+correct (they are also covered by the reference tests). Three faults were fixed and one method added:
+
+* **POT event rate over gaps (bug).** λ was peaks ÷ (last date − first date), so missing months or years counted
+  as flood-free time and λ, and every POT return level, came out low. BWDB daily records often have such gaps.
+  λ now uses observed time = number of values × the median time step; the page reports the span and the gap years.
+  Tested on a 10-year record with a 2-year gap (observed 8.0 years, span 10.0).
+* **POT return-period basis.** Levels were given only for the average interval between exceedances T_PD, while
+  the main design-flood table uses annual-maximum return periods T. The two differ markedly at short T (the 2-year
+  partial-duration level is the 1.6-year annual-maximum level). The default is now the annual-maximum basis via the
+  Poisson–GPA relation G(x_T) = 1 + ln(1 − 1/T)/λ (Stedinger et al. 1993), so POT and AMS design floods are directly
+  comparable; the partial-duration basis remains an option. The bootstrap follows the chosen basis. Checked against
+  SciPy `genpareto` and through the Langbein relation.
+* **Delta method for LN2 and LP3.** The interval was symmetric in flow units. These distributions are fitted on
+  logarithms, where the quantile estimator is close to normal; the interval is now formed for log x_T and
+  transformed back (asymmetric, always positive), as in Kite (1977) and Bulletin 17B practice.
+* **Profile likelihood for a 3-parameter GPA** with a free location is refused: its likelihood is unbounded as the
+  location approaches the smallest value (Smith 1985), so the profile is not a valid likelihood-ratio interval.
+* **Added: Gumbel's finite-sample method** (Gumbel 1958; Chow et al. 1988), x_T = x̄ + K s with
+  K = (y_T − ȳ_n)/σ_n. It is the calculation in most South Asian textbooks and many agency reports. ȳ_n and σ_n are
+  computed exactly from the Weibull plotting positions, reproducing the printed table to 4 decimals (n = 10–100).
+  Included so users can reproduce and check existing reports; the help text says L-moments are more efficient.
+
+Considered and not added: regional (index-flood) frequency analysis and Kappa/Wakeby. Both need multi-site input
+and validation against R `lmomRFA`, which was not available; they stay listed under limitations.

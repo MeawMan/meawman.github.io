@@ -1,4 +1,4 @@
-# Limitations (OpenFFA 0.1.0)
+# Limitations (OpenFFA 0.3.0)
 
 ## Methods not implemented
 * Kappa and Wakeby distributions; LH-moments; mixed-population (e.g. snowmelt + rain) models.
@@ -18,7 +18,10 @@
   by thresholds) are not implemented.
 * The non-stationary GEV allows linear trends in location and log-scale only, with a constant shape. There
   is no non-stationary GPA or LP3.
-* Peaks-over-threshold confidence intervals hold the event rate λ fixed.
+* Peaks-over-threshold intervals include the uncertainty of the event rate λ (Poisson event count) but treat the threshold as known.
+* The POT event rate uses observed time (number of values × median time step). Irregular records whose step changes over time (e.g. daily, then hourly) are counted at the median step; check the reported observed years.
+* Gumbel's method (Gumbel 1958) is provided to reproduce existing reports. It is a less efficient estimator than L-moments or maximum likelihood, and its bootstrap intervals refit with the same method.
+* Bootstrap interval coverage: in OpenFFA's simulations (n = 30, 90 % nominal, 100-year flood) the parametric bootstrap covered 86–87 %, the non-parametric percentile bootstrap 74–79 % and the non-parametric BCa 77–85 %. All under-cover somewhat; treat intervals as a lower bound on uncertainty.
 
 ## Statistical cautions
 * GOF tests have little power for typical record lengths (20–60 years). A large p-value is not evidence
@@ -41,5 +44,3 @@
 * The plotting library is the Plotly "basic" bundle (scatter, bar). Specialised charts would need the
   full bundle.
 * No Bangladeshi dataset is bundled; the monsoon sample is synthetic.
-* The literature review behind the gap analysis relied partly on secondary sources for the commercial and
-  desktop tools (see `GAP_ANALYSIS.md`).

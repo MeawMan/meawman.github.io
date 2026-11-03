@@ -17,6 +17,9 @@
 import { fitDistribution } from './fit.js';
 import { mean, sd } from './stats.js';
 import { normPpf } from './special.js';
+import { DISTRIBUTIONS } from './distributions.js';
+import { RNG } from './rng.js';
+import { bootLimits } from './bootci.js';
 
 const DAY = 86400000;
 
@@ -79,9 +82,23 @@ export function peaksOverThreshold(records, threshold, { minSeparationDays = 7, 
     }
     peaks.push({ peak: r.peak, idx: s.indexOf(r.peak) });
   }
+  // The event rate must use the time actually OBSERVED: with gaps (common in BWDB records), the span
+  // from the first to the last value overstates the record length and biases lambda, and every
+  // return level, low. Observed time = number of values x the usual time step (median spacing).
   const spanYears = s.length ? (s[s.length - 1].date - s[0].date) / (365.25 * DAY) + (1 / 365.25) : 0;
+  const step = medianStep(s);
+  const observedYears = s.length && step ? Math.min(spanYears, (s.length * step) / (365.25 * DAY)) : spanYears;
   const values = peaks.map((p) => p.peak.value);
-  return { peaks: peaks.map((p) => ({ date: p.peak.date, value: p.peak.value })), values, nYears: spanYears, lambda: values.length / spanYears, threshold };
+  return { peaks: peaks.map((p) => ({ date: p.peak.date, value: p.peak.value })), values, nYears: observedYears, spanYears, gapYears: spanYears - observedYears, stepDays: step / DAY, lambda: values.length / observedYears, threshold };
+}
+
+/** Median spacing between consecutive dated values (ms); robust to gaps. */
+function medianStep(s) {
+  const d = [];
+  for (let i = 1; i < s.length; i++) { const v = s[i].date - s[i - 1].date; if (v > 0) d.push(v); }
+  if (!d.length) return DAY;
+  d.sort((a, b) => a - b);
+  return d[Math.floor(d.length / 2)];
 }
 
 /** Mean excess over each threshold with approximate 95 % CI; linear in u above a valid threshold. */
@@ -107,12 +124,54 @@ export function parameterStability(values, thresholds, method = 'mle') {
   });
 }
 
-/** POT -> return level for T years with lambda events per year (GPA fitted to exceedances). */
-export function potReturnLevel(gpaParams, lambda, T) {
-  if (!(lambda * T > 1)) return NaN; // the T-year event is below the threshold
-  const F = 1 - 1 / (lambda * T);
+/**
+ * POT -> return level for T years with lambda events per year (GPA fitted to exceedances).
+ *   basis 'pds' : T is the average interval between exceedances (partial-duration ARI): F = 1 - 1/(lambda T).
+ *   basis 'ams' : T is an annual-maximum return period. With Poisson arrivals, P(annual max <= x) =
+ *                 exp{-lambda [1 - G(x)]}, so G(x_T) = 1 + ln(1 - 1/T)/lambda (Stedinger et al. 1993, eq. 18.6.4;
+ *                 Madsen et al. 1997). Directly comparable with the annual-maximum design floods.
+ * NaN when the T-year level lies below the threshold.
+ */
+export function potReturnLevel(gpaParams, lambda, T, basis = 'pds') {
+  const F = basis === 'ams' ? 1 + Math.log(1 - 1 / T) / lambda : 1 - 1 / (lambda * T);
+  if (!(F > 0 && F < 1)) return NaN; // the T-year event is below the threshold
   const [xi, a, k] = gpaParams;
   return Math.abs(k) < 1e-8 ? xi - a * Math.log(1 - F) : xi + a * (1 - Math.pow(1 - F, k)) / k;
 }
 /** Langbein (1949): convert partial-duration return period to annual-maximum return period. */
 export const langbeinAnnualT = (Tpds) => 1 / (1 - Math.exp(-1 / Tpds));
+/** Inverse of langbeinAnnualT: partial-duration ARI for an annual-maximum return period. */
+export const langbeinPdsT = (Tams) => -1 / Math.log(1 - 1 / Tams);
+
+/**
+ * Parametric bootstrap of POT return levels that includes the uncertainty of the event rate.
+ * Each replicate draws the number of exceedances from Poisson(lambda * nYears), simulates that many
+ * exceedances from the fitted GPA (location = threshold), refits by the same method with the threshold
+ * fixed, and evaluates the T-year level with the replicate's own rate lambda* = n* / nYears.
+ * (Holding lambda fixed, as a plain bootstrap of the exceedances does, understates the uncertainty
+ * at short return periods; Coles 2001, sec. 4.4.1.)
+ */
+export function potBootstrap(fit, lambda, nYears, Ts, { nBoot = 500, seed = 1, level = 0.9, method = 'mle', threshold, correction = 'percentile', basis = 'pds' } = {}) {
+  const rng = new RNG(seed);
+  const gpa = DISTRIBUTIONS.GPA;
+  const reps = Ts.map(() => []);
+  let failed = 0;
+  for (let b = 0; b < nBoot; b++) {
+    const n = rng.poisson(lambda * nYears);
+    if (n < 10) { failed++; continue; }
+    const sim = Array.from({ length: n }, () => gpa.quantile(rng.uniformOpen(), fit.params));
+    const r = fitDistribution('GPA', sim, method, { loc: threshold });
+    if (!r.ok) { failed++; continue; }
+    const lam = n / nYears;
+    Ts.forEach((T, j) => { const q = potReturnLevel(r.params, lam, T, basis); if (Number.isFinite(q)) reps[j].push(q); });
+  }
+  const intervals = Ts.map((T, j) => {
+    const s = Float64Array.from(reps[j]).sort();
+    if (s.length < 20) return { lo: NaN, hi: NaN, se: NaN };
+    let m = 0; for (const v of s) m += v; m /= s.length;
+    let v2 = 0; for (const v of s) v2 += (v - m) ** 2;
+    const lim = bootLimits(s, potReturnLevel(fit.params, lambda, T, basis), level, correction === 'bca' ? 'bc' : correction);
+    return { lo: lim.lo, hi: lim.hi, se: Math.sqrt(v2 / (s.length - 1)) };
+  });
+  return { intervals, Ts, nBoot, failed, level, method: 'parametric bootstrap, Poisson event count', correction, basis };
+}

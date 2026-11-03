@@ -2,6 +2,7 @@
 import { DISTRIBUTIONS } from '../core/distributions.js';
 import { PLOTTING_POSITIONS } from '../core/plotpos.js';
 import { CI_METHODS } from '../core/uncertainty.js';
+import { gumbelReducedMoments } from '../core/fit.js';
 
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const num = (v, sig = 5) => (v === null || v === undefined || !Number.isFinite(v) ? '' : Number(v.toPrecision(sig)));
@@ -45,6 +46,8 @@ export function workbook(state) {
 
 // ------------------------------------------------------------------ report
 export const REFERENCES = {
+  gumbel1958: 'Gumbel, E.J. (1958). Statistics of Extremes. Columbia University Press, New York.',
+  chow1988: 'Chow, V.T., Maidment, D.R., Mays, L.W. (1988). Applied Hydrology. McGraw-Hill, New York.',
   b17c: 'England, J.F., Jr., Cohn, T.A., Faber, B.A., Stedinger, J.R., Thomas, W.O., Jr., Veilleux, A.G., Kiang, J.E., Mason, R.R., Jr. (2018, v1.1 2019). Guidelines for determining flood flow frequency—Bulletin 17C. U.S. Geological Survey Techniques and Methods 4-B5. https://doi.org/10.3133/tm4B5',
   hosking1990: 'Hosking, J.R.M. (1990). L-moments: analysis and estimation of distributions using linear combinations of order statistics. Journal of the Royal Statistical Society B, 52(1), 105–124.',
   hw1997: 'Hosking, J.R.M., Wallis, J.R. (1997). Regional Frequency Analysis: An Approach Based on L-Moments. Cambridge University Press.',
@@ -61,6 +64,7 @@ export const REFERENCES = {
   ww: 'Wald, A., Wolfowitz, J. (1943). An exact test for randomness in the non-parametric case based on serial correlation. Annals of Mathematical Statistics, 14, 378–388.',
   lilliefors: 'Lilliefors, H.W. (1967). On the Kolmogorov-Smirnov test for normality with mean and variance unknown. Journal of the American Statistical Association, 62, 399–402.',
   efron: 'Efron, B., Tibshirani, R.J. (1993). An Introduction to the Bootstrap. Chapman & Hall, New York.',
+  efron87: 'Efron, B. (1987). Better bootstrap confidence intervals. Journal of the American Statistical Association 82(397), 171–185.',
   akaike: 'Akaike, H. (1974). A new look at the statistical model identification. IEEE Transactions on Automatic Control, 19(6), 716–723; Hurvich, C.M., Tsai, C.-L. (1989). Regression and time series model selection in small samples. Biometrika, 76(2), 297–307.',
   cunnane: 'Cunnane, C. (1978). Unbiased plotting positions—a review. Journal of Hydrology, 37, 205–222.',
   griffis: 'Griffis, V.W., Stedinger, J.R., Cohn, T.A. (2004). Log Pearson type 3 quantile estimators with regional skew information and low outlier adjustments. Water Resources Research, 40, W07503.',
@@ -76,6 +80,8 @@ export function methodsText(state) {
   P.push(`<p>Before fitting, the series was checked for monotonic trend (Mann-Kendall test with the Hamed-Rao correction for autocorrelation and the Theil-Sen slope), for a change point (Pettitt test), for serial dependence (lag-1 autocorrelation and the Wald-Wolfowitz test), for homogeneity between the two halves of the record (Mann-Whitney test) and for low outliers (Multiple Grubbs-Beck test of Bulletin 17C, Cohn et al. 2013; single Grubbs-Beck test of Bulletin 17B for high outliers). ${esc(res.diagnostics.recommendation)}</p>`);
   const methods = [...new Set(res.fits.map((f) => f.methodLabel))];
   P.push(`<p>The following distribution and estimation-method combinations were fitted: ${res.fits.map((f) => `${f.distId} (${esc(f.methodLabel)})`).join('; ')}. Parameter conventions follow Hosking &amp; Wallis (1997). L-moment estimates use the unbiased probability-weighted moments and exact inversion of the theoretical L-moment ratios. Maximum-likelihood estimates were obtained numerically; for Pearson type III the likelihood was restricted to |skew| ≤ 2, where it is regular.</p>`);
+  const g58 = res.fits.find((f) => f.method === 'gumbel58' && f.ok);
+  if (g58) { const gm = gumbelReducedMoments(g58.n); cites.add('gumbel1958'); cites.add('chow1988'); P.push(`<p>The Gumbel distribution was also fitted by Gumbel's finite-sample method (Gumbel 1958; Chow et al. 1988): x<sub>T</sub> = x̄ + K s with K = (y<sub>T</sub> − ȳ<sub>n</sub>)/σ<sub>n</sub>, where ȳ<sub>n</sub> = ${num(gm.ybar, 4)} and σ<sub>n</sub> = ${num(gm.sigma, 4)} are the mean and standard deviation of the reduced variates of the Weibull plotting positions for n = ${g58.n}, computed exactly.</p>`); }
   if (methods.some((m) => /EMA/.test(m))) { cites.add('b17c'); cites.add('cohn1997'); P.push('<p>The log-Pearson type III distribution was also fitted with the Expected Moments Algorithm (EMA) of Bulletin 17C (Cohn et al. 1997; England et al. 2018), which represents censored, historic and low-outlier information as flow intervals.</p>'); }
   if (res.p0 > 0) P.push(`<p>Zero annual peaks were treated with the conditional-probability adjustment (p0 = ${res.p0.toFixed(3)}) for the methods that do not model them as censored values.</p>`);
   if (res.pilf) P.push(`<p>${res.pilf.n} annual peaks below ${num(res.pilf.threshold, 5)} (${esc(res.pilf.source)} threshold) were treated as potentially influential low floods and censored in the EMA and censored maximum-likelihood fits.</p>`);
@@ -83,7 +89,7 @@ export function methodsText(state) {
   if (S.regionalSkew) { cites.add('griffis'); P.push(`<p>A regional skew of ${S.regionalSkew.value} (MSE ${S.regionalSkew.mse}) was combined with the station skew by inverse-MSE weighting (method of moments) and through the equivalent record length of Bulletin 17C eq. 7-10 (EMA); the station-skew MSE was computed with the Bulletin 17B formula.</p>`); }
   cites.add('lilliefors'); cites.add('efron'); cites.add('akaike'); cites.add('cunnane');
   P.push(`<p>Goodness of fit was assessed with the Kolmogorov-Smirnov, Anderson-Darling and Cramér-von Mises statistics and the probability-plot correlation coefficient. Because the parameters are estimated from the same data, p-values were obtained by parametric bootstrap (${S.gofBoot} replicates, re-fitting each replicate with the same method) rather than from tables that assume known parameters (Lilliefors 1967). Fits were ranked by ${esc(res.ranking.label)}; AIC, AICc and BIC are exact comparisons only between maximum-likelihood fits. Observed values were plotted with the ${esc(PLOTTING_POSITIONS[S.plottingPosition]?.label ?? S.plottingPosition)} plotting position.</p>`);
-  if (S.ciMethod !== 'none') { cites.add('coles2001'); P.push(`<p>${Math.round(S.ciLevel * 100)} % confidence intervals for the design floods were computed by ${esc((CI_METHODS[S.ciMethod] ?? S.ciMethod).toLowerCase())}${S.ciMethod.startsWith('boot') ? ` with ${S.nBoot} replicates (seed ${S.seed}); for censored or EMA fits the bootstrap re-simulates the same censoring design` : ''}. The intervals describe sampling uncertainty under each fitted model and do not include the uncertainty of choosing the model.</p>`); }
+  if (S.ciMethod !== 'none') { cites.add('coles2001'); if (S.ciMethod.startsWith('boot') && S.ciCorrection && S.ciCorrection !== 'percentile') cites.add('efron87'); P.push(`<p>${Math.round(S.ciLevel * 100)} % confidence intervals for the design floods were computed by ${esc((CI_METHODS[S.ciMethod] ?? S.ciMethod).toLowerCase())}${S.ciMethod.startsWith('boot') ? ` with ${S.nBoot} replicates (seed ${S.seed}) and ${({ percentile: 'percentile limits', bc: 'bias-corrected (BC) limits', bca: 'bias-corrected and accelerated (BCa) limits (BC for parametric and censored fits)' })[S.ciCorrection || 'percentile']}${S.ciCorrection && S.ciCorrection !== 'percentile' ? ' (Efron 1987)' : ''}; for censored or EMA fits the bootstrap re-simulates the same censoring design` : ''}. The intervals describe sampling uncertainty under each fitted model and do not include the uncertainty of choosing the model.</p>`); }
   P.push(`<p>Calculations were made with ${res.software.name} ${res.software.version}, which runs in the web browser; the numerical routines are validated against R (lmom, extRemes, ismev, MGBT, trend), SciPy and the worked examples of Bulletin 17C (see the validation report distributed with the software). The full settings are listed in the appendix and in the saved project file, so the analysis can be reproduced exactly.</p>`);
   return { html: P.join('\n'), cites: [...cites] };
 }

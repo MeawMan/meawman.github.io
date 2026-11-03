@@ -1,6 +1,6 @@
 // sw.js - service worker: caches the whole app on first visit so it works offline afterwards.
 // Bump VERSION whenever files change (scripts/build-sw.mjs regenerates the list).
-const VERSION = 'openffa-0.1.0-portfolio-2';
+const VERSION = 'openffa-0.3.0-portfolio-1';
 const FILES = [
   'assets/fonts/barlow-semi-condensed-latin-500-normal.woff2',
   'assets/fonts/barlow-semi-condensed-latin-600-normal.woff2',
@@ -21,6 +21,7 @@ const FILES = [
   'data/usgs_11274500_orestimba_creek_peaks.csv',
   'index.html',
   'src/core/analysis.js',
+  'src/core/bootci.js',
   'src/core/censored.js',
   'src/core/diagnostics.js',
   'src/core/distributions.js',
@@ -64,8 +65,7 @@ self.addEventListener('activate', (e) => { e.waitUntil(caches.keys().then((ks) =
 // was not bumped); every same-origin response is also stored, so the app keeps working offline.
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
-  const same = new URL(e.request.url).origin === location.origin;
-  if (!same) return;
+  if (new URL(e.request.url).origin !== location.origin) return;
   e.respondWith(fetch(e.request).then((r) => {
     if (r.ok) { const copy = r.clone(); caches.open(VERSION).then((c) => c.put(e.request, copy)); }
     return r;

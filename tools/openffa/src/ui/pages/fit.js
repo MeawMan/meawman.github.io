@@ -7,7 +7,7 @@ import { PLOTTING_POSITIONS } from '../../core/plotpos.js';
 import { plotBlock } from '../../plot/render.js';
 import { frequencyPlot, lmrdPlot, SERIES } from '../../plot/plots.js';
 
-const METHODS = ['lmom', 'mle', 'mom', 'pwm', 'ema'];
+const METHODS = ['lmom', 'mle', 'mom', 'pwm', 'ema', 'gumbel58'];
 const MLABEL = { ...METHOD_LABELS, ema: 'EMA (Bulletin 17C)' };
 const avail = (d, m) => (m === 'ema' ? d === 'LP3' : AVAILABLE_METHODS[d].includes(m));
 
@@ -29,7 +29,7 @@ export function render(host, ctx) {
   const presetBtns = h('div', { class: 'btn-group' }, Object.entries(PRESETS).map(([k, p]) => h('button', { class: 'btn quiet', type: 'button', onclick: () => {
     st.fits = p.fits().map(([distId, method]) => ({ distId, method })); ctx.render(); } }, p.label)));
   sel.append(h('p', { class: 'small muted' }, 'Start from a preset, then add or remove combinations. Every combination is fitted to the same data.'), presetBtns);
-  const head = h('tr', {}, h('th', { class: 'l' }, 'Distribution'), METHODS.map((m) => h('th', {}, MLABEL[m].replace(' (plotting-position)', ''))));
+  const head = h('tr', {}, h('th', { class: 'l' }, 'Distribution'), METHODS.map((m) => h('th', {}, m === 'gumbel58' ? "Gumbel's method" : MLABEL[m].replace(' (plotting-position)', ''))));
   const body = DIST_ORDER.map((d) => h('tr', {}, h('td', { class: 'l' }, DISTRIBUTIONS[d].name),
     METHODS.map((m) => h('td', {}, avail(d, m) ? h('input', { type: 'checkbox', checked: chosen.has(`${d}|${m}`), 'aria-label': `${DISTRIBUTIONS[d].name}, ${MLABEL[m]}`,
       onchange: (e) => { const key = `${d}|${m}`; if (e.target.checked) st.fits.push({ distId: d, method: m }); else st.fits = st.fits.filter((f) => `${f.distId}|${f.method}` !== key); } }) : ''))));

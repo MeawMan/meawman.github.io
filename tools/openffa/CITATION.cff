@@ -1,8 +1,10 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
 title: "OpenFFA: browser-based flood frequency analysis"
-version: 0.1.0
-date-released: 2026-10-27
+version: 0.3.0
+date-released: 2026-11-03
+url: "https://meawman.github.io/tools/openffa/"
+repository-code: "https://github.com/MeawMan/meawman.github.io"
 license: MIT
 authors:
   - family-names: Joy

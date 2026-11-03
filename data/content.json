@@ -147,13 +147,13 @@
       "name": "OpenFFA",
       "group": "Analysis",
       "tagline": "Flood frequency analysis, validated against Bulletin 17C",
-      "description": "Load annual maximum floods or daily flows (with water-year extraction, e.g. April–March) and find out whether stationary frequency analysis is defensible, fit 11 distributions by L-moments, maximum likelihood, moments or the Bulletin 17C Expected Moments Algorithm, compare them, and read design floods with confidence intervals. Peaks over threshold and a non-stationary GEV are included, and every estimator is tested against R, SciPy and the Bulletin 17C worked examples.",
+      "description": "Load annual peaks or a daily flow record and estimate design floods: checks for trend, change points, independence and low outliers, 11 distributions fitted by L-moments, maximum likelihood, moments or the Bulletin 17C Expected Moments Algorithm, bootstrap goodness of fit, four kinds of confidence interval, peaks over threshold and a non-stationary GEV. Tested against R, SciPy and the Bulletin 17C examples.",
       "url": "tools/openffa/",
       "icon": "ffa",
       "accent": "orange",
       "status": "live",
       "updated": "2026-11-03",
-      "features": ["Checks first: Mann-Kendall, Pettitt, independence, homogeneity, Grubbs-Beck and MGBT", "11 distributions: GEV, Gumbel, LP3, Pearson III, LN2/LN3, GLO, GPA and more", "L-moments, maximum likelihood, moments, PWM and Bulletin 17C EMA", "Historic floods, zero flows and low outliers handled by censoring", "Bootstrap goodness of fit, AICc/BIC ranking and L-moment ratio diagram", "Design floods with bootstrap, delta-method or profile-likelihood intervals", "Peaks over threshold, non-stationary GEV, report, Excel and project file"],
+      "features": ["11 distributions: GEV, LP3, P3, Gumbel, GLO, LN2/LN3, Gamma, Weibull, GPA, Normal", "L-moments, ML (censored/historic), moments, PWM, Bulletin 17C EMA, Gumbel's method", "Mann-Kendall (Hamed-Rao), Pettitt, independence and Multiple Grubbs-Beck checks", "Bootstrap GOF p-values, AIC/AICc/BIC, L-moment ratio diagram", "Intervals: parametric/non-parametric bootstrap (BC, BCa), delta, profile likelihood", "Peaks over threshold (gap-aware, annual-maximum T) and non-stationary GEV", "Report with methods paragraph, Excel and project file"],
       "tags": ["Flood frequency", "Design floods", "Bulletin 17C"]
     },
     {
@@ -181,6 +181,19 @@
       "updated": "2026-11-03",
       "features": ["Slope per catchment: mean, median, P10–P90, classes (Horn, as ArcGIS)", "LULC & soil area and % per catchment (raster or polygons)", "Streams GeoTIFFs of any size; geographic DEMs handled exactly", "Project, clip, merge, dissolve, slope raster with real GDAL (WebAssembly)", "Export shapefile, GeoPackage, GeoJSON, KML in any CRS", "Excel workbook, methods text, results joined to the map"],
       "tags": ["GIS", "Slope", "Land cover"]
+    },
+    {
+      "name": "Composite CN Calculator",
+      "group": "Modelling",
+      "tagline": "SCS curve number and runoff for every sub-catchment",
+      "description": "Paste a land-use table straight from Excel, one row per sub-catchment, and get the area-weighted SCS curve number (TR-55 / NEH-4) for AMC I, II and III, retention S, initial abstraction, design-storm runoff, runoff coefficient and volume. Soil textures map to hydrologic soil groups, open water can count at CN 100 or be left out, and the CN lookup for Bangladesh land-cover classes is editable.",
+      "url": "tools/cn-calculator/",
+      "icon": "cn",
+      "accent": "rose",
+      "status": "live",
+      "updated": "2026-11-03",
+      "features": ["Paste blocks from Excel; columns matched by header in any order", "Area-weighted CN for AMC I, II and III", "S, Ia (any λ), runoff Q, C = Q/P and volume per sub-catchment", "Soil texture or group A–D; Bangladesh land-cover classes built in", "Open water at CN 100 or excluded as storage", "Editable CN lookup; results copy straight back to Excel"],
+      "tags": ["Curve number", "Runoff", "TR-55"]
     },
     {
       "name": "Hydro ML Studio",

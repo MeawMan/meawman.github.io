@@ -150,10 +150,11 @@ function setMode(m) {
   try { localStorage.setItem('openffa-mode', m); } catch { /* storage unavailable */ }
   render();
 }
+// Theme: light or dark, shared with the portfolio through the 'mrj_theme' key (set before first paint in index.html).
 function setTheme(t) {
-  if (t) document.documentElement.dataset.theme = t; else delete document.documentElement.dataset.theme;
-  try { localStorage.setItem('mrj_theme', t || ''); } catch { /* ignore */ }
-  if (state.page) render();
+  document.documentElement.dataset.theme = t;
+  try { localStorage.setItem('mrj_theme', t); } catch { /* ignore */ }
+  if (state.page) render(); // plots read their colours from CSS variables
 }
 
 export function projectJSON() {
@@ -192,16 +193,13 @@ document.addEventListener('DOMContentLoaded', () => {
   $('#versionFoot').textContent = `${SOFTWARE.name} ${SOFTWARE.version} · runs in your browser; data never leave this computer`;
   $$('.staff button.step').forEach((b) => b.addEventListener('click', () => go(b.dataset.page)));
   $$('[data-mode]').forEach((b) => b.addEventListener('click', () => setMode(b.dataset.mode)));
-  $('#themeBtn').addEventListener('click', () => {
-    const cur = document.documentElement.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-    setTheme(cur === 'dark' ? 'light' : 'dark');
-  });
+  $('#tsTheme').addEventListener('click', () => setTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'));
   $('#saveProjectBtn').addEventListener('click', saveProject);
   $('#openProjectBtn').addEventListener('click', () => $('#projectFile').click());
   $('#projectFile').addEventListener('change', (e) => { const f = e.target.files[0]; if (f) openProject(f); e.target.value = ''; });
-  let m = 'guided', t = '';
-  try { m = localStorage.getItem('openffa-mode') || 'guided'; t = localStorage.getItem('mrj_theme') || ''; } catch { /* ignore */ }
-  if (t) document.documentElement.dataset.theme = t;
+  let m = 'guided';
+  try { m = localStorage.getItem('openffa-mode') || 'guided'; } catch { /* ignore */ }
+  if (!document.documentElement.dataset.theme) document.documentElement.dataset.theme = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
   state.mode = m; document.body.classList.toggle('guided', m === 'guided'); document.body.classList.toggle('expert', m === 'expert');
   $$('[data-mode]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.mode === m)));
   const start = (location.hash || '#data').slice(1);

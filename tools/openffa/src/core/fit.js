@@ -1,7 +1,7 @@
 // fit.js - parameter estimation for every distribution and method.
 //
 // fitDistribution(distId, data, method, opts) -> result object
-//   method : 'mom' | 'lmom' | 'pwm' | 'mle'
+//   method : 'mom' | 'lmom' | 'pwm' | 'mle' | 'gumbel58' (Gumbel only)
 //   opts   : { skew: number          fixed skew for PE3/LP3 'mom' (e.g. regional/weighted skew)
 //              skewType: 'unbiased'|'moment'   sample skew estimator for PE3/LP3 'mom'
 //              loc: number           fixed location (GPA, e.g. POT threshold)
@@ -18,12 +18,13 @@ import { nelderMead, brent, findRoot } from './optim.js';
 
 export const METHOD_LABELS = {
   mom: 'Method of moments', lmom: 'L-moments', pwm: 'Probability-weighted moments (plotting-position)', mle: 'Maximum likelihood',
+  gumbel58: "Gumbel's method (finite-sample ȳn, σn)",
 };
 
 /** Which estimation methods are implemented for each distribution. */
 export const AVAILABLE_METHODS = {
   NOR: ['mom', 'lmom', 'mle'], LN2: ['mom', 'lmom', 'mle'], LN3: ['mom', 'lmom', 'mle'],
-  GUM: ['mom', 'lmom', 'pwm', 'mle'], GEV: ['mom', 'lmom', 'pwm', 'mle'],
+  GUM: ['mom', 'lmom', 'pwm', 'mle', 'gumbel58'], GEV: ['mom', 'lmom', 'pwm', 'mle'],
   PE3: ['mom', 'lmom', 'pwm', 'mle'], LP3: ['mom', 'lmom', 'pwm', 'mle'],
   GAM: ['mom', 'lmom', 'mle'], WEI: ['mom', 'lmom', 'mle'],
   GLO: ['lmom', 'pwm', 'mle'], GPA: ['mom', 'lmom', 'pwm', 'mle'],
@@ -94,6 +95,28 @@ function momEstimate(distId, x, y, opts) {
     }
     default: return { fail: 'Method of moments is not available for this distribution.' };
   }
+}
+
+// ---------------------------------------------------------------- Gumbel (1958) finite-sample method
+// The textbook "Gumbel's method" (Gumbel 1958; Chow et al. 1988; Subramanya, Engineering Hydrology):
+//   x_T = mean + K s,  K = (y_T - ybar_n) / sigma_n,  y_T = -ln(-ln(1 - 1/T)),
+// where ybar_n and sigma_n are the mean and (population) standard deviation of the reduced variates
+// y_i = -ln(-ln(i/(n+1))) of the Weibull plotting positions, and s is the sample SD (n - 1).
+// Computed exactly for any n (it reproduces the printed tables, e.g. n = 10: 0.4952, 0.9496).
+// Equivalent to a Gumbel distribution with alpha = s / sigma_n and xi = mean - alpha ybar_n.
+// Included so results match agency and textbook calculations; L-moments are more efficient.
+export function gumbelReducedMoments(n) {
+  let m = 0;
+  const y = new Array(n);
+  for (let i = 1; i <= n; i++) { y[i - 1] = -Math.log(-Math.log(i / (n + 1))); m += y[i - 1]; }
+  m /= n;
+  let v = 0; for (const t of y) v += (t - m) ** 2;
+  return { ybar: m, sigma: Math.sqrt(v / n) };
+}
+function gumbel58Estimate(x) {
+  const { ybar, sigma } = gumbelReducedMoments(x.length);
+  const a = sd(x) / sigma;
+  return [mean(x) - a * ybar, a];
 }
 
 // ---------------------------------------------------------------- L-moments
@@ -280,6 +303,7 @@ export function fitDistribution(distId, data, method = 'lmom', opts = {}) {
   const y = logTransform(dist, x);
   let p;
   if (method === 'mom') p = momEstimate(distId, x, y, opts);
+  else if (method === 'gumbel58') p = gumbel58Estimate(x);
   else if (method === 'lmom' || method === 'pwm') p = lmomEstimate(distId, dist, x, y, method, opts);
   else {
     // ML: use the L-moment and moment solutions as starting points

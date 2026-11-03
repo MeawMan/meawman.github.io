@@ -14,13 +14,14 @@ import { mgbt } from './mgbt.js';
 import { plottingPositions, thresholdExceedancePositions, PLOTTING_POSITIONS } from './plotpos.js';
 import { skew } from './stats.js';
 
-export const SOFTWARE = { name: 'OpenFFA', version: '0.1.0' };
+export const SOFTWARE = { name: 'OpenFFA', version: '0.3.0' };
 
 export const DEFAULT_SETTINGS = {
   fits: DIST_ORDER.filter((d) => d !== 'GPA').map((d) => ({ distId: d, method: AVAILABLE_METHODS[d].includes('lmom') ? 'lmom' : 'mle' })),
   returnPeriods: [2, 5, 10, 25, 50, 100, 200, 500, 1000],
   plottingPosition: 'weibull',
   ciMethod: 'boot-param',
+  ciCorrection: 'percentile',  // bootstrap limits: 'percentile' | 'bc' | 'bca' (bca: non-parametric only; bc otherwise)
   ciLevel: 0.9,
   nBoot: 1000,
   gofBoot: 300,
@@ -170,13 +171,13 @@ export function runAnalysis(input, userSettings = {}, onProgress = () => {}) {
             ci = bootstrapCensoredQuantiles(f, {
               ns: all.length, pilfThreshold: pilf?.threshold ?? (nZero ? Math.min(...pos) : null),
               historicYears: hist ? hist.years : 0, historicThreshold: hist?.threshold,
-            }, FaV, { nBoot: Math.min(S.nBoot, 500), seed: S.seed + 1000 + idx, level: S.ciLevel, opts: method === 'ema' ? emaOpts : opts,
+            }, FaV, { nBoot: Math.min(S.nBoot, 500), seed: S.seed + 1000 + idx, level: S.ciLevel, correction: S.ciCorrection, opts: method === 'ema' ? emaOpts : opts,
               onProgress: (q) => onProgress({ stage: `Confidence intervals ${distId} (censored design)`, frac: frac0 + (0.3 + 0.7 * q) / nFits }) });
             ci.note = 'Parametric bootstrap that re-simulates the same censoring/historic design and refits by the same method (not the Bulletin 17C analytical EMA interval).';
           } else ci = { error: 'For censored and EMA fits choose the parametric bootstrap (it re-simulates the censoring design).' };
         } else {
           ci = confidenceIntervals(fitSample, { ...f, distId, method }, FaV, S.ciMethod, {
-            level: S.ciLevel, nBoot: S.nBoot, seed: S.seed + 1000 + idx, fitOpts: opts,
+            level: S.ciLevel, nBoot: S.nBoot, seed: S.seed + 1000 + idx, fitOpts: opts, correction: S.ciCorrection,
             onProgress: (q) => onProgress({ stage: `Confidence intervals ${distId}`, frac: frac0 + (0.3 + 0.7 * q) / nFits }),
           });
         }
@@ -189,7 +190,7 @@ export function runAnalysis(input, userSettings = {}, onProgress = () => {}) {
       const iv = ci && ci.intervals ? ci.intervals[j] : null; j++;
       return { T, F: Fs[i], q, lo: iv ? iv.lo : null, hi: iv ? iv.hi : null, se: iv ? iv.se : null };
     });
-    fit.ci = ci ? { method: S.ciMethod, level: S.ciLevel, error: ci.error, note: ci.note, failed: ci.failed, nBoot: ci.nBoot } : null;
+    fit.ci = ci ? { method: S.ciMethod, level: S.ciLevel, correction: ci.correction ?? null, error: ci.error, note: ci.note, failed: ci.failed, nBoot: ci.nBoot } : null;
     if (fit.quantiles.some((q) => q.T > 2 * sample.length)) fit.extrapolation = 2 * sample.length;
     out.fits.push(fit);
   });

@@ -165,7 +165,7 @@
   }
 
   // ------------------------------------------------------------ tools
-  const TOOL_COLORS = { cyan: 'var(--accent)', violet: 'var(--violet)', amber: 'var(--accent-2)', lime: 'var(--accent-3)', pink: 'var(--pink)', blue: 'var(--blue, #4f8cff)', teal: 'var(--teal, #2dd4bf)', orange: 'var(--orange, #fb923c)', earth: 'var(--earth, #d6a066)' };
+  const TOOL_COLORS = { cyan: 'var(--accent)', violet: 'var(--violet)', amber: 'var(--accent-2)', lime: 'var(--accent-3)', pink: 'var(--pink)', blue: 'var(--blue, #4f8cff)', teal: 'var(--teal, #2dd4bf)', orange: 'var(--orange, #fb923c)', earth: 'var(--earth, #d6a066)', rose: 'var(--rose, #fb7185)' };
   const TOOL_ICONS = {
     band: '<path d="M3 15c2-3 4-6 7-4s4 4 7 1 3-5 4-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M3 19c2-2 4-4 7-3s4 2 7 0 3-3 4-4M3 11c2-4 4-7 7-6s4 3 7 0 3-5 4-6" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".55"/>',
     extend: '<path d="M3 16c1.5-2 3-5 5-4s3 3 4 1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M12 13c2-3 3-6 5-4s2 3 4 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="2 2.5"/><path d="M12 4v16" stroke="currentColor" stroke-width="1" opacity=".5"/>',
@@ -176,6 +176,7 @@
     depend: '<path d="M3 4c3 1 5 4 8 7s5 5 10 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M18 3v18" stroke="currentColor" stroke-width="1.6" stroke-dasharray="2 2"/><path d="M3 21h18" stroke="currentColor" stroke-width="1.2" opacity=".55"/>',
     gap: '<circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5.5 14l2.5-3.5 2 2.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M14 11.5l2 3.5 2.5-2.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M10 13l4-1.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-dasharray="1.6 1.6" opacity=".7"/>',
     dsbc: '<rect x="2.5" y="5.5" width="8" height="8" rx="1" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M6.5 5.5v8M2.5 9.5h8" stroke="currentColor" stroke-width="1.2" opacity=".6"/><path d="M11.5 9.5h1.8m0 0-1.4-1.4m1.4 1.4-1.4 1.4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><rect x="14.5" y="4.5" width="7" height="10" rx="1" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M16.8 4.5v10M19.2 4.5v10M14.5 7.8h7M14.5 11.2h7" stroke="currentColor" stroke-width=".9" opacity=".6"/><path d="M3 20c2-2.2 4-2.2 6 0s4 2.2 6 0 4-2.2 6 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
+    cn: '<path d="M7 2.5c-1.3 2-2 3.1-2 4a2 2 0 0 0 4 0c0-.9-.7-2-2-4zM15 4.5c-1 1.5-1.5 2.3-1.5 3a1.5 1.5 0 0 0 3 0c0-.7-.5-1.5-1.5-3z" fill="currentColor" opacity=".8"/><path d="M2.5 13h19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M3 17h18M3 20.5h18" stroke="currentColor" stroke-width="1.3" opacity=".5"/><path d="M14 13l4.5-3.2M18.5 9.8l-.4 2.1M18.5 9.8l-2.1-.3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>',
     catchment: '<path d="M4.5 9.5C5 5.5 9 3 13 3.6c4.2.6 7 3.8 6.6 7.6-.3 3.4-2.8 4.4-4 6.6-1.1 2-3.2 3.6-5.6 3-3.4-.8-6.1-6.4-5.5-11.3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M8 9.5c1.6-2.2 5-2.6 7.2-.8M8.6 13.2c1.3-1.4 3.7-1.6 5.4-.3" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".55"/><path d="M12.5 5.5c-.6 3.4.4 6.6-.6 10.4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
     ffa: '<path d="M3 3v18h18" fill="none" stroke="currentColor" stroke-width="1.4" opacity=".55"/><path d="M5 18C9 15.5 13 11 20 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="7" cy="16.3" r="1.3" fill="currentColor"/><circle cx="10.5" cy="14.6" r="1.3" fill="currentColor"/><circle cx="13" cy="11.2" r="1.3" fill="currentColor"/><circle cx="16.5" cy="8.6" r="1.3" fill="currentColor"/><path d="M15 20.5c1-.9 2-.9 3 0s2 .9 3 0" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" opacity=".7"/>',
     idf: '<path d="M4 5c1 6 3 9 7 11s7 2.5 10 3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M4 10c1.5 4 3.5 6.5 7 7.5s6 1.6 10 2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" opacity=".6"/><path d="M8 2.5c-1.2 1.8-1.8 2.9-1.8 3.7a1.8 1.8 0 0 0 3.6 0c0-.8-.6-1.9-1.8-3.7z" fill="currentColor"/>',
@@ -208,6 +209,16 @@
         '<line x1="' + x(cut) + '" x2="' + x(cut) + '" y1="' + pad + '" y2="' + (H - pad) + '" class="ta-div"/>' +
         '<circle cx="' + x(cut) + '" cy="' + y(ranked[cut]) + '" r="4" class="ta-dot"/>' +
         '<text x="' + (+x(cut) - 6) + '" y="' + (H - pad - 6) + '" text-anchor="end" class="ta-lbl">97% dependable</text></svg>';
+    }
+    if (kind === 'cn') {
+      // SCS runoff curves Q(P) for three curve numbers: no runoff until P passes Ia = 0.2 S, then Q climbs towards P
+      const Pmax = 250, X = (p) => (pad + (p / Pmax) * (W - 2 * pad)).toFixed(1), Y = (q) => (H - pad - (q / Pmax) * (H - 2 * pad)).toFixed(1);
+      const curve = (cn) => { const S = 25400 / cn - 254, Ia = 0.2 * S;
+        return Array.from({ length: 51 }, (_, i) => { const p = (i / 50) * Pmax, q = p > Ia ? (p - Ia) ** 2 / (p - Ia + S) : 0; return (i ? 'L' : 'M') + X(p) + ' ' + Y(q); }).join(' '); };
+      return '<svg viewBox="0 0 ' + W + ' ' + H + '" aria-hidden="true">' + g +
+        '<path d="M' + X(0) + ' ' + Y(0) + ' L ' + X(Pmax) + ' ' + Y(Pmax) + '" class="ta-div"/>' +
+        [[60, 'ta-obs'], [75, 'ta-obs'], [90, 'ta-avg']].map(([cn, c]) => '<path d="' + curve(cn) + '" class="' + c + '"/>').join('') +
+        '<text x="' + (pad + 6) + '" y="' + (pad + 12) + '" class="ta-lbl2">runoff Q vs rainfall P · CN 90, 75, 60</text></svg>';
     }
     if (kind === 'catchment') {
       // catchment outline over slope classes: shaded bands (steeper = deeper), contours and the main stream

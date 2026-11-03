@@ -1,0 +1,468 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Composite CN Calculator &mdash; SCS curve number and runoff &middot; Mahfujur Rahman Joy</title>
+<meta name="description" content="Area-weighted SCS curve number (TR-55 / NEH-4) for every sub-catchment: paste a land-use table from Excel, get CN for AMC I, II and III, retention, initial abstraction, design-storm runoff and volume. Runs in your browser; files are never uploaded.">
+<meta property="og:title" content="Composite CN Calculator &middot; Mahfujur Rahman Joy">
+<meta property="og:description" content="Paste land use from Excel, get area-weighted curve numbers and design-storm runoff per sub-catchment. Runs in your browser.">
+<meta property="og:image" content="https://meawman.github.io/assets/og-image.png">
+<link rel="canonical" href="https://meawman.github.io/tools/cn-calculator/">
+<link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../../assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Silkscreen&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/css/tool-shell.css">
+<script>
+  // Same theme key as the portfolio, so the tool opens in the theme the visitor already chose.
+  (function () {
+    var t = null; try { t = localStorage.getItem('mrj_theme'); } catch (e) {}
+    if (t !== 'light' && t !== 'dark') t = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', t);
+  })();
+</script><style>
+/* Layout: parameter strip → input sheet (Excel-like grid) → results ledger → reference tables. Field-book feel: ruled cells, ink-blue accent, silt amber for flags. */
+:root{
+  --bg:#f3f5f4; --surface:#ffffff; --sunk:#e8eceb; --fg:#15211f; --muted:#5b6b68; --line:#d3dbd9; --grid:#e1e7e5;
+  --accent:#1f5f8b; --accent-soft:#dbe8f2; --flag:#a8620a; --flag-soft:#f8ead2; --bad:#b3362c;
+  --cn-lo:#3f8a5a; --cn-mid:#c79a1e; --cn-hi:#b8452f;
+  --display:"Archivo","Arial Narrow",system-ui,sans-serif;
+  --body:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#101615; --surface:#172020; --sunk:#0c1211; --fg:#e3ebe9; --muted:#93a4a0; --line:#2a3634; --grid:#222d2b;
+  --accent:#7db4dc; --accent-soft:#1c3346; --flag:#e3a64a; --flag-soft:#3a2b12; --bad:#ef7d72;
+  --cn-lo:#6cc08a; --cn-mid:#e2bd4f; --cn-hi:#ec7a60; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#101615; --surface:#172020; --sunk:#0c1211; --fg:#e3ebe9; --muted:#93a4a0; --line:#2a3634; --grid:#222d2b;
+  --accent:#7db4dc; --accent-soft:#1c3346; --flag:#e3a64a; --flag-soft:#3a2b12; --bad:#ef7d72;
+  --cn-lo:#6cc08a; --cn-mid:#e2bd4f; --cn-hi:#ec7a60; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:14px;line-height:1.5}
+.wrap{max-width:1280px;margin:0 auto;padding-block:28px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:28px}
+header{display:grid;gap:6px}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(26px,4vw,36px);letter-spacing:-.01em;margin:0;text-wrap:balance}
+h1 small{font-weight:500;color:var(--muted);font-size:.5em;letter-spacing:.04em;text-transform:uppercase;display:block;margin-bottom:2px}
+.lede{color:var(--muted);max-width:72ch;margin:0}
+h2{font-family:var(--display);font-weight:700;font-size:18px;margin:0;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+h2 .step{font-family:var(--mono);font-size:12px;color:var(--accent);font-weight:500}
+.sec{display:grid;gap:12px;min-width:0}
+.sec-head{display:flex;justify-content:space-between;align-items:end;gap:12px;flex-wrap:wrap}
+.hint{color:var(--muted);font-size:13px;margin:0;max-width:84ch}
+.hint kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-bottom-width:2px;border-radius:3px;padding:0 4px;background:var(--surface);color:var(--fg)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:6px}
+.params{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.param{background:var(--surface);padding:12px 14px;display:grid;gap:6px;align-content:start}
+.param label{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.param .sub{font-size:12px;color:var(--muted)}
+input,select{font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:6px 8px;min-width:0}
+input[type=number]{font-family:var(--mono);font-variant-numeric:tabular-nums}
+input:focus-visible,select:focus-visible,button:focus-visible,tr:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.btns{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+button{font:inherit;font-weight:600;font-size:13px;border-radius:4px;padding:7px 12px;cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--fg)}
+button:hover{border-color:var(--accent);color:var(--accent)}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+button.primary:hover{filter:brightness(1.1);color:var(--surface)}
+.toast{font-size:13px;color:var(--accent);min-height:1.5em}
+.scroll{overflow-x:auto}
+
+/* sheet */
+.sheet-wrap{overflow:auto;max-height:560px;background:var(--surface);border:1px solid var(--line);border-radius:6px}
+table.sheet{border-collapse:separate;border-spacing:0;font-size:13px}
+.sheet th{position:sticky;top:0;z-index:2;background:var(--sunk);color:var(--muted);font-size:11px;font-weight:600;line-height:1.25;text-align:left;vertical-align:bottom;padding:6px 6px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);width:96px;min-width:96px;max-width:96px;white-space:normal}
+.sheet th .col{display:block;font-family:var(--mono);font-weight:500;color:var(--accent);font-size:10px;margin-bottom:2px}
+.sheet th.w{color:var(--accent)}
+.sheet td{border-right:1px solid var(--grid);border-bottom:1px solid var(--grid);padding:0;background:var(--surface)}
+.sheet td input{width:100%;border:0;border-radius:0;background:transparent;padding:6px 6px;font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right;font-size:13px}
+.sheet td input:focus{outline:2px solid var(--accent);outline-offset:-2px;background:var(--accent-soft)}
+.sheet td.rn,.sheet th.rn{position:sticky;left:0;z-index:1;width:40px;min-width:40px;max-width:40px;text-align:center;font-family:var(--mono);color:var(--muted);background:var(--sunk);font-size:11px;border-right:1px solid var(--line)}
+.sheet th.rn{z-index:3}
+.sheet td.nm,.sheet th.nm{position:sticky;left:40px;z-index:1;width:140px;min-width:140px;max-width:140px}
+.sheet th.nm{z-index:3}
+.sheet td.nm{border-right:1px solid var(--line)}
+.sheet td.nm input,.sheet td.sl input{text-align:left;font-family:var(--body)}
+.sheet th.sl,.sheet td.sl{width:120px;min-width:120px;max-width:120px}
+.sheet td.sl.bad input{color:var(--flag);background:var(--flag-soft)}
+.sheet td.tot,.sheet th.tot{width:110px;min-width:110px;text-align:right;font-family:var(--mono);color:var(--muted);padding:6px;background:var(--sunk)}
+.sheet tr.active td.rn{background:var(--accent);color:var(--surface)}
+.sheet tr.filled td.rn{color:var(--fg)}
+
+/* results */
+table.res{border-collapse:collapse;width:100%;font-size:13px}
+.res th{font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:600;text-align:right;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+.res th.l,.res td.l{text-align:left}
+.res td{padding:7px 10px;border-bottom:1px solid var(--line);text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.res td.txt{font-family:var(--body)}
+.res tbody tr:last-child td{border-bottom:0}
+.res tbody tr{cursor:pointer}
+.res tbody tr:hover td{background:var(--sunk)}
+.cn{display:inline-flex;align-items:center;gap:8px;font-weight:500}
+.cn i{display:inline-block;width:46px;height:6px;border-radius:3px;background:var(--sunk);position:relative;overflow:hidden}
+.cn i b{position:absolute;inset:0 auto 0 0;border-radius:3px}
+.pill{display:inline-block;font-family:var(--body);font-size:11px;font-weight:600;padding:1px 7px;border-radius:999px;background:var(--flag-soft);color:var(--flag)}
+.pill.ok{background:var(--sunk);color:var(--muted)}
+.ex{font-family:var(--body);font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--flag);background:var(--flag-soft);padding:2px 8px;border-radius:999px}
+.stats{display:flex;gap:24px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.stats b{font-family:var(--mono);color:var(--fg);font-weight:500}
+details{background:var(--surface);border:1px solid var(--line);border-radius:6px}
+summary{cursor:pointer;padding:12px 14px;font-family:var(--display);font-weight:700;font-size:15px}
+details[open] summary{border-bottom:1px solid var(--line)}
+details .inner{padding:12px 14px;display:grid;gap:10px}
+.lk{border-collapse:collapse;width:100%;font-size:13px}
+.lk th{font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:600;text-align:right;padding:6px 8px;border-bottom:1px solid var(--line)}
+.lk th.l,.lk td.l{text-align:left}
+.lk td{padding:5px 8px;border-bottom:1px solid var(--line);text-align:right}
+.lk td input[type=number]{width:64px;text-align:right;padding:4px 6px}
+.lk td input.cls{width:260px;padding:4px 6px}
+.formula{font-family:var(--mono);font-size:12px;color:var(--muted);display:grid;gap:2px}
+.empty{padding:24px;text-align:center;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+<style>
+/* Portfolio edition: portfolio colours and fonts for both themes (:root:root outranks the tool's own
+   :root[data-theme] rules above and tool-shell.css), a slightly larger base size, and the header. */
+:root:root[data-theme="dark"] {
+  --bg:#080b14; --surface:#0d1322; --sunk:#121b2f; --fg:#eef3fb; --muted:#a7b3cb; --line:#24334f; --grid:#1a2540;
+  --accent:#5be7ff; --accent-soft:rgba(91,231,255,.12); --flag:#ffc857; --flag-soft:rgba(255,200,87,.1); --bad:#ff6b8b;
+  --cn-lo:#6cc08a; --cn-mid:#e2bd4f; --cn-hi:#ec7a60; color-scheme:dark;
+}
+:root:root[data-theme="light"] {
+  --bg:#f2f4f9; --surface:#ffffff; --sunk:#eef2f8; --fg:#0b1222; --muted:#4a5672; --line:#d3dbe8; --grid:#e3e8f1;
+  --accent:#0786ad; --accent-soft:#dff1f7; --flag:#b86200; --flag-soft:#fff4e3; --bad:#c0264d;
+  --cn-lo:#3f8a5a; --cn-mid:#a17a12; --cn-hi:#b8452f; color-scheme:light;
+}
+:root:root { --display:'Space Grotesk',system-ui,sans-serif; --body:'Space Grotesk',system-ui,sans-serif; --mono:'JetBrains Mono',ui-monospace,Consolas,monospace; }
+html[data-theme] body { margin:0; font-size:15px; }
+button.primary, button.primary:hover { color:var(--bg); }
+.intro-row { display:flex; flex-wrap:wrap; gap:8px 16px; align-items:center; justify-content:space-between; }
+@media (max-width: 760px) { .ts-actions .ts-privacy { display:none; } } /* keeps the pinned header to one line on phones */
+</style>
+</head>
+<body>
+<header class="ts-bar">
+  <div class="ts-brand">
+    <a class="ts-logo" href="../../" title="Back to the portfolio"><img src="../../assets/favicon.svg" alt="Mahfujur Rahman Joy â€” portfolio" width="34" height="34"></a>
+    <span class="ts-crumb"><a href="../../"><b>Joy</b></a><span aria-hidden="true">/</span><a href="../../#tools">Tools</a><span aria-hidden="true">/</span><em>Composite CN Calculator</em></span>
+  </div>
+  <div class="ts-actions" style="margin-left:auto">
+    <span class="ts-privacy">&#128274; Runs in your browser &middot; nothing is uploaded</span>
+    <a class="ts-btn" href="../../#tools">All tools</a>
+    <button class="ts-btn icon" id="tsTheme" type="button" aria-label="Toggle light or dark theme" title="Toggle theme">
+      <svg class="i-sun" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M11 1h2v3h-2zM11 20h2v3h-2zM1 11h3v2H1zM20 11h3v2h-3zM4.2 5.6l1.4-1.4 2.1 2.1-1.4 1.4zM16.3 17.7l1.4-1.4 2.1 2.1-1.4 1.4zM4.2 18.4l2.1-2.1 1.4 1.4-2.1 2.1zM16.3 6.3l2.1-2.1 1.4 1.4-2.1 2.1zM7 9h2V7h6v2h2v6h-2v2H9v-2H7z"/></svg>
+      <svg class="i-moon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M9 2h6v2h-4v2H9v4H7v4h2v4h2v2h4v-2h4v-2h2v-4h-2v2h-2v2h-6v-2H9v-4H7v-2h2V6h2V4H9z"/></svg>
+    </button>
+  </div>
+</header><div class="wrap">
+  <header>
+    <h1><small>SCS Curve Number · TR-55 / NEH-4</small>Composite CN Calculator</h1>
+    <p class="lede">Paste your land use table straight from Excel into the sheet below. Each row is a sub-catchment; the area-weighted CN, AMC I/III values and design-storm runoff update as you paste or type.</p>
+  </header>
+
+  <section class="sec">
+    <h2><span class="step">1</span>Parameters</h2>
+    <div class="params">
+      <div class="param"><label for="p-lambda">Initial abstraction ratio λ</label><input id="p-lambda" type="number" step="0.01" min="0" max="0.5"><span class="sub">Ia = λ·S · NEH-4 uses 0.20</span></div>
+      <div class="param"><label for="p-amc">AMC applied</label><select id="p-amc"><option value="I">I · dry</option><option value="II">II · average</option><option value="III">III · wet</option></select><span class="sub">Sets the CN used for S, Ia, Q</span></div>
+      <div class="param"><label for="p-P">Design rainfall P (mm)</label><input id="p-P" type="number" step="0.1" min="0"><span class="sub">Event depth for the runoff check</span></div>
+      <div class="param"><label for="p-water">Open water classes</label><select id="p-water"><option value="cn100">Include at CN 100</option><option value="exclude">Exclude from CN area</option></select><span class="sub">Exclude if beels, ponds and ghers act as storage</span></div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-head">
+      <h2><span class="step">2</span>Input sheet <span id="ex-badge" class="ex" hidden>Rows 1–3: sample from your workbook</span></h2>
+      <div class="btns">
+        <button id="btn-rows">Add 10 rows</button>
+        <button id="btn-template">Copy header row</button>
+        <button id="btn-clear">Clear sheet</button>
+      </div>
+    </div>
+    <p class="hint">Click a cell, then paste (<kbd>Ctrl</kbd>+<kbd>V</kbd>) a block copied from Excel. Data fills right and down from that cell, and rows are added as needed. If your block starts with a header row, columns are matched by name in any order. Areas in hectares. Soil accepts a texture (e.g. Clay Loam) or a group letter A–D. Move with <kbd>Enter</kbd> and arrow keys.</p>
+    <div class="sheet-wrap" id="sheet-wrap"><table class="sheet" id="sheet"><thead></thead><tbody></tbody></table></div>
+    <span class="toast" id="toast-sheet" role="status"></span>
+  </section>
+
+  <section class="sec">
+    <div class="sec-head">
+      <h2><span class="step">3</span>Results</h2>
+      <div class="btns">
+        <button class="primary" id="btn-copy">Copy results for Excel</button>
+        <span class="toast" id="toast-copy" role="status"></span>
+      </div>
+    </div>
+    <div class="stats" id="stats"></div>
+    <div class="panel scroll">
+      <table class="res" id="results">
+        <thead><tr>
+          <th class="l">Row</th><th class="l">Sub-catchment</th><th class="l">Soil</th><th class="l">HSG</th>
+          <th>Area (ha)</th><th class="l">CN (AMC II)</th><th>CN I</th><th>CN III</th><th>CN used</th>
+          <th>S (mm)</th><th>Ia (mm)</th><th>Q (mm)</th><th>C = Q/P</th><th>Volume (Mm³)</th><th class="l">Checks</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <p class="hint">Click a result to jump to its row in the sheet.</p>
+  </section>
+
+  <section class="sec">
+    <h2><span class="step">4</span>Reference tables</h2>
+    <details>
+      <summary>CN lookup by land use class and soil group (AMC II, editable)</summary>
+      <div class="inner">
+        <p class="hint">Values from your workbook's CN_Lookup sheet (TR-55 analogues). Tick "water" for classes treated as open water. Renaming a class here renames its sheet column.</p>
+        <div class="scroll"><table class="lk" id="lk"><thead><tr><th class="l">Land use class</th><th>A</th><th>B</th><th>C</th><th>D</th><th class="l">Water</th><th class="l">TR-55 analogue</th></tr></thead><tbody></tbody></table></div>
+        <div class="btns"><button id="btn-addclass">Add class</button></div>
+      </div>
+    </details>
+    <details>
+      <summary>Soil texture to hydrologic soil group</summary>
+      <div class="inner"><div class="scroll"><table class="lk" id="soil"><thead><tr><th class="l">Soil texture</th><th class="l">HSG</th></tr></thead><tbody></tbody></table></div></div>
+    </details>
+    <details>
+      <summary>Equations</summary>
+      <div class="inner formula">
+        <span>CN(II) = Σ(Aᵢ·CNᵢ) / ΣAᵢ   (CNᵢ for the sub-catchment's soil group)</span>
+        <span>CN(I) = 4.2·CN / (10 − 0.058·CN)      CN(III) = 23·CN / (10 + 0.13·CN)</span>
+        <span>S = 25400/CN − 254 (mm)      Ia = λ·S</span>
+        <span>Q = (P − Ia)² / (P − Ia + S) for P &gt; Ia, else 0      C = Q/P</span>
+        <span>V = Q·A·10 m³ (A in ha); with water excluded, A is the land area only</span>
+      </div>
+    </details>
+    <div class="btns"><button id="btn-reset">Reset to workbook defaults</button><span class="toast" id="toast-reset" role="status"></span></div>
+  </section>
+</div>
+
+<datalist id="soils"></datalist>
+
+<script>
+const LOOKUP=[["Air Port",83,89,92,93,"Commercial and business, 85% impervious (TR-55 2-2a)"],["Baor",100,100,100,100,"Open water body"],["Brackish Water Aquaculture",100,100,100,100,"Permanently ponded water surface"],["Brickfield",81,88,91,93,"Industrial district, 72% impervious (TR-55 2-2a)"],["Built-Up Non-Linear",77,85,90,92,"Residential, 1/8 acre lots, 65% impervious (TR-55 2-2a)"],["Dump Sites/ Extraction Sites",77,86,91,94,"Newly graded area, pervious only (TR-55 2-2a)"],["Forest Plantation",30,55,70,77,"Woods, good condition (TR-55 2-2c)"],["Fresh Water Aquaculture",100,100,100,100,"Permanently ponded water surface"],["Herb Dominated Area",49,69,79,84,"Pasture/grassland, fair condition (TR-55 2-2c)"],["Lake",100,100,100,100,"Open water body"],["Mangrove Forest",30,55,70,77,"Woods, good condition; tidal ground may justify higher CN"],["Mangrove Plantation",36,60,73,79,"Woods, fair condition (TR-55 2-2c)"],["Mud Flats or Intertidal Area",77,86,91,94,"Bare saturated ground, as newly graded"],["Multiple Crop",65,75,82,86,"Row crops, contoured, good (TR-55 2-2b)"],["Orchards and Other Plantations (Shrub)",35,56,70,77,"Brush with grass, fair (TR-55 2-2c)"],["Orchards and Other Plantations (Trees)",43,65,76,82,"Woods-grass / orchard, fair (TR-55 2-2c)"],["Perennial Beels/Haors",100,100,100,100,"Perennially flooded depression"],["Ponds",100,100,100,100,"Open water body"],["River Banks",77,86,91,94,"Bare unvegetated soil"],["Rivers and Khals",100,100,100,100,"Open channel water surface"],["Rubber Plantation",30,55,70,77,"Woods, good condition (TR-55 2-2c)"],["Rural Settlement",54,70,80,85,"Homestead, 1/2 acre lots, 25% impervious (TR-55 2-2a)"],["Sand",77,86,91,94,"Bare sand or char land"],["Single Crop",67,78,85,89,"Row crops, straight row, good; bunded paddy may justify lower"],["Swamp Plantation",45,66,77,83,"Woods on wet ground, poor-fair (TR-55 2-2c)"]];
+const WATER=new Set(["Baor","Brackish Water Aquaculture","Fresh Water Aquaculture","Lake","Perennial Beels/Haors","Ponds","Rivers and Khals"]);
+const SOILS=[["Sand","A"],["Loamy Sand","A"],["Sandy Loam","A"],["Loam","B"],["Silt Loam","B"],["Silt","B"],["Sandy Clay Loam","C"],["Clay Loam","D"],["Silty Clay Loam","D"],["Sandy Clay","D"],["Silty Clay","D"],["Clay","D"],["Peat / Organic","D"]];
+const SAMPLE_CLASSES=LOOKUP.map(r=>r[0]);
+const SAMPLE=[["Catchment 1",[0,22.5967,0,118.0902,602.3503,41.6716,0,195.7003,3088.7622,0,0,3014.6771,4718.5347,54701.3829,1.8562,90.6155,0,18.0705,3.4768,32436.6623,0,39759.4567,31.7626,6577.8667,0]],["Catchment 2",[0,0,0,59.7722,175.8908,35.0389,0,62.3894,22.7149,0,0,135.8314,0,5409.0028,0,7.5905,0,5.9107,0,688.2874,0,3841.5786,0,3868.3171,0]],["Catchment 3",[47.5258,0,0,94.8767,573.0455,0,0,81.7388,23.0418,0,0,0,0,4598.0138,0,1116.2906,0,19.2718,0,1099.416,0,16385.8579,0,6927.8774,0]]];
+
+const MIN_ROWS=20;
+function blank(){return {name:"",soil:"",areas:{}}}
+function defaults(){
+  const cats=SAMPLE.map(s=>({name:s[0],soil:"Clay Loam",areas:Object.fromEntries(SAMPLE_CLASSES.map((c,j)=>[c,s[1][j]]).filter(e=>e[1]>0))}));
+  while(cats.length<MIN_ROWS) cats.push(blank());
+  return {params:{lambda:0.2,amc:"II",P:573.5,water:"cn100"},
+    lookup:LOOKUP.map(r=>({name:r[0],A:r[1],B:r[2],C:r[3],D:r[4],water:WATER.has(r[0]),note:r[5]})),
+    cats,sample:true};
+}
+let S;
+try{S=JSON.parse(localStorage.getItem("cn-calc-v2"))}catch(e){}
+if(!S||!S.lookup||!S.cats) S=defaults();
+function save(){try{localStorage.setItem("cn-calc-v2",JSON.stringify(S))}catch(e){}}
+
+const $=id=>document.getElementById(id);
+const norm=s=>String(s||"").trim().toLowerCase().replace(/\s+/g," ");
+const findClass=n=>S.lookup.find(r=>norm(r.name)===norm(n));
+function soilHSG(t){const s=String(t||"").trim();if(/^[abcd]$/i.test(s))return s.toUpperCase();const r=SOILS.find(x=>norm(x[0])===norm(s));return r?r[1]:null}
+function canonSoil(t){const s=String(t||"").trim();if(/^[abcd]$/i.test(s))return s.toUpperCase();const r=SOILS.find(x=>norm(x[0])===norm(s));return r?r[0]:s}
+const f=(v,d=1)=>v==null||!isFinite(v)?"—":v.toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d});
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const num=v=>{const x=parseFloat(String(v).replace(/,/g,"").trim());return isFinite(x)?x:NaN};
+const isFilled=c=>c.name.trim()!==""||Object.values(c.areas).some(a=>a>0);
+
+function compute(cat){
+  const hsg=soilHSG(cat.soil||"Clay Loam"), p=S.params;
+  let total=0,used=0,sum=0; const missing=[];
+  for(const [cls,a] of Object.entries(cat.areas)){
+    if(!(a>0)) continue; total+=a;
+    const row=findClass(cls); const cn=row&&hsg?row[hsg]:null;
+    if(row&&row.water&&p.water==="exclude") continue;
+    if(cn==null||cn===""||!isFinite(+cn)){missing.push(cls);continue}
+    used+=a; sum+=a*(+cn);
+  }
+  const out={hsg,total,used,missing};
+  if(!hsg||used<=0) return out;
+  const cn2=sum/used, cn1=4.2*cn2/(10-0.058*cn2), cn3=23*cn2/(10+0.13*cn2);
+  const cnU=p.amc==="I"?cn1:p.amc==="III"?cn3:cn2;
+  const Sm=25400/cnU-254, Ia=p.lambda*Sm, P=+p.P||0;
+  const Q=P>Ia?(P-Ia)**2/(P-Ia+Sm):0;
+  const A=p.water==="exclude"?used:total;
+  return Object.assign(out,{cn2,cn1,cn3,cnU,S:Sm,Ia,Q,C:P>0?Q/P:null,V:Q*A*10/1e6});
+}
+const cnColor=cn=>cn<70?"var(--cn-lo)":cn<85?"var(--cn-mid)":"var(--cn-hi)";
+function cnCell(cn){if(cn==null)return"—";const w=Math.max(0,Math.min(100,(cn-30)/70*100));return `<span class="cn">${f(cn,2)}<i><b style="width:${w}%;background:${cnColor(cn)}"></b></i></span>`}
+
+/* ---------- sheet ---------- */
+function cols(){return [{k:"name",label:"Sub-catchment"},{k:"soil",label:"Soil"},...S.lookup.map(l=>({k:"c:"+l.name,label:l.name,water:l.water}))]}
+function colLetter(i){let s="";i++;while(i>0){const m=(i-1)%26;s=String.fromCharCode(65+m)+s;i=Math.floor((i-1)/26)}return s}
+function getVal(cat,k){if(k==="name")return cat.name;if(k==="soil")return cat.soil;const a=cat.areas[k.slice(2)];return a>0?String(a):""}
+function setVal(cat,k,v){
+  v=String(v??"").trim();
+  if(k==="name"){cat.name=v;return}
+  if(k==="soil"){cat.soil=canonSoil(v);return}
+  const x=num(v),c=k.slice(2);
+  if(x>0) cat.areas[c]=x; else delete cat.areas[c];
+}
+function renderSheet(){
+  const C=cols();
+  $("sheet").tHead.innerHTML=`<tr><th class="rn"></th>${C.map((c,i)=>`<th class="${i===0?"nm":i===1?"sl":""}${c.water?" w":""}" title="${esc(c.label)}"><span class="col">${colLetter(i)}</span>${esc(c.label)}</th>`).join("")}<th class="tot">Total (ha)</th></tr>`;
+  $("sheet").tBodies[0].innerHTML=S.cats.map((cat,r)=>rowHTML(cat,r,C)).join("");
+  $("ex-badge").hidden=!S.sample;
+}
+function rowHTML(cat,r,C){
+  const tot=Object.values(cat.areas).reduce((a,b)=>a+(b>0?b:0),0);
+  const badSoil=cat.soil&&!soilHSG(cat.soil);
+  return `<tr data-r="${r}" class="${isFilled(cat)?"filled":""}"><td class="rn">${r+1}</td>${C.map((c,i)=>`<td class="${i===0?"nm":i===1?"sl"+(badSoil?" bad":""):""}"><input data-r="${r}" data-c="${i}" value="${esc(getVal(cat,c.k))}" ${i===1?'list="soils" placeholder="Clay Loam"':i>1?'inputmode="decimal"':""} autocomplete="off" spellcheck="false" aria-label="Row ${r+1} ${esc(c.label)}"></td>`).join("")}<td class="tot" data-tot="${r}">${tot?f(tot,1):""}</td></tr>`;
+}
+function updateRowMeta(r){
+  const cat=S.cats[r],tr=$("sheet").tBodies[0].rows[r]; if(!tr) return;
+  const tot=Object.values(cat.areas).reduce((a,b)=>a+(b>0?b:0),0);
+  tr.querySelector("[data-tot]").textContent=tot?f(tot,1):"";
+  tr.classList.toggle("filled",isFilled(cat));
+  tr.cells[2].classList.toggle("bad",!!(cat.soil&&!soilHSG(cat.soil)));
+}
+const sheet=$("sheet");
+sheet.addEventListener("input",e=>{
+  const t=e.target; if(t.dataset.r==null) return;
+  const r=+t.dataset.r,c=+t.dataset.c,k=cols()[c].k;
+  if(k==="soil") S.cats[r].soil=t.value.trim(); else setVal(S.cats[r],k,t.value);
+  S.sample=false; $("ex-badge").hidden=true; updateRowMeta(r); renderResults(); save();
+});
+sheet.addEventListener("change",e=>{const t=e.target;if(t.dataset.c==="1"){const r=+t.dataset.r;S.cats[r].soil=canonSoil(t.value);t.value=S.cats[r].soil;updateRowMeta(r);renderResults();save()}});
+sheet.addEventListener("focusin",e=>{const tr=e.target.closest("tr[data-r]");sheet.querySelectorAll("tr.active").forEach(x=>x.classList.remove("active"));if(tr)tr.classList.add("active")});
+function focusCell(r,c){
+  const C=cols(); c=Math.max(0,Math.min(C.length-1,c)); r=Math.max(0,r);
+  if(r>=S.cats.length){S.cats.push(blank());renderSheet()}
+  const el=sheet.querySelector(`input[data-r="${r}"][data-c="${c}"]`); if(el){el.focus();el.select()}
+}
+sheet.addEventListener("keydown",e=>{
+  const t=e.target; if(t.dataset.r==null) return;
+  const r=+t.dataset.r,c=+t.dataset.c;
+  const atStart=t.selectionStart===0&&t.selectionEnd===0, atEnd=t.selectionStart===t.value.length;
+  const allSel=t.selectionStart===0&&t.selectionEnd===t.value.length;
+  if(e.key==="Enter"){e.preventDefault();focusCell(e.shiftKey?r-1:r+1,c)}
+  else if(e.key==="ArrowDown"&&!(c===1&&t.value)){e.preventDefault();focusCell(r+1,c)}
+  else if(e.key==="ArrowUp"&&!(c===1&&t.value)){e.preventDefault();focusCell(r-1,c)}
+  else if(e.key==="ArrowRight"&&(atEnd||allSel)){e.preventDefault();focusCell(r,c+1)}
+  else if(e.key==="ArrowLeft"&&(atStart||allSel)){e.preventDefault();focusCell(r,c-1)}
+});
+
+/* paste: block fill from the focused cell */
+sheet.addEventListener("paste",e=>{
+  const t=e.target; if(t.dataset.r==null) return;
+  const txt=(e.clipboardData||window.clipboardData).getData("text/plain");
+  if(!/[\t\n]/.test(txt.replace(/\r?\n$/,""))) return; // single value: normal paste
+  e.preventDefault();
+  let lines=txt.replace(/\r/g,"").split("\n"); while(lines.length&&lines[lines.length-1]==="") lines.pop();
+  const grid=lines.map(l=>l.split("\t"));
+  const r0=+t.dataset.r, c0=+t.dataset.c;
+  const head=grid[0].map(h=>h.trim());
+  const known=head.filter(h=>findClass(h)).length;
+  const added=[]; let skipped=0, rowsDone=0, keys;
+  if(known>=2){
+    // header mode: map columns by name
+    keys=head.map(h=>{
+      if(!h) return null;
+      if(findClass(h)) return "c:"+findClass(h).name;
+      if(/^(sub.?)?catchment|name|polder/i.test(h)) return "name";
+      if(/soil|texture|hsg/i.test(h)) return "soil";
+      if(/total|^#$|^id$|cat.?id|^s\.?l\.?$|serial/i.test(h)) {skipped++;return null}
+      if(/^-?[\d.,]+$/.test(h)) return null;
+      S.lookup.push({name:h,A:null,B:null,C:null,D:null,water:false,note:"Added from pasted header, CN not set"}); added.push(h); return "c:"+h;
+    });
+    const data=grid.slice(1);
+    const startRow=r0;
+    data.forEach((row,i)=>{
+      const r=startRow+i; while(S.cats.length<=r) S.cats.push(blank());
+      const cat=S.cats[r]; cat.areas={}; cat.name="";cat.soil="";
+      row.forEach((v,j)=>{if(keys[j]) setVal(cat,keys[j],v)});
+      rowsDone++;
+    });
+  } else {
+    const C=cols();
+    grid.forEach((row,i)=>{
+      const r=r0+i; while(S.cats.length<=r) S.cats.push(blank());
+      row.forEach((v,j)=>{const c=c0+j; if(c>=C.length){skipped++;return} setVal(S.cats[r],C[c].k,v)});
+      rowsDone++;
+    });
+  }
+  while(S.cats.length<MIN_ROWS) S.cats.push(blank());
+  S.sample=false; renderLookup(); renderSheet(); renderResults(); save();
+  let msg=`Pasted ${rowsDone} row${rowsDone===1?"":"s"}${known>=2?" (columns matched by header)":""}.`;
+  if(added.length) msg+=` New class${added.length>1?"es":""} ${added.join(", ")} added; set CN values in step 4.`;
+  if(skipped&&known<2) msg+=` ${skipped} cell${skipped>1?"s":""} beyond the last column ignored.`;
+  toast("toast-sheet",msg,added.length?"var(--flag)":"var(--accent)");
+  focusCell(r0,c0);
+});
+
+/* ---------- results ---------- */
+function renderResults(){
+  const tb=$("results").tBodies[0];
+  const rows=S.cats.map((c,i)=>[c,i]).filter(([c])=>isFilled(c));
+  if(!rows.length){tb.innerHTML=`<tr><td colspan="15" class="empty txt">Paste land use areas into the sheet above to see CNs here.</td></tr>`;$("stats").innerHTML="";return}
+  let A=0,AC=0,mn=Infinity,mx=-Infinity,flags=0;
+  tb.innerHTML=rows.map(([c,i])=>{
+    const r=compute(c); const checks=[];
+    if(!r.hsg) checks.push(`<span class="pill">soil not recognised</span>`);
+    if(r.missing.length) checks.push(`<span class="pill" title="${esc(r.missing.join(", "))}">${r.missing.length} class${r.missing.length>1?"es":""} without CN</span>`);
+    if(!r.total) checks.push(`<span class="pill">no area</span>`);
+    if(checks.length) flags++;
+    if(r.cn2!=null){A+=r.total;AC+=r.total*r.cn2;mn=Math.min(mn,r.cn2);mx=Math.max(mx,r.cn2)}
+    return `<tr data-row="${i}" tabindex="0"><td class="l">${i+1}</td><td class="l txt">${esc(c.name||"(no name)")}</td>
+      <td class="l txt">${c.soil?esc(c.soil):'Clay Loam <span class="pill" title="No soil entered for this row; group D assumed">default</span>'}</td><td class="l">${r.hsg||"?"}</td><td>${f(r.total,1)}</td>
+      <td class="l">${cnCell(r.cn2)}</td><td>${f(r.cn1,2)}</td><td>${f(r.cn3,2)}</td><td>${f(r.cnU,2)}</td>
+      <td>${f(r.S,1)}</td><td>${f(r.Ia,1)}</td><td>${f(r.Q,1)}</td><td>${f(r.C,3)}</td><td>${f(r.V,2)}</td>
+      <td class="l txt">${checks.join(" ")||'<span class="pill ok">OK</span>'}</td></tr>`;
+  }).join("");
+  $("stats").innerHTML=`<span>Sub-catchments <b>${rows.length}</b></span><span>Total area <b>${f(A,0)} ha</b></span><span>Area-weighted CN <b>${A?f(AC/A,2):"—"}</b></span><span>Range <b>${isFinite(mn)?f(mn,1)+" – "+f(mx,1):"—"}</b></span><span>Rows with flags <b style="color:${flags?"var(--flag)":"inherit"}">${flags}</b></span>`;
+}
+function jump(tr){const r=+tr.dataset.row;const el=sheet.querySelector(`input[data-r="${r}"][data-c="0"]`);if(el){el.scrollIntoView({block:"center",behavior:"smooth"});el.focus({preventScroll:true})}}
+$("results").addEventListener("click",e=>{const tr=e.target.closest("tr[data-row]");if(tr)jump(tr)});
+$("results").addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.matches("tr[data-row]"))jump(e.target)});
+
+/* ---------- lookup ---------- */
+function renderLookup(){
+  $("lk").tBodies[0].innerHTML=S.lookup.map((l,i)=>`<tr>
+    <td class="l"><input class="cls" data-lk="${i}" data-k="name" value="${esc(l.name)}" aria-label="Class name"></td>
+    ${["A","B","C","D"].map(k=>`<td><input type="number" min="0" max="100" step="any" data-lk="${i}" data-k="${k}" value="${l[k]??""}" aria-label="${esc(l.name)} CN for soil group ${k}"></td>`).join("")}
+    <td class="l"><input type="checkbox" data-lk="${i}" data-k="water" ${l.water?"checked":""} aria-label="${esc(l.name)} is open water"></td>
+    <td class="l" style="color:var(--muted);min-width:220px">${esc(l.note||"")}</td></tr>`).join("");
+  $("soil").tBodies[0].innerHTML=SOILS.map(s=>`<tr><td class="l">${s[0]}</td><td class="l">${s[1]}</td></tr>`).join("");
+  $("soils").innerHTML=SOILS.map(s=>`<option value="${esc(s[0])}"></option>`).join("");
+}
+$("lk").addEventListener("change",e=>{
+  const t=e.target; if(t.dataset.lk==null) return; const l=S.lookup[+t.dataset.lk], k=t.dataset.k;
+  if(k==="water") l.water=t.checked;
+  else if(k==="name"){const old=l.name,nw=t.value.trim()||old;l.name=nw;if(nw!==old)S.cats.forEach(c=>{if(old in c.areas){c.areas[nw]=(c.areas[nw]||0)+c.areas[old];delete c.areas[old]}})}
+  else l[k]=t.value===""?null:parseFloat(t.value);
+  renderSheet(); renderResults(); save();
+});
+$("btn-addclass").addEventListener("click",()=>{S.lookup.push({name:"New class "+(S.lookup.length+1),A:null,B:null,C:null,D:null,water:false,note:"Added by you"});renderLookup();renderSheet();save()});
+
+/* ---------- params & buttons ---------- */
+function renderParams(){const p=S.params;$("p-lambda").value=p.lambda;$("p-amc").value=p.amc;$("p-P").value=p.P;$("p-water").value=p.water}
+[["p-lambda","lambda",true],["p-amc","amc"],["p-P","P",true],["p-water","water"]].forEach(([id,k,n])=>{
+  $(id).addEventListener("input",e=>{S.params[k]=n?parseFloat(e.target.value)||0:e.target.value;renderResults();save()});
+});
+function toast(id,msg,color){const t=$(id);t.style.color=color||"var(--accent)";t.textContent=msg;clearTimeout(t._h);t._h=setTimeout(()=>{t.textContent=""},7000)}
+async function copyText(txt,id,ok){
+  try{await navigator.clipboard.writeText(txt);toast(id,ok)}
+  catch(e){toast(id,"Clipboard is blocked in this view. Select the results table and copy it manually.","var(--flag)")}
+}
+$("btn-rows").addEventListener("click",()=>{for(let i=0;i<10;i++)S.cats.push(blank());renderSheet();save()});
+$("btn-template").addEventListener("click",()=>copyText(["Sub-catchment","Soil",...S.lookup.map(l=>l.name)].join("\t"),"toast-sheet","Header row copied. Paste it into row 1 of your Excel sheet so columns line up."));
+function armed(btn,label,fn){btn.addEventListener("click",()=>{if(btn.dataset.armed){fn();delete btn.dataset.armed;btn.textContent=label}else{btn.dataset.armed="1";btn.textContent="Click again to confirm";setTimeout(()=>{if(btn.dataset.armed){delete btn.dataset.armed;btn.textContent=label}},4000)}})}
+armed($("btn-clear"),"Clear sheet",()=>{S.cats=Array.from({length:MIN_ROWS},blank);S.sample=false;renderSheet();renderResults();save();toast("toast-sheet","Sheet cleared. Click cell A1 and paste.")});
+armed($("btn-reset"),"Reset to workbook defaults",()=>{S=defaults();renderAll();save();toast("toast-reset","Reset done.")});
+$("btn-copy").addEventListener("click",()=>{
+  const p=S.params;
+  const head=["Row","Sub-catchment","Soil","HSG","Area (ha)","CN AMC II","CN AMC I","CN AMC III",`CN used (AMC ${p.amc})`,"S (mm)","Ia (mm)",`Q (mm) at P=${p.P}`,"C","Volume (Mm3)","Classes without CN"];
+  const rows=S.cats.map((c,i)=>[c,i]).filter(([c])=>isFilled(c)).map(([c,i])=>{const r=compute(c);const n=(v,d)=>v==null?"":v.toFixed(d);
+    return [i+1,c.name,c.soil||"Clay Loam",r.hsg||"?",n(r.total,2),n(r.cn2,2),n(r.cn1,2),n(r.cn3,2),n(r.cnU,2),n(r.S,2),n(r.Ia,2),n(r.Q,2),n(r.C,4),n(r.V,3),r.missing.join("; ")].join("\t")});
+  copyText([head.join("\t"),...rows].join("\n"),"toast-copy","Results copied. Paste into Excel.");
+});
+
+function renderAll(){renderParams();renderLookup();renderSheet();renderResults()}
+renderAll();
+</script>
+<script src="../../assets/js/tool-shell.js"></script>
+</body>
+</html>

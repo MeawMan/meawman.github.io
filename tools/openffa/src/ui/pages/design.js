@@ -1,6 +1,7 @@
 // pages/design.js - step 4: quantiles (design floods), confidence intervals and diagnostic plots.
 import { h, field, helpButton, toast, fmt, table } from '../dom.js';
 import { CI_METHODS } from '../../core/uncertainty.js';
+import { CI_CORRECTIONS } from '../../core/bootci.js';
 import { plotBlock } from '../../plot/render.js';
 import { frequencyPlot, qqPlot, ppPlot, pdfPlot, cdfPlot, PAPERS, fitLabel } from '../../plot/plots.js';
 
@@ -18,17 +19,19 @@ export function render(host, ctx) {
   const ciM = h('select', {}, h('option', { value: 'none', selected: st.ciMethod === 'none' }, 'No interval'), Object.entries(CI_METHODS).map(([k, v]) => h('option', { value: k, selected: st.ciMethod === k }, v)));
   const lvl = h('select', {}, [0.8, 0.9, 0.95, 0.99].map((l) => h('option', { value: String(l), selected: st.ciLevel === l }, `${Math.round(l * 100)} %`)));
   const nb = h('input', { type: 'number', min: '100', max: '20000', step: '100', value: String(st.nBoot) });
+  st.ciCorrection ??= 'percentile';
+  const corr = h('select', {}, Object.entries(CI_CORRECTIONS).map(([k, v]) => h('option', { value: k, selected: st.ciCorrection === k }, v)));
   const runBox = h('div', {});
   const recompute = async () => {
     const T = rp.value.split(/[,;\s]+/).map(Number).filter((v) => v > 1);
     if (!T.length) return toast('Enter return periods greater than 1 year.');
-    st.returnPeriods = [...new Set(T)].sort((a, b) => a - b); st.ciMethod = ciM.value; st.ciLevel = Number(lvl.value); st.nBoot = Number(nb.value);
+    st.returnPeriods = [...new Set(T)].sort((a, b) => a - b); st.ciMethod = ciM.value; st.ciLevel = Number(lvl.value); st.nBoot = Number(nb.value); st.ciCorrection = corr.value;
     try { await ctx.runFullAnalysis(runBox); ctx.render(); } catch (e) { if (e.message !== 'Cancelled') toast(e.message, 6000); }
   };
   const fitSel = h('select', { onchange: (e) => { state.selected = Number(e.target.value); ctx.render(); } }, ok.map(([f, i]) => h('option', { value: String(i), selected: i === state.selected }, fitLabel(f))));
   host.append(h('div', { class: 'sheet' },
     h('div', { class: 'row' }, h('div', { class: 'grow' }, field('Selected fit', fitSel)), field('Return periods (years)', rp, 'Comma separated')),
-    h('div', { class: 'row', style: { marginTop: '.75rem' } }, field('Confidence interval', ciM, null, 'ci'), field('Level', lvl), field('Bootstrap replicates', nb),
+    h('div', { class: 'row', style: { marginTop: '.75rem' } }, field('Confidence interval', ciM, null, 'ci'), field('Level', lvl), field('Bootstrap replicates', nb), h('span', { class: 'expert' }, field('Bootstrap limits', corr)),
       h('button', { class: 'btn secondary', type: 'button', onclick: recompute }, 'Recalculate')), runBox));
 
   // ---------------- quantile table for the selected fit
@@ -38,6 +41,7 @@ export function render(host, ctx) {
     h('p', { class: 'small muted' }, `Parameters: ${fit.params.map((v, k) => `${fit.paramNames[k]} = ${fmt(v, 5)}`).join(', ')}${fit.distId === 'LP3' ? ' (log10 space)' : ''}${['GEV', 'GLO', 'GPA'].includes(fit.distId) ? '. Shape k uses the Hosking sign (k > 0: bounded upper tail); ξ in Coles/extRemes = −k.' : '.'}`),
     table(['Return period (yr)', 'AEP', `Design flood (${units})`, `Lower ${lvlTxt}`, `Upper ${lvlTxt}`, 'SE', ''], rows, { classes: ['', '', '', '', '', '', 'l'] }),
     fit.ci?.error ? h('p', { class: 'note' }, fit.ci.error) : null,
+    fit.ci?.correction && fit.ci.correction !== 'percentile' ? h('p', { class: 'small muted' }, `Interval limits: ${fit.ci.correction === 'bca' ? 'bias-corrected and accelerated (BCa)' : 'bias-corrected (BC)'} bootstrap.`) : null,
     fit.ci?.note ? h('p', { class: 'note' }, fit.ci.note) : null,
     fit.ci?.failed ? h('p', { class: 'note' }, `${fit.ci.failed} of ${fit.ci.nBoot} bootstrap refits failed and were left out.`) : null,
     h('p', { class: 'note' }, `Return periods beyond about twice the record length (${2 * res.input.n} years) are extrapolations: the result depends mainly on the assumed distribution, which the data cannot confirm.`)));

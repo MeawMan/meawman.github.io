@@ -7,7 +7,7 @@
 
 import { runAnalysis } from '../core/analysis.js';
 import { fitNonstationaryGEV, gumbelResiduals } from '../core/nonstationary.js';
-import { meanResidualLife, parameterStability, peaksOverThreshold, annualMaxima } from '../core/series.js';
+import { meanResidualLife, parameterStability, peaksOverThreshold, annualMaxima, potBootstrap } from '../core/series.js';
 import { fitDistribution } from '../core/fit.js';
 import { bootstrapQuantiles } from '../core/uncertainty.js';
 
@@ -27,7 +27,7 @@ const CALLS = {
     const f = fitDistribution('GPA', p.values, method, { loc: threshold });
     return { pot: { ...p, peaks: p.peaks.map((q) => [q.date.getTime(), q.value]) }, fit: f };
   },
-  potBootstrap(values, fit, Fs, opts) { return bootstrapQuantiles(values, fit, Fs, opts); },
+  potBootstrap(fit, lambda, nYears, Ts, opts) { return potBootstrap(fit, lambda, nYears, Ts, opts); },
   annualMaxima(recordsSerial, opts) {
     const recs = recordsSerial.map(([t, v]) => ({ date: new Date(t), value: v }));
     const a = annualMaxima(recs, opts);

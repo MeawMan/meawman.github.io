@@ -1,56 +1,92 @@
 /* portfolio.css — OpenFFA inside meawman.github.io.
-   Loaded after app.css. Maps OpenFFA's colour tokens to the portfolio palette for both themes, uses the
-   portfolio's body font, and styles the portfolio breadcrumb, "All tools" link and theme icon in the top bar.
-   OpenFFA's own look (gauge-staff step rail, Barlow headings) is kept. */
-
-:root[data-theme="light"] {
-  --paper: #f2f4f9; --sheet: #ffffff; --ink: #0b1222; --muted: #4a5672; --grid: #d3dbe8;
-  --river: #0786ad; --river-soft: #dff1f7; --plot-bg: #ffffff;
-  --danger: #c0264d; --danger-soft: #fdeef2; --caution: #8a4b00; --caution-soft: #fff4e3; --ok: #2c8a22; --ok-soft: #e7f5e4;
-  color-scheme: light;
-}
+   Loaded after app.css (and the portfolio's tool-shell.css). Re-maps OpenFFA's tokens to the portfolio palette
+   for both themes, uses the portfolio fonts, adds the portfolio header and places the gauge-staff rail under it.
+   Header rules are repeated here so the tool still looks right when served on its own. */
 :root[data-theme="dark"] {
   --paper: #06080f; --sheet: #0d1322; --ink: #eef3fb; --muted: #a7b3cb; --grid: #24334f;
-  --river: #5be7ff; --river-soft: rgba(91, 231, 255, .12); --plot-bg: #0d1322;
+  --river: #5be7ff; --river-soft: rgba(91, 231, 255, .12);
   --danger: #ff6b8b; --danger-soft: rgba(255, 107, 139, .1); --caution: #ffc857; --caution-soft: rgba(255, 200, 87, .08);
-  --ok: #9dff6b; --ok-soft: rgba(157, 255, 107, .08);
+  --ok: #9dff6b; --ok-soft: rgba(157, 255, 107, .08); --plot-bg: #0d1322;
+  --panel: #0d1322; --line2: #2a3a5c; --strong: #eef3fb; --dim: #8592ab; --accent: #5be7ff;
   color-scheme: dark;
 }
-:root { --font-body: 'Space Grotesk', 'Public Sans', system-ui, sans-serif; }
+:root[data-theme="light"] {
+  --paper: #f2f4f9; --sheet: #ffffff; --ink: #0b1222; --muted: #4a5672; --grid: #d3dbe8;
+  --river: #0786ad; --river-soft: #dff1f7;
+  --danger: #c0264d; --danger-soft: #fdeef2; --caution: #8a4b00; --caution-soft: #fff4e3;
+  --ok: #2c8a22; --ok-soft: #e8f6e5; --plot-bg: #ffffff;
+  --panel: #ffffff; --line2: #c5cfe0; --strong: #0b1222; --dim: #5b6782; --accent: #0786ad;
+  color-scheme: light;
+}
+:root {
+  --font-body: 'Space Grotesk', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-gauge: 'Space Grotesk', system-ui, sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, Consolas, monospace;
+  --bar-h: 55px;
+  --radius-control: 8px; --radius-sheet: 12px;
+}
+html[data-theme] .app { max-width: none; padding-block: 0; } /* undo tool-shell's width cap */
 
-/* bright accent in the dark theme: dark text on filled buttons */
-:root[data-theme="dark"] button.btn:not(.secondary):not(.quiet):not(.danger),
-:root[data-theme="dark"] .seg button[aria-pressed="true"] { color: #04141a; }
-button.btn, .seg { border-radius: 8px; }
-
-/* ---- portfolio breadcrumb in OpenFFA's top bar ---- */
-.topbar { min-height: 3.2rem; padding-block: .45rem; }
-.pf-brand { align-items: center; gap: .75rem; font-family: var(--font-body); font-weight: 400; font-size: 1rem; min-width: 0; }
-.pf-logo { display: block; flex: none; border-radius: 9px; box-shadow: 0 0 0 1px color-mix(in srgb, var(--river) 55%, transparent); }
-.pf-logo img { display: block; width: 32px; height: 32px; border-radius: 9px; image-rendering: pixelated; }
-.pf-crumb { display: flex; align-items: center; gap: .5rem; font-size: .875rem; color: var(--muted); white-space: nowrap; }
-.pf-crumb a { color: var(--muted); text-decoration: none; }
-.pf-crumb a:hover { color: var(--river); }
-.pf-crumb b { color: var(--ink); font-weight: 700; }
-.pf-crumb em { font-style: normal; color: var(--ink); font-weight: 600; font-family: var(--font-gauge); font-size: 1.15rem; }
-.pf-btn { display: inline-flex; align-items: center; justify-content: center; height: 34px; padding: 0 12px; border-radius: 8px; border: 1px solid var(--grid);
+/* ---- portfolio header ---- */
+.ts-bar { position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 12px 20px; flex-wrap: wrap; min-height: var(--bar-h);
+  padding: 10px 20px; background: color-mix(in srgb, var(--paper) 82%, transparent); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--grid); font-family: var(--font-body); }
+.ts-brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.ts-logo { display: block; flex: none; border-radius: 9px; box-shadow: 0 0 0 1px color-mix(in srgb, var(--river) 55%, transparent); }
+.ts-logo img { display: block; width: 34px; height: 34px; border-radius: 9px; image-rendering: pixelated; }
+.ts-crumb { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--muted); white-space: nowrap; overflow: hidden; }
+.ts-crumb a { color: var(--muted); text-decoration: none; }
+.ts-crumb a:hover { color: var(--river); }
+.ts-crumb b { color: var(--ink); font-weight: 700; }
+.ts-crumb em { font-style: normal; color: var(--ink); font-weight: 600; }
+.ts-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+.ts-btn { display: inline-flex; align-items: center; justify-content: center; height: 34px; padding: 0 12px; border-radius: 8px; border: 1px solid var(--grid);
   background: var(--sheet); color: var(--ink); font: 500 13px var(--font-body); text-decoration: none; cursor: pointer; }
-.pf-btn:hover { border-color: var(--river); color: var(--river); }
-.pf-btn.icon { width: 34px; padding: 0; }
+.ts-btn:hover { border-color: var(--river); color: var(--river); }
+.ts-btn.icon { width: 34px; padding: 0; }
 :root[data-theme="light"] .i-moon, :root[data-theme="dark"] .i-sun { display: none; }
+.ts-privacy { font: 12px var(--mono); color: var(--ok); border: 1px solid color-mix(in srgb, var(--ok) 40%, transparent); padding: 4px 10px; border-radius: 999px; }
+
+/* ---- tool bar and rail under the header ---- */
+.topbar { position: static; background: transparent; border-bottom: 1px solid var(--grid); flex-wrap: wrap; }
+.app { min-height: calc(100vh - var(--bar-h)); }
+.staff { top: var(--bar-h); height: calc(100vh - var(--bar-h)); background: color-mix(in srgb, var(--paper) 70%, transparent); }
+.staff .pole { border-color: var(--muted); }
+.staff li::before { border-top-color: var(--muted); }
+.sheet { border-radius: 12px; }
+.plot { border-radius: 8px; overflow: hidden; }
+.btn { border-radius: 8px; }
+button.help { border-color: var(--river); color: var(--river); width: 1.05rem; height: 1.05rem; font-family: var(--mono); }
+button.help:hover, button.help[aria-expanded="true"] { background: var(--river); color: var(--paper); }
+.popover { border: 1px solid color-mix(in srgb, var(--river) 45%, var(--grid)); border-left: 3px solid var(--river); border-radius: 8px; box-shadow: 0 14px 32px -16px rgba(0, 0, 0, .55); max-width: min(26rem, calc(100vw - 24px)); }
+
+/* ---- Methods and references ---- */
+.lede { color: var(--muted); max-width: 80ch; }
+nav.toc ol { columns: 2 16rem; margin: 0 0 1rem; padding-left: 1.3rem; }
+nav.toc a { color: var(--river); text-decoration: none; }
+nav.toc a:hover { text-decoration: underline; }
+.sheet.methods { scroll-margin-top: calc(var(--bar-h) + 12px); }
+.sheet.methods li { max-width: 78ch; }
+pre.eq { font-family: var(--mono); font-size: .8125rem; background: var(--paper); border: 1px solid var(--grid); border-radius: 8px; padding: .55rem .75rem; overflow-x: auto; white-space: pre; margin: .4rem 0 .9rem; }
+ol.refs { padding-left: 1.4rem; font-size: .8125rem; color: var(--muted); }
+ol.refs li { margin-bottom: .35rem; overflow-wrap: anywhere; }
+.staff .extras button.step.sep { margin-top: .4rem; padding-top: .55rem; border-top: 1px solid var(--grid); border-radius: 0; }
 
 @media (max-width: 860px) {
-  .pf-crumb > a:first-child, .pf-crumb > span:first-of-type, .pf-brand small, .pf-all { display: none; }
-  .topbar { position: static; gap: .5rem .6rem; } /* wrapped bar would cover a fifth of a phone screen if it stayed pinned */
+  .staff { top: 0; height: auto; position: static; }
+  .ts-bar { padding: 10px 14px; }
+  .ts-crumb > a:first-child, .ts-crumb > span:first-of-type { display: none; }
+  .ts-actions .ts-btn:not(.icon) { display: none; }
+  .ts-privacy { white-space: normal; }
+  /* the further analyses and Methods stay reachable on phones (app.css hid them) */
+  .staff .extras { display: flex; flex-wrap: wrap; gap: .25rem .5rem; margin-top: .5rem; padding-right: 0; }
+  .staff .extras h3 { display: none; }
+  .staff .extras button.step { width: auto; padding: .35rem .6rem; font-size: .875rem; }
+  .staff .extras button.step.sep { margin-top: 0; padding-top: .35rem; border-top: 0; }
 }
-@media print { .pf-logo, .pf-btn { display: none !important; } }
-/* the rail sits right under the bar; keep the two heights in step on wide screens */
-@media (min-width: 861px) {
-  .topbar { height: 3.2rem; }
-  .staff { top: 3.2rem; height: calc(100vh - 3.2rem); }
-}
-
-/* Page headings receive focus when a step is opened (for screen readers); no outline box for that. */
-h2[tabindex="-1"]:focus, h1[tabindex="-1"]:focus { outline: none; }
-/* Larger text on tablets and desktops: app.css sizes are in rem, so text and spacing scale together. */
+@media print { .ts-bar { display: none !important; } }
+.page h2:focus { outline: none; }
+@media (max-width: 1480px) { .topbar .ts-privacy { display: none; } }
+/* Larger text on tablets and desktops: app.css sizes are in rem, so text and spacing scale together
+   (the portfolio header above uses px and keeps its size). */
 @media (min-width: 861px) { html { font-size: 112.5%; } }

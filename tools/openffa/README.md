@@ -1,5 +1,20 @@
 # OpenFFA — browser-based flood frequency analysis
 
+Live: **https://meawman.github.io/tools/openffa/** (part of the portfolio of Mahfujur Rahman Joy). Version 0.3.0.
+
+### New in 0.3.0 (methods audit)
+* **Fixed:** the peaks-over-threshold event rate now counts only observed time, so gaps in a daily record no longer bias return levels low.
+* **Fixed:** delta-method intervals for LN2 and LP3 are formed in log space (asymmetric, never negative).
+* **Fixed:** profile likelihood is refused for a 3-parameter generalised Pareto with a free location (its likelihood is unbounded).
+* **New:** peaks-over-threshold return levels on the annual-maximum basis (default), directly comparable with the design-flood table.
+* **New:** Gumbel's finite-sample method (Gumbel 1958; x_T = x̄ + K s), as used in textbooks and many reports, with ȳn and σn computed exactly.
+
+### New in 0.2.0
+* Bootstrap limits: percentile, bias-corrected (BC) or bias-corrected and accelerated (BCa), with a coverage study.
+* Peaks-over-threshold intervals now include the uncertainty of the event rate (Poisson event count).
+* A ? button with an explanation on every option, and a **Methods and references** page with the equations.
+* Portfolio header, fonts and colours; light/dark theme shared with the portfolio; further analyses reachable on phones.
+
 OpenFFA is a flood frequency analysis (FFA) tool that runs entirely in a web browser, with no server, no
 installation and no data upload. It is meant for water-resources engineers and researchers, with
 Bangladesh-style records (BWDB discharge and water-level series, April–March water years) as the main
@@ -20,17 +35,19 @@ context, and it works for any annual-maximum or daily record.
 
   The result is a plain-language verdict on whether stationary FFA is defensible.
 * **11 distributions**: Normal, LN2, LN3, Gumbel, GEV, Pearson III, log-Pearson III, Gamma, Weibull, GLO, GPA.
-* **5 estimation methods**: L-moments, maximum likelihood (including censored/historic data), method of
-  moments (B17B), PWM, and the Expected Moments Algorithm of Bulletin 17C.
+* **6 estimation methods**: L-moments, maximum likelihood (including censored/historic data), method of
+  moments (B17B), PWM, the Expected Moments Algorithm of Bulletin 17C, and Gumbel's finite-sample method.
 * **Model comparison**:
   * KS, AD, CvM and PPCC statistics with bootstrap-calibrated p-values (not tables);
   * AIC, AICc and BIC;
   * L-moment ratio diagram;
   * a transparent ranking with caveats.
-* **Design floods**: any return periods; parametric/non-parametric bootstrap, delta-method and
-  profile-likelihood intervals; probability paper (Gumbel, normal, log-T, Weibull axes).
+* **Bootstrap limits**: percentile, BC or BCa (Efron 1987).
+* **Design floods**: any return periods; parametric/non-parametric bootstrap (percentile, BC or BCa limits),
+  delta-method and profile-likelihood intervals; probability paper (Gumbel, normal, log-T, Weibull axes).
 * **Further analyses**: peaks over threshold (declustering, mean residual life and parameter-stability plots,
-  GPA) and a non-stationary GEV (trend in location/scale with a likelihood-ratio test).
+  GPA, intervals that include the event-rate uncertainty) and a non-stationary GEV (trend in location/scale with a
+  likelihood-ratio test).
 * **Outputs**:
   * PNG/SVG figures at any size and DPI;
   * CSV and XLSX tables;
@@ -60,7 +77,7 @@ full table is in [`docs/VALIDATION.md`](docs/VALIDATION.md), and the reference d
 Run the tests (Node.js 20 or newer; no packages needed):
 
 ```bash
-npm test             # 64 tests
+npm test             # the full test-suite (counts in docs/VALIDATION.md)
 npm run validate     # tests + regenerate docs/VALIDATION.md
 ```
 
@@ -86,11 +103,18 @@ python -m http.server 8000      # then open http://localhost:8000
 4. **Design floods**: select a fit, set return periods and the interval method, and compare fits.
 5. **Report**: open or download the report; export tables and the project file.
 
-## Hosting on GitHub Pages
+## Publishing in the portfolio
 
-1. Create a repository and upload the contents of this folder. Keep `index.html` at the top level.
-2. In *Settings → Pages*, choose *Deploy from a branch*, branch `main`, folder `/ (root)`.
-3. The site appears at `https://<user>.github.io/<repository>/` within a minute or two.
+The folder is built to sit at `tools/openffa/` in the `meawman.github.io` repository. It links the portfolio's
+`assets/favicon.svg` and `assets/css/tool-shell.css` with `../../` and stores the theme under `mrj_theme`.
+
+1. Copy the contents of this folder to `tools/openffa/` in the portfolio repository.
+2. Add the Tools card to `data/content.json` (the entry is in `PORTFOLIO_ENTRY.json`).
+3. Commit and push; the tool appears at `https://meawman.github.io/tools/openffa/`.
+
+Served on its own (e.g. `python -m http.server`), the portfolio header images are missing; everything else works.
+`node tools/browser_smoke.cjs out/` drives the interface in headless Chromium (needs Playwright);
+`SITE_ROOT=<portfolio> BASE=/tools/openffa/ node tools/browser_smoke.cjs out/` does the same inside the portfolio.
 
 There is no build step. The file `.nojekyll` stops GitHub from processing the files. After changing files,
 run `node scripts/build-sw.mjs` so the offline cache picks up the new version.
@@ -108,7 +132,7 @@ src/ui/                 interface: app shell, help texts, one file per page in s
 src/worker/worker.js    Web Worker entry point
 tests/                  automated tests; tests/reference/ holds reference generators and values
 data/                   sample datasets (see data/README.md)
-docs/                   validation, decisions, gap analysis, paper outline, limitations, research brief
+docs/                   validation, validation notes, decisions, limitations
 vendor/                 Plotly.js (basic bundle) and SheetJS, copied locally with their licences
 assets/                 fonts (SIL Open Font Licence) and icon
 scripts/                helper scripts (vendor update, sample data, validation table, offline cache)
@@ -121,8 +145,8 @@ references it follows.
 
 ## Citation
 
-> OpenFFA (version 0.1.0): browser-based flood frequency analysis with validated L-moment, maximum-likelihood
-> and Bulletin 17C EMA estimation. 2026. Software. [Add the archived DOI, e.g. Zenodo, once released.]
+> Joy, M. R. (2026). *OpenFFA: browser-based flood frequency analysis* (version 0.3.0) [software].
+> https://meawman.github.io/tools/openffa/
 
 A `CITATION.cff` file is included so GitHub shows a "Cite this repository" button.
 

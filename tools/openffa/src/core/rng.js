@@ -38,6 +38,14 @@ export class RNG {
     this._spare = r * Math.sin(2 * Math.PI * v);
     return r * Math.cos(2 * Math.PI * v);
   }
+  /** Poisson variate (Knuth's product method; normal approximation above a mean of 500). */
+  poisson(mean) {
+    if (!(mean > 0)) return 0;
+    if (mean > 500) return Math.max(0, Math.round(mean + Math.sqrt(mean) * this.normal()));
+    const L = Math.exp(-mean); let k = 0, p = 1;
+    do { k++; p *= this.random(); } while (p > L);
+    return k - 1;
+  }
   /** Resample with replacement. */
   resample(arr) {
     const n = arr.length, out = new Array(n);
