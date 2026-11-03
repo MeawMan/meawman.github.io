@@ -29,6 +29,9 @@
   --radius-s: 7px; --radius-m: 12px;
 }
 body { font-family: var(--font-ui); }
+/* Larger text on tablets and desktops: every size in style.css is in rem, so this scales text and spacing together
+   (body 15 -> about 17 px, labels 13 -> about 15 px). Phones keep the base size. */
+@media (min-width: 861px) { html { font-size: 112.5%; } }
 html[data-theme] .app { max-width: none; padding-block: 0; } /* undo tool-shell's width cap: the rail layout needs the full width */
 
 /* ---- portfolio header (also defined in tool-shell.css) ---- */
