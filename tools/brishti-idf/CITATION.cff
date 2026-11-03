@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below, and cite the methods named in each report."
+title: "Brishti IDF: browser-based rainfall intensity-duration-frequency analysis"
+version: 0.2.0
+date-released: 2026-11-03
+license: MIT
+type: software
+authors:
+  - family-names: Joy
+    given-names: Mahfujur Rahman
+url: "https://meawman.github.io/tools/brishti-idf/"
+repository-code: "https://github.com/MeawMan/meawman.github.io"
+keywords:
+  - intensity-duration-frequency
+  - IDF curves
+  - design rainfall
+  - rainfall disaggregation
+  - Bangladesh
+  - hydrology

@@ -1,0 +1,114 @@
+/* portfolio.css — Brishti IDF inside meawman.github.io.
+   Loaded after style.css (and the portfolio's tool-shell.css). Re-maps Brishti's colour tokens to the
+   portfolio palette for both themes, switches to the portfolio fonts, places the rail under the sticky
+   portfolio header, and styles the “i” buttons and the Methods screen.
+   The header rules are repeated here so the tool still looks right when served on its own. */
+
+:root[data-theme="dark"] {
+  --ground: #06080f; --surface: #0d1322; --ink: #eef3fb; --ink-2: #a7b3cb;
+  --rule: #24334f; --rule-soft: #141e33;
+  --teal: #5be7ff; --teal-soft: rgba(91, 231, 255, .12);
+  --silt: #ffc857; --silt-soft: rgba(255, 200, 87, .08);
+  --red: #ff6b8b; --red-soft: rgba(255, 107, 139, .1); --focus: #5be7ff;
+  --panel: #0d1322; --line2: #2a3a5c; --strong: #eef3fb; --dim: #8592ab; --accent: #5be7ff;
+  color-scheme: dark;
+}
+:root[data-theme="light"] {
+  --ground: #f2f4f9; --surface: #ffffff; --ink: #0b1222; --ink-2: #4a5672;
+  --rule: #d3dbe8; --rule-soft: #e9eef6;
+  --teal: #0786ad; --teal-soft: #dff1f7;
+  --silt: #8a4b00; --silt-soft: #fff4e3;
+  --red: #c0264d; --red-soft: #fdeef2; --focus: #0786ad;
+  --panel: #ffffff; --line2: #c5cfe0; --strong: #0b1222; --dim: #5b6782; --accent: #0786ad;
+  color-scheme: light;
+}
+:root {
+  --font-ui: 'Space Grotesk', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --bar-h: 55px;
+  --radius-s: 7px; --radius-m: 12px;
+}
+body { font-family: var(--font-ui); }
+html[data-theme] .app { max-width: none; padding-block: 0; } /* undo tool-shell's width cap: the rail layout needs the full width */
+
+/* ---- portfolio header (also defined in tool-shell.css) ---- */
+.ts-bar { position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 12px 20px; flex-wrap: wrap; min-height: var(--bar-h);
+  padding: 10px 20px; background: color-mix(in srgb, var(--ground) 82%, transparent); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--rule); font-family: var(--font-ui); }
+.ts-brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.ts-logo { display: block; flex: none; border-radius: 9px; box-shadow: 0 0 0 1px color-mix(in srgb, var(--teal) 55%, transparent); }
+.ts-logo img { display: block; width: 34px; height: 34px; border-radius: 9px; image-rendering: pixelated; }
+.ts-crumb { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--ink-2); white-space: nowrap; overflow: hidden; }
+.ts-crumb a { color: var(--ink-2); text-decoration: none; }
+.ts-crumb a:hover { color: var(--teal); }
+.ts-crumb b { color: var(--ink); font-weight: 700; }
+.ts-crumb em { font-style: normal; color: var(--ink); font-weight: 600; }
+.ts-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+.ts-btn { display: inline-flex; align-items: center; justify-content: center; height: 34px; padding: 0 12px; border-radius: 8px; border: 1px solid var(--rule);
+  background: var(--surface); color: var(--ink); font: 500 13px var(--font-ui); text-decoration: none; cursor: pointer; }
+.ts-btn:hover { border-color: var(--teal); color: var(--teal); }
+.ts-btn.icon { width: 34px; padding: 0; }
+:root[data-theme="light"] .i-moon, :root[data-theme="dark"] .i-sun { display: none; }
+.ts-privacy { font: 12px var(--mono); color: #2c8a22; border: 1px solid color-mix(in srgb, #2c8a22 40%, transparent); padding: 4px 10px; border-radius: 999px; white-space: nowrap; }
+:root[data-theme="dark"] .ts-privacy { color: #9dff6b; border-color: rgba(157, 255, 107, .4); }
+
+/* ---- frame under the header ---- */
+.rail { top: var(--bar-h); height: calc(100vh - var(--bar-h)); background: color-mix(in srgb, var(--ground) 70%, transparent); }
+.brand h1 { font-size: 1.25rem; display: flex; align-items: center; gap: .45rem; }
+.brand h1 svg { flex: none; }
+.steps button { border-radius: 8px; }
+.steps button[aria-current="step"] { background: color-mix(in srgb, var(--teal) 16%, transparent); }
+.steps li.sep { margin-top: .6rem; padding-top: .6rem; border-top: 1px solid var(--rule); }
+.steps li.sep button::before { content: '§'; }
+main { max-width: 1240px; }
+table.data th { background: var(--surface); }
+button.btn { border-radius: 8px; color: var(--ground); }
+:root[data-theme="light"] button.btn:not(.quiet):not(.danger) { color: #fff; }
+input[type="text"], input[type="number"], select, textarea { border-radius: 7px; }
+.plot, .eq, .note { border-radius: 8px; }
+.seg { border-radius: 8px; }
+.intro-line { display: flex; flex-wrap: wrap; gap: .5rem 1rem; align-items: center; justify-content: space-between; margin: 0 0 1rem; }
+.intro-line p { margin: 0; color: var(--ink-2); max-width: 80ch; font-size: .875rem; }
+
+/* ---- “i” buttons ---- */
+.lbl { display: inline-flex; align-items: center; gap: .35rem; }
+.ib { position: relative; flex: none; display: inline-grid; place-items: center; width: 17px; height: 17px; padding: 0; border-radius: 50%;
+  border: 1px solid var(--rule); background: var(--surface); color: var(--ink-2); font: 700 10px/1 var(--mono); cursor: pointer; vertical-align: .1em; }
+.ib::after { content: ''; position: absolute; inset: -6px; } /* larger touch target */
+.ib:hover, .ib[aria-expanded="true"] { border-color: var(--teal); background: var(--teal); color: var(--ground); }
+section.block > h3 { display: flex; align-items: center; gap: .45rem; }
+/* Explanations float over the form (so opening one never shifts the other controls), except under section headings. */
+label.field, .check-wrap { position: relative; }
+.ib-pop { position: absolute; z-index: 25; top: calc(100% + 4px); left: 0; width: max-content; max-width: min(44ch, calc(100vw - 32px));
+  padding: .55rem .7rem; border: 1px solid color-mix(in srgb, var(--teal) 45%, var(--rule)); border-left: 3px solid var(--teal);
+  background: var(--surface); border-radius: 8px; box-shadow: 0 14px 32px -16px rgba(0, 0, 0, .55);
+  color: var(--ink); font-size: .8125rem; line-height: 1.45; font-weight: 400; white-space: normal; text-align: left; }
+section.block > .ib-pop { position: static; width: auto; max-width: 72ch; margin: -.2rem 0 .8rem; box-shadow: none; background: var(--teal-soft); border-color: transparent; border-left-color: var(--teal); }
+.check-wrap { display: inline-flex; align-items: center; gap: .4rem; }
+
+/* ---- Methods screen ---- */
+nav.toc ol { columns: 2 16rem; margin: 0 0 1rem; padding-left: 1.2rem; font-size: .875rem; }
+nav.toc a { color: var(--teal); text-decoration: none; }
+nav.toc a:hover { text-decoration: underline; }
+section.methods { scroll-margin-top: calc(var(--bar-h) + 12px); }
+section.methods > p, section.methods li { max-width: 78ch; }
+section.methods .eq { white-space: pre; margin: .4rem 0 .9rem; }
+ol.refs { padding-left: 1.4rem; font-size: .8125rem; color: var(--ink-2); }
+ol.refs li { margin-bottom: .35rem; overflow-wrap: anywhere; }
+p.methods-para { max-width: 80ch; padding: .75rem .9rem; background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; line-height: 1.6; }
+h4 { margin: 1rem 0 .3rem; font-size: .9375rem; }
+
+@media (max-width: 860px) {
+  .rail { top: 0; height: auto; position: static; }
+  .ts-bar { padding: 10px 14px; }
+  .ts-crumb > a:first-child, .ts-crumb > span:first-of-type { display: none; }
+  .ts-actions .ts-btn:not(.icon) { display: none; }
+  .ts-privacy { white-space: normal; }
+}
+@media print { .ts-bar, .intro-line { display: none !important; } }
+
+/* Off-screen host for report figures: always the light palette, white plates (see plots.setRenderRoot). */
+.report-figures {
+  --ground: #ffffff; --surface: #ffffff; --ink: #0b1222; --ink-2: #4a5672; --rule: #c5cfe0; --rule-soft: #e6ebf3;
+  --teal: #0786ad; --teal-soft: #dff1f7; --silt: #8a4b00; --silt-soft: #fff4e3; --red: #c0264d; --red-soft: #fdeef2;
+}

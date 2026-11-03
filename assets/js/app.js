@@ -12,7 +12,7 @@
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const SECTIONS = [
-    ['about', 'About'], ['tools', 'Tools'], ['experience', 'Experience'], ['map', 'Map'], ['research', 'Research'],
+    ['about', 'About'], ['research', 'Research'], ['experience', 'Experience'], ['tools', 'Tools'], ['map', 'Map'],
     ['skills', 'Skills'], ['education', 'Education'], ['leadership', 'Leadership'], ['contact', 'Contact'],
   ];
 
@@ -165,7 +165,7 @@
   }
 
   // ------------------------------------------------------------ tools
-  const TOOL_COLORS = { cyan: 'var(--accent)', violet: 'var(--violet)', amber: 'var(--accent-2)', lime: 'var(--accent-3)', pink: 'var(--pink)', blue: 'var(--blue, #4f8cff)' };
+  const TOOL_COLORS = { cyan: 'var(--accent)', violet: 'var(--violet)', amber: 'var(--accent-2)', lime: 'var(--accent-3)', pink: 'var(--pink)', blue: 'var(--blue, #4f8cff)', teal: 'var(--teal, #2dd4bf)' };
   const TOOL_ICONS = {
     band: '<path d="M3 15c2-3 4-6 7-4s4 4 7 1 3-5 4-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M3 19c2-2 4-4 7-3s4 2 7 0 3-3 4-4M3 11c2-4 4-7 7-6s4 3 7 0 3-5 4-6" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".55"/>',
     extend: '<path d="M3 16c1.5-2 3-5 5-4s3 3 4 1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M12 13c2-3 3-6 5-4s2 3 4 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="2 2.5"/><path d="M12 4v16" stroke="currentColor" stroke-width="1" opacity=".5"/>',
@@ -176,6 +176,7 @@
     depend: '<path d="M3 4c3 1 5 4 8 7s5 5 10 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M18 3v18" stroke="currentColor" stroke-width="1.6" stroke-dasharray="2 2"/><path d="M3 21h18" stroke="currentColor" stroke-width="1.2" opacity=".55"/>',
     gap: '<circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5.5 14l2.5-3.5 2 2.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M14 11.5l2 3.5 2.5-2.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M10 13l4-1.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-dasharray="1.6 1.6" opacity=".7"/>',
     dsbc: '<rect x="2.5" y="5.5" width="8" height="8" rx="1" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M6.5 5.5v8M2.5 9.5h8" stroke="currentColor" stroke-width="1.2" opacity=".6"/><path d="M11.5 9.5h1.8m0 0-1.4-1.4m1.4 1.4-1.4 1.4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><rect x="14.5" y="4.5" width="7" height="10" rx="1" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M16.8 4.5v10M19.2 4.5v10M14.5 7.8h7M14.5 11.2h7" stroke="currentColor" stroke-width=".9" opacity=".6"/><path d="M3 20c2-2.2 4-2.2 6 0s4 2.2 6 0 4-2.2 6 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
+    idf: '<path d="M4 5c1 6 3 9 7 11s7 2.5 10 3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M4 10c1.5 4 3.5 6.5 7 7.5s6 1.6 10 2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" opacity=".6"/><path d="M8 2.5c-1.2 1.8-1.8 2.9-1.8 3.7a1.8 1.8 0 0 0 3.6 0c0-.8-.6-1.9-1.8-3.7z" fill="currentColor"/>',
   };
   // Small decorative preview drawn from a seeded pseudo-random series
   function toolArt(kind) {
@@ -205,6 +206,15 @@
         '<line x1="' + x(cut) + '" x2="' + x(cut) + '" y1="' + pad + '" y2="' + (H - pad) + '" class="ta-div"/>' +
         '<circle cx="' + x(cut) + '" cy="' + y(ranked[cut]) + '" r="4" class="ta-dot"/>' +
         '<text x="' + (+x(cut) - 6) + '" y="' + (H - pad - 6) + '" text-anchor="end" class="ta-lbl">97% dependable</text></svg>';
+    }
+    if (kind === 'idf') {
+      // IDF curves: intensity falling with duration, one curve per return period, rarer storms on top
+      const curve = (a) => Array.from({ length: N }, (_, i) => a / Math.pow(1 + i / 4, 0.75));
+      const cs = [0.95, 0.72, 0.52];
+      return '<svg viewBox="0 0 ' + W + ' ' + H + '" aria-hidden="true">' + g +
+        cs.map((a, k) => '<path d="' + line(curve(a), 0, N) + '" class="' + (k === 0 ? 'ta-avg' : 'ta-obs') + '"/>').join('') +
+        '<text x="' + (W - pad - 4) + '" y="' + (pad + 12) + '" text-anchor="end" class="ta-lbl2">intensity vs duration</text>' +
+        '<text x="' + (W - pad - 4) + '" y="' + (pad + 26) + '" text-anchor="end" class="ta-lbl2">T = 100, 10, 2 yr</text></svg>';
     }
     if (kind === 'gap') {
       // observed record with a missing stretch (shaded) and the filled values bridging it
@@ -242,6 +252,7 @@
     if (!tools.length) { $('#tools').hidden = true; return; }
     const STATUS_T = { live: 'LIVE', beta: 'BETA', soon: 'SOON' };
     box.innerHTML = '<div class="tb-tabs" role="tablist" aria-label="Tools">' + tools.map((t, i) =>
+      (t.group && t.group !== (tools[i - 1] || {}).group ? '<p class="tb-group pixel">' + esc(t.group) + '</p>' : '') +
       '<button class="tb-tab" role="tab" id="tbt-' + i + '" aria-controls="tbp" aria-selected="' + (i === 0) + '" tabindex="' + (i === 0 ? 0 : -1) + '" data-i="' + i + '" style="--tc:' + (TOOL_COLORS[t.accent] || TOOL_COLORS.cyan) + '">' +
       '<span class="tb-ico">' + svg(TOOL_ICONS[t.icon] || TOOL_ICONS.chart, 20) + '</span>' +
       '<span class="tb-txt"><b>' + esc(t.name) + '</b><small>' + esc(t.tagline || '') + '</small></span></button>').join('') +
@@ -686,6 +697,11 @@
     buddy = new window.PixelAvatar($('#buddyCanvas'), $('#buddyBubble'), { mini: true, autoTalk: false });
     const hero = $('#home');
     new IntersectionObserver(([en]) => el.classList.toggle('show', !en.isIntersecting), { threshold: 0.15 }).observe(hero);
+    // phones: step out of the way while the page moves, so the mini Joy never sits on text being read
+    if (matchMedia('(max-width: 640px)').matches) {
+      let quietT = 0;
+      addEventListener('scroll', () => { el.classList.add('quiet'); clearTimeout(quietT); quietT = setTimeout(() => el.classList.remove('quiet'), 700); }, { passive: true });
+    }
     const said = {};
     const lines = cfg.sections || {};
     const io = new IntersectionObserver((entries) => entries.forEach((en) => {

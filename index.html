@@ -74,6 +74,14 @@
   </header>
 
   <main id="main">
+    <noscript>
+      <section class="section noscript">
+        <h1>Mahfujur Rahman Joy</h1>
+        <p>Water resources engineer and researcher: Research Consultant at CEGIS, M.Sc. (WRD) student at BUET. River modeling, GIS and remote sensing, and machine learning for floods and droughts.</p>
+        <p>This site needs JavaScript for its full content. Meanwhile: <a href="https://scholar.google.com/citations?user=kWzC3RUAAAAJ&amp;hl=en">Google Scholar</a> · <a href="https://www.researchgate.net/profile/Mahfujur-Rahman-Joy">ResearchGate</a> · <a href="https://orcid.org/0009-0003-4202-9776">ORCID</a> · <a href="https://www.linkedin.com/in/mahfujur-rahman-joy">LinkedIn</a> · <a href="https://github.com/meawman">GitHub</a> · <a href="mailto:mrjoy@cegisbd.com">Email</a></p>
+        <p>Tools: <a href="tools/gaplens/">GapLens</a> · <a href="tools/hydro-series/">Min-Max-Avg Terminal and Series Generator</a> · <a href="tools/dependability/">Dependability Analyzer</a> · <a href="tools/brishti-idf/">Brishti IDF</a> · <a href="tools/hydro-ml/">Hydro ML Studio</a> · <a href="tools/dsbc/">DSBC Studio</a></p>
+      </section>
+    </noscript>
     <!-- HERO -->
     <section id="home" class="hero">
       <div class="hero-text">
@@ -127,13 +135,20 @@
       <div class="focus-grid" id="focusGrid"></div>
     </section>
 
-    <section id="tools" class="section">
+    <section id="research" class="section">
       <header class="sec-head">
-        <span class="pixel sec-idx">02</span>
-        <div><p class="pixel sec-kicker">TOOLBOX</p><h2>Tools I’ve built</h2></div>
-        <p class="sec-note mono">Free · runs in your browser · files never uploaded</p>
+        <span class="pixel sec-idx">04</span>
+        <div><p class="pixel sec-kicker">RESEARCH ARCHIVE</p><h2>Publications</h2></div>
+        <p class="sec-note mono" id="pubNote"></p>
       </header>
-      <div class="card toolbox reveal" id="toolbox"></div>
+      <div class="pub-tools">
+        <div class="seg" id="pubTypes" role="tablist" aria-label="Publication type"></div>
+        <label class="search">
+          <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" d="M21 21l-5-5m2-6a8 8 0 1 1-16 0 8 8 0 0 1 16 0z"/></svg>
+          <input id="pubSearch" type="search" placeholder="Search title, co-author, venue, method…" aria-label="Search publications" />
+        </label>
+      </div>
+      <div class="pub-list" id="pubList"></div>
     </section>
 
     <section id="experience" class="section">
@@ -149,6 +164,15 @@
       <ol class="timeline" id="timeline"></ol>
     </section>
 
+    <section id="tools" class="section">
+      <header class="sec-head">
+        <span class="pixel sec-idx">02</span>
+        <div><p class="pixel sec-kicker">TOOLBOX</p><h2>Tools I’ve built</h2></div>
+        <p class="sec-note mono">Free · runs in your browser · files never uploaded</p>
+      </header>
+      <div class="card toolbox reveal" id="toolbox"></div>
+    </section>
+
     <section id="map" class="section">
       <header class="sec-head">
         <span class="pixel sec-idx">03</span>
@@ -162,22 +186,6 @@
         </div>
         <div class="map-side" id="mapSide"></div>
       </div>
-    </section>
-
-    <section id="research" class="section">
-      <header class="sec-head">
-        <span class="pixel sec-idx">04</span>
-        <div><p class="pixel sec-kicker">RESEARCH ARCHIVE</p><h2>Publications</h2></div>
-        <p class="sec-note mono" id="pubNote"></p>
-      </header>
-      <div class="pub-tools">
-        <div class="seg" id="pubTypes" role="tablist" aria-label="Publication type"></div>
-        <label class="search">
-          <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" d="M21 21l-5-5m2-6a8 8 0 1 1-16 0 8 8 0 0 1 16 0z"/></svg>
-          <input id="pubSearch" type="search" placeholder="Search title, co-author, venue, method…" aria-label="Search publications" />
-        </label>
-      </div>
-      <div class="pub-list" id="pubList"></div>
     </section>
 
     <section id="skills" class="section">

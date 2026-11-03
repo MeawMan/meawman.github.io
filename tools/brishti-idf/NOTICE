@@ -1,0 +1,11 @@
+Brishti IDF bundles third-party components under their own licences:
+
+- Plotly.js 3.2.0 (vendor/plotly-3.2.0.min.js) - MIT licence, vendor/LICENSE-plotly.txt
+- SheetJS Community Edition 0.18.5 (vendor/xlsx-0.18.5.full.min.js) - Apache License 2.0, vendor/LICENSE-sheetjs.txt
+- Public Sans font (vendor/fonts/) - SIL Open Font License 1.1, vendor/fonts/LICENSE-OFL.txt
+- Denver hourly precipitation (data/third-party/denver_july_hourly_1949-1990.csv), from the R package
+  extRemes 2.2-1 (dataset Denversp) - GPL (>= 2). Redistributed unchanged in content, separately from
+  the tool's code; see data/third-party/README.md.
+
+SCS (NRCS) 24-hour distributions were taken from the HEC-HMS 4.13 tables as packaged in hms-commander 0.4.0;
+Huff (1990) curves were transcribed from Illinois State Water Survey Circular 173.

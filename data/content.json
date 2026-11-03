@@ -3,7 +3,7 @@
     "title": "Mahfujur Rahman Joy — Water Resources Engineer & Researcher",
     "description": "Portfolio of Mahfujur Rahman Joy: Research Consultant at CEGIS, M.Sc. (WRD) candidate at BUET. Hydrodynamic modeling, GIS & remote sensing, CMIP6 downscaling and machine learning for floods and droughts.",
     "siteUrl": "https://meawman.github.io/",
-    "updated": "2026-10-25"
+    "updated": "2026-11-03"
   },
   "settings": {
     "showPhone": false,
@@ -93,6 +93,7 @@
   "tools": [
     {
       "name": "GapLens",
+      "group": "Data preparation",
       "tagline": "Find, fill & compare gaps in hydroclimate records",
       "description": "Load a streamflow, water-level, rainfall or groundwater record with its neighbours and GapLens maps the gaps, recommends methods, ranks 70+ filling methods by hiding real observations and scoring how well each one restores them, and fills the record. Includes a rating-curve editor with automatic segments and year-by-year curves. Real Python (Pyodide) running in your browser.",
       "url": "tools/gaplens/",
@@ -105,7 +106,8 @@
     },
     {
       "name": "Series Generator",
-      "tagline": "Fill gaps and extend hydrological records",
+      "group": "Data preparation",
+      "tagline": "Extend records with plausible synthetic years",
       "description": "Learns the seasonal pattern, spread and day-to-day memory of a series, then fills the missing values or adds plausible years before or after the record. Includes an accuracy test for the filled values.",
       "url": "tools/hydro-series/#generator",
       "icon": "extend",
@@ -117,6 +119,7 @@
     },
     {
       "name": "Min-Max-Avg Terminal",
+      "group": "Analysis",
       "tagline": "Daily, monthly & yearly statistics from any time series",
       "description": "Load a water-level, discharge or rainfall record and get the minimum, maximum and average for every day, month and year — with an interactive range chart, a sortable table and Excel export.",
       "url": "tools/hydro-series/#minmax",
@@ -129,6 +132,7 @@
     },
     {
       "name": "Dependability Analyzer",
+      "group": "Analysis",
       "tagline": "Dependable water level, flow & rainfall for reports",
       "description": "Rank a long record with the Weibull plotting position (or Gringorten, Cunnane, Hazen) and read off dependable low and high values at any P. Filter years and months, convert the datum (e.g. mPWD to mMSL), and export report-style figures, a dependability table, a methods paragraph and an Excel workbook.",
       "url": "tools/dependability/",
@@ -140,7 +144,21 @@
       "tags": ["Dependable flow", "Water level", "Reports"]
     },
     {
+      "name": "Brishti IDF",
+      "group": "Analysis",
+      "tagline": "Rainfall IDF curves with every method under your control",
+      "description": "Load a rainfall record (1-minute to daily, BMD daily sheets or annual-maximum tables) and build intensity–duration–frequency curves: quality checks, annual maxima or peaks over threshold, eight distributions fitted by L-moments, moments or maximum likelihood, IDF equations, short durations from daily data, design storms and a methods report. Every option has an explanation, and the numerics are tested against SciPy.",
+      "url": "tools/brishti-idf/",
+      "icon": "idf",
+      "accent": "teal",
+      "status": "live",
+      "updated": "2026-11-03",
+      "features": ["Gumbel, GEV, LP3, LN2/LN3, Gamma, P3, GLO; L-moments, moments or ML", "GEV with a fixed (e.g. regional) shape; rank by AICc, BIC, A², PPCC or KS", "Peaks over threshold with a threshold-stability table", "Koutsoyiannis general IDF plus Talbot, Sherman, Bernard, Kimijima and more", "Daily to sub-daily: IMD, calibrated power law, scaling, ratio transfer", "Bootstrap confidence intervals, trend and outlier screening", "Design storms for SWMM and HEC-HMS; report, Excel and methods paragraph"],
+      "tags": ["IDF curves", "Rainfall", "Design storms"]
+    },
+    {
       "name": "Hydro ML Studio",
+      "group": "Modelling",
       "tagline": "Machine learning for water level, discharge & rainfall",
       "description": "Train and compare eight machine-learning models to simulate or forecast a hydrological series: automatic lag, rolling and seasonal features, cross-validation, Grid / Random / Bayesian tuning, NSE · KGE · PBIAS with Moriasi ratings, gap filling and Excel export.",
       "url": "tools/hydro-ml/",
@@ -153,6 +171,7 @@
     },
     {
       "name": "DSBC Studio",
+      "group": "Modelling",
       "tagline": "Downscaling & bias correction of climate data",
       "description": "Statistical downscaling and bias correction of daily, weekly or monthly climate series. Screen predictors with partial informational correlation, train and honestly validate 11 regression models, then correct climate-model runs with 10 univariate and 5 multivariate methods, checking that each correction keeps the model's projected change. Real Python (Pyodide) running in your browser.",
       "url": "tools/dsbc/",
