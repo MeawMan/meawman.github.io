@@ -115,3 +115,11 @@ h4 { margin: 1rem 0 .3rem; font-size: .9375rem; }
   --ground: #ffffff; --surface: #ffffff; --ink: #0b1222; --ink-2: #4a5672; --rule: #c5cfe0; --rule-soft: #e6ebf3;
   --teal: #0786ad; --teal-soft: #dff1f7; --silt: #8a4b00; --silt-soft: #fff4e3; --red: #c0264d; --red-soft: #fdeef2;
 }
+
+/* ---- fuller rail: step descriptions and the project card (see app.js renderStatus) ---- */
+:root { --rail: 18rem; }
+.steps button { padding: 0.22rem 0.5rem; line-height: 1.28; }
+.rail-status { margin: -0.5rem 0 1rem; }
+.brand { margin-bottom: 1rem; }
+.step-hint { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rail-status dl { gap: 0.15rem 0.6rem; font-size: 0.8125rem; line-height: 1.35; }

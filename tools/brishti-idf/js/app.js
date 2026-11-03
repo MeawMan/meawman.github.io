@@ -3,7 +3,7 @@
  * The analysis itself lives in pipeline.js (run in the worker); step screens live in ui/steps.js.
  */
 import { DEFAULT_SETTINGS, withDefaults, TOOL_VERSION } from './pipeline.js';
-import { STEPS, renderStep } from './ui/steps.js';
+import { STEPS, renderStep, kindLabel } from './ui/steps.js';
 import { h, clear } from './ui/dom.js';
 
 const state = {
@@ -188,16 +188,35 @@ function renderRail() {
     const disabled = s.needs === 'result' ? !res : s.needs === 'station' ? !state.stations.length : false;
     nav.append(h('li', { class: s.id === 'methods' ? 'sep' : null }, h('button', {
       type: 'button', 'aria-current': state.step === s.id ? 'step' : null, disabled: disabled || null,
-      onclick: () => app.go(s.id), title: s.title,
-    }, s.label)));
+      onclick: () => app.go(s.id), title: s.hint ? `${s.label}: ${s.hint}` : s.title,
+    }, h('span.step-text', s.label, s.hint ? h('small.step-hint', s.hint) : null))));
   }
+  renderStatus(res);
   const pick = document.getElementById('station-pick');
   clear(pick);
-  if (state.stations.length) {
+  if (state.stations.length > 1) { // one station: the project card already names it
     pick.append(h('label', { for: 'station-select' }, 'Active station'),
       h('select#station-select', { onchange: (e) => app.setActive(e.target.value) },
         state.stations.map((s) => h('option', { value: s.id, selected: s.id === state.active ? true : null }, s.name))));
   }
+}
+
+// Project card at the foot of the rail: what to do first, then what is loaded and what the analysis produced.
+function renderStatus(res) {
+  const box = document.getElementById('rail-status');
+  if (!box) return;
+  clear(box);
+  const st = state.stations.find((s) => s.id === state.active);
+  if (!st) {
+    box.append(h('b', 'No data yet'), h('p', 'Start on ', h('a', { href: '#', onclick: (e) => { e.preventDefault(); app.go('data'); } }, 'Your data'), ': drop a file, paste a table or try an example.'));
+    return;
+  }
+  const rows = [['Station', st.name], ['Record', kindLabel(st)]];
+  if (state.stations.length > 1) rows.push(['Stations', `${state.stations.length} in project`]);
+  if (res?.ams) rows.push(['Maxima', `${res.ams.years.length} years, ${res.ams.durations.length} durations`]);
+  if (res?.design?.returnPeriods?.length) { const T = res.design.returnPeriods; rows.push(['Design', `T = ${T[0]}–${T[T.length - 1]} yr`]); }
+  box.append(h('b', 'This project'), h('dl', rows.flatMap(([k, v]) => [h('dt', k), h('dd', v)])));
+  if (!res) box.append(h('p.muted', 'Analysing…'));
 }
 
 function toast(message, kind = '') {

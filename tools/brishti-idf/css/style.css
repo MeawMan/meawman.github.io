@@ -71,6 +71,16 @@ a { color: var(--teal); }
 .steps button[aria-current="step"]::before { color: var(--teal); }
 .steps button[data-done="true"]::before { color: var(--teal); }
 .steps button:disabled { opacity: 0.45; cursor: not-allowed; }
+.step-text { display: grid; gap: 0.05rem; }
+.step-hint { font-size: 0.75rem; font-weight: 400; color: var(--ink-2); opacity: 0.8; line-height: 1.3; }
+.steps button[aria-current="step"] .step-hint { opacity: 1; }
+.rail-status { padding: 0.7rem 0.8rem; border: 1px solid var(--rule); border-radius: var(--radius-s); background: var(--surface); }
+.rail-status b { display: block; margin-bottom: 0.35rem; font-size: 0.8125rem; }
+.rail-status p { margin: 0; color: var(--ink-2); line-height: 1.4; }
+.rail-status a { color: var(--teal); }
+.rail-status dl { display: grid; grid-template-columns: auto 1fr; gap: 0.2rem 0.6rem; margin: 0; }
+.rail-status dt { color: var(--ink-2); }
+.rail-status dd { margin: 0; overflow-wrap: anywhere; }
 .rail-foot { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--rule); display: grid; gap: 0.6rem; font-size: 0.8125rem; }
 .station-pick label { display: block; color: var(--ink-2); margin-bottom: 0.2rem; }
 .station-pick select { width: 100%; max-width: 100%; }
@@ -165,6 +175,7 @@ p.eq { white-space: pre-wrap; overflow-wrap: anywhere; }
   .rail { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--rule); padding: 1rem; }
   .steps { display: flex; overflow-x: auto; gap: 0.25rem; }
   .steps button { white-space: nowrap; }
+  .step-hint, .rail-status { display: none; }
   .rail-foot { display: none; }
   main { padding: 1rem 1rem 3rem; }
 }

@@ -19,17 +19,17 @@ import { buildReport, methodsParagraph, methodLabel } from '../report/report.js'
 import { renderMethods } from './methods.js';
 
 export const STEPS = [
-  { id: 'data', label: 'Your data', title: 'Load rainfall records or annual-maximum tables' },
-  { id: 'quality', label: 'Check quality', needs: 'result' },
-  { id: 'ams', label: 'Annual maxima', needs: 'result' },
-  { id: 'frequency', label: 'Frequency analysis', needs: 'result' },
-  { id: 'daily', label: 'Short durations from daily data', needs: 'result' },
-  { id: 'idf', label: 'Fit IDF equations', needs: 'result' },
-  { id: 'curves', label: 'IDF curves and tables', needs: 'result' },
-  { id: 'storm', label: 'Design storm', needs: 'result' },
-  { id: 'stations', label: 'Compare stations', needs: 'station' },
-  { id: 'report', label: 'Report and export', needs: 'result' },
-  { id: 'methods', label: 'Methods and references' },
+  { id: 'data', label: 'Your data', hint: 'Load a record or an example', title: 'Load rainfall records or annual-maximum tables' },
+  { id: 'quality', label: 'Check quality', hint: 'Gaps, odd values, trend', needs: 'result' },
+  { id: 'ams', label: 'Annual maxima', hint: 'Yearly maxima per duration', needs: 'result' },
+  { id: 'frequency', label: 'Frequency analysis', hint: 'Fit distributions', needs: 'result' },
+  { id: 'daily', label: 'Short durations from daily data', hint: 'Sub-daily from daily gauges', needs: 'result' },
+  { id: 'idf', label: 'Fit IDF equations', hint: 'One equation for all durations', needs: 'result' },
+  { id: 'curves', label: 'IDF curves and tables', hint: 'Design intensities and depths', needs: 'result' },
+  { id: 'storm', label: 'Design storm', hint: 'Hyetograph for SWMM, HEC-HMS', needs: 'result' },
+  { id: 'stations', label: 'Compare stations', hint: 'Side by side, regional checks', needs: 'station' },
+  { id: 'report', label: 'Report and export', hint: 'Report, Excel and figures', needs: 'result' },
+  { id: 'methods', label: 'Methods and references', hint: 'Equations and sources' },
 ];
 
 const RENDER = {};
@@ -128,7 +128,7 @@ RENDER.data = (app, main, after) => {
     h('p.small.muted', 'A project file stores every setting, the random seed and the tool version, so opening it reproduces the same results.')));
 };
 
-function kindLabel(s) {
+export function kindLabel(s) {
   if (s.data.kind === 'ams') return `annual maxima, ${Object.keys(s.data.depth).length} durations`;
   const step = s.data.step;
   return `${step >= 1440 ? 'daily' : `${step}-min`} series, ${(s.data.values.length * step / 525960).toFixed(1)} yr`;
