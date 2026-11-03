@@ -249,10 +249,9 @@ async function addDemo(app, which) {
       const p = parseDelimited(text);
       const recs = applyMapping(p.rows, guessMapping(p.header, p.rows), { dateOrder: 'ymd' }).stations.get('Station 1').records;
       const s = buildRegularSeries(recs, { step: 60, convention: 'end' });
-      app.state.settings.includeIncomplete = true;
       app.state.settings.qc.wetMonths = [7];
       app.addStations([{ id: uid(), name: 'Denver hourly, July only (real)', lat: 39.74, lon: -104.99, data: { kind: 'series', origin: s.origin, step: 60, values: s.values }, source: { fileName: 'extRemes::Denversp (GPL)' } }]);
-      app.toast('Denver has July data only: “keep incomplete years” was switched on so each July counts as a year.', 'warn');
+      app.toast('Denver has July data only: gaps and coverage are counted within July, and the maxima are July maxima.', 'warn');
     } catch (e) { app.toast(`Could not load the example: ${e.message}`, 'error'); }
   }
 }
@@ -266,7 +265,7 @@ RENDER.quality = (app, main, after) => {
   if (res.kind === 'ams') { main.append(note('This station was supplied as an annual-maximum table, so time-series checks are not possible. Check the table itself for transcription errors.', 'warn')); return; }
   const q = res.qc;
   main.append(block('Findings', q.issues.length ? q.issues.map((i) => note(i.text, i.level === 'error' ? 'error' : i.level === 'warning' ? 'warn' : '')) : note('No issues detected.')));
-  main.append(block('Record strip', h('p.muted.small', 'Each row is a year and each column a day; darker cells are wetter days. Red cells are days with more than 20% of values missing.'),
+  main.append(block('Record strip', h('p.muted.small', 'Each row is a year and each column a day; darker cells are wetter days. Red cells are days with more than 20% of values missing; grey cells are months the record does not observe.'),
     plotBox(after, (el) => plots.recordStrip(el, res.series.dailyStrip), { cls: 'strip', name: 'record-strip', label: 'Record strip of daily rainfall by year' })));
   main.append(block('Rules',
     h('div.row',

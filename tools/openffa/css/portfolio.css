@@ -46,6 +46,11 @@ button.btn, .seg { border-radius: 8px; }
 @media print { .pf-logo, .pf-btn { display: none !important; } }
 /* the rail sits right under the bar; keep the two heights in step on wide screens */
 @media (min-width: 861px) {
-  .topbar { height: 54px; }
-  .staff { top: 54px; height: calc(100vh - 54px); }
+  .topbar { height: 3.2rem; }
+  .staff { top: 3.2rem; height: calc(100vh - 3.2rem); }
 }
+
+/* Page headings receive focus when a step is opened (for screen readers); no outline box for that. */
+h2[tabindex="-1"]:focus, h1[tabindex="-1"]:focus { outline: none; }
+/* Larger text on tablets and desktops: app.css sizes are in rem, so text and spacing scale together. */
+@media (min-width: 861px) { html { font-size: 112.5%; } }

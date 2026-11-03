@@ -142,6 +142,51 @@ function intervalsInYear(y, yearStartMonth, step) {
   return Math.round((b - a) / (step * MS_MIN));
 }
 
+export const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+/**
+ * Months the record actually observes (1-12). A gauge read only in some months (a July-only archive such as
+ * the Denver record, or a monsoon-season gauge) leaves the other months blank; those months are "not
+ * observed", not missing, and must not count against gaps or coverage. A month counts as observed when at
+ * least half of the record's years have data in it; a record with data in every month returns all twelve.
+ */
+export function observedMonths(series) {
+  const { values, step, origin } = series;
+  const stepMs = step * MS_MIN;
+  const seen = Array.from({ length: 13 }, () => new Set());
+  const years = new Set();
+  for (let i = 0; i < values.length; i++) {
+    if (Number.isNaN(values[i])) continue;
+    const d = new Date(origin + i * stepMs);
+    const y = d.getUTCFullYear();
+    years.add(y); seen[d.getUTCMonth() + 1].add(y);
+  }
+  const need = Math.max(1, Math.ceil(0.5 * years.size));
+  const months = [];
+  for (let m = 1; m <= 12; m++) if (seen[m].size >= need) months.push(m);
+  return months.length ? months : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+}
+
+/** Intervals of `step` minutes in the observed months of hydrological year `y` (the whole year if all 12 are observed). */
+function intervalsInSeason(y, yearStartMonth, step, months) {
+  if (!months || months.length === 12) return intervalsInYear(y, yearStartMonth, step);
+  let n = 0;
+  for (const m of months) {
+    const cy = m >= yearStartMonth ? y : y + 1;
+    n += Math.round((Date.UTC(cy, m, 1) - Date.UTC(cy, m - 1, 1)) / (step * MS_MIN));
+  }
+  return n;
+}
+
+/** "July", "June to September", or "March, July and October" for a list of months. */
+export function monthsLabel(months) {
+  const names = months.map((m) => MONTH_NAMES[m - 1]);
+  const consecutive = months.every((m, i) => i === 0 || m === months[i - 1] + 1);
+  if (names.length === 1) return names[0];
+  if (consecutive) return `${names[0]} to ${names[names.length - 1]}`;
+  return `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`;
+}
+
 // ---------------------------------------------------------------------------
 // Data-quality checks
 // ---------------------------------------------------------------------------
@@ -182,16 +227,24 @@ export function qualityReport(series, opt = {}) {
   if (neg) issues.push({ level: 'error', code: 'negative', count: neg, text: `${neg} negative value(s)${fix ? ' set to missing' : ''}.` });
   if (impl) issues.push({ level: 'error', code: 'implausible', count: impl, text: `${impl} value(s) exceed the approximate world-record envelope for a ${step}-min interval (${env.toFixed(0)} mm)${fix ? ' — set to missing' : ''}.` });
 
-  // missing runs
+  // observed months: blank months outside them are "not observed", not missing (seasonal records)
+  const months = opt.months ?? observedMonths(series);
+  const seasonal = months.length < 12;
+  const inSeason = seasonal ? (i) => months.includes(monthOf(origin + i * stepMs)) : () => true;
+  if (seasonal) issues.push({ level: 'info', code: 'seasonal', text: `The record observes ${monthsLabel(months)} only. Gaps and coverage are counted within ${months.length === 1 ? 'that month' : 'those months'}, and the maxima are ${monthsLabel(months)} maxima: they equal annual maxima only if the year's largest storms fall in ${months.length === 1 ? 'that month' : 'those months'}.` });
+
+  // missing runs (within the observed months)
   const gaps = [];
-  let runStart = -1;
+  let runStart = -1; let nSeason = 0;
   for (let i = 0; i <= values.length; i++) {
-    const miss = i < values.length && Number.isNaN(values[i]);
+    const inS = i < values.length && inSeason(i);
+    if (inS) nSeason++;
+    const miss = inS && Number.isNaN(values[i]);
     if (miss && runStart < 0) runStart = i;
     if (!miss && runStart >= 0) { gaps.push({ start: origin + runStart * stepMs, end: origin + i * stepMs, n: i - runStart }); runStart = -1; }
   }
   const nMissing = gaps.reduce((s, g) => s + g.n, 0);
-  if (nMissing) issues.push({ level: 'warning', code: 'gaps', count: gaps.length, text: `${gaps.length} gap(s), ${nMissing} missing intervals (${(100 * nMissing / values.length).toFixed(2)}% of record).` });
+  if (nMissing) issues.push({ level: 'warning', code: 'gaps', count: gaps.length, text: `${gaps.length} gap(s), ${nMissing} missing intervals (${(100 * nMissing / Math.max(1, nSeason)).toFixed(2)}% of ${seasonal ? 'the observed months' : 'record'}).` });
 
   // flat-lined sensor: identical non-zero values repeated
   const flatN = Math.max(2, Math.ceil(flatlineMin / step));
@@ -221,7 +274,7 @@ export function qualityReport(series, opt = {}) {
   const years = new Map();
   for (let i = 0; i < values.length; i++) {
     const y = yearOf(origin + i * stepMs, yearStartMonth);
-    if (!years.has(y)) years.set(y, { year: y, valid: 0, present: 0, total: intervalsInYear(y, yearStartMonth, step), sum: 0 });
+    if (!years.has(y)) years.set(y, { year: y, valid: 0, present: 0, total: intervalsInSeason(y, yearStartMonth, step, months), sum: 0 });
     const r = years.get(y);
     r.present++;
     if (!Number.isNaN(values[i])) { r.valid++; r.sum += values[i]; }
@@ -232,7 +285,7 @@ export function qualityReport(series, opt = {}) {
   if (complete < 10) issues.push({ level: 'error', code: 'short', count: complete, text: `Only ${complete} year(s) meet the ${Math.round(minCov * 100)}% coverage threshold. Frequency estimates from fewer than ~10 years are highly uncertain; consider regional analysis.` });
   else if (complete < 30) issues.push({ level: 'info', code: 'shortish', count: complete, text: `${complete} usable years. A common rule of thumb is not to extrapolate far beyond 2-4x the record length (here roughly T <= ${2 * complete}-${4 * complete} yr); report confidence intervals.` });
 
-  return { issues, gaps, flats, zeros, coverage, changed, nValues: values.length, nMissing, step };
+  return { issues, gaps, flats, zeros, coverage, changed, nValues: values.length, nMissing, step, months };
 }
 
 // ---------------------------------------------------------------------------
@@ -273,7 +326,8 @@ export function annualMaxima(series, durations, opt = {}) {
     if (!miss) yearsSet.get(y).valid++;
   }
   const years = [...yearsSet.keys()].sort((a, b) => a - b);
-  const coverage = years.map((y) => yearsSet.get(y).valid / intervalsInYear(y, yearStartMonth, step));
+  const months = opt.months ?? observedMonths(series);
+  const coverage = years.map((y) => yearsSet.get(y).valid / intervalsInSeason(y, yearStartMonth, step, months));
   const usable = years.map((y, j) => coverage[j] >= minCoverage || !!opt.includeIncomplete);
   const excluded = years.filter((_, j) => !usable[j]).map((y) => ({ year: y, coverage: coverage[years.indexOf(y)] }));
 

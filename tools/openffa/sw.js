@@ -1,6 +1,6 @@
 // sw.js - service worker: caches the whole app on first visit so it works offline afterwards.
 // Bump VERSION whenever files change (scripts/build-sw.mjs regenerates the list).
-const VERSION = 'openffa-0.1.0-portfolio-1';
+const VERSION = 'openffa-0.1.0-portfolio-2';
 const FILES = [
   'assets/fonts/barlow-semi-condensed-latin-500-normal.woff2',
   'assets/fonts/barlow-semi-condensed-latin-600-normal.woff2',

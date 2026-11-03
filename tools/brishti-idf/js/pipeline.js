@@ -102,16 +102,16 @@ export function analyseStation(station, settingsIn, ctx = {}) {
     const qc = qualityReport(series, { yearStartMonth: S.yearStartMonth, minCoverage: S.minCoverage, fix: S.qc.fix, wetMonths: S.qc.wetMonths, zeroRunDays: S.qc.zeroRunDays, flatlineMinutes: S.qc.flatlineMinutes ?? undefined });
     out.qc = { ...qc, gaps: qc.gaps.slice(0, 200), changed: qc.changed.slice(0, 500) };
     out.kind = step >= 1440 ? 'daily' : 'subdaily';
-    out.series = { origin: series.origin, step: series.step, n: series.values.length, dailyStrip: dailyStrip(series, S.yearStartMonth) };
+    out.series = { origin: series.origin, step: series.step, n: series.values.length, dailyStrip: dailyStrip(series, S.yearStartMonth, qc.months) };
     progress({ stage: 'Extracting annual maxima' });
     const durs = S.durations.filter((d) => d % step === 0 && d >= step);
     if (out.kind === 'daily') for (const d of [1440, 2880, 4320]) if (!durs.includes(d) && d % step === 0) durs.push(d);
     durs.sort((a, b) => a - b);
-    ams = annualMaxima(series, durs, { yearStartMonth: S.yearStartMonth, minCoverage: S.minCoverage, includeIncomplete: S.includeIncomplete, maxMissingFraction: S.maxMissingFraction, mode: S.amsMode });
+    ams = annualMaxima(series, durs, { yearStartMonth: S.yearStartMonth, minCoverage: S.minCoverage, months: qc.months, includeIncomplete: S.includeIncomplete, maxMissingFraction: S.maxMissingFraction, mode: S.amsMode });
     const skipped = S.durations.filter((d) => !durs.includes(d));
     if (skipped.length) out.log.push(`Durations not resolvable from ${step}-min data (need disaggregation or finer data): ${skipped.join(', ')} min.`);
     if (step <= 60 && durs.includes(1440)) {
-      try { out.hershfield = empiricalHershfield(series, 1440, { yearStartMonth: S.yearStartMonth, minCoverage: S.minCoverage, includeIncomplete: S.includeIncomplete }); } catch { /* not enough data */ }
+      try { out.hershfield = empiricalHershfield(series, 1440, { yearStartMonth: S.yearStartMonth, minCoverage: S.minCoverage, months: qc.months, includeIncomplete: S.includeIncomplete }); } catch { /* not enough data */ }
     }
   }
   out.ams = { durations: ams.durations, years: ams.years, depth: ams.depth, when: ams.when, coverage: ams.coverage, excluded: ams.excluded, mode: ams.mode };
@@ -291,7 +291,7 @@ export function analyseStation(station, settingsIn, ctx = {}) {
 }
 
 /** Year x day-of-year matrix of daily totals for the record strip (NaN = missing). */
-function dailyStrip(series, yearStartMonth) {
+function dailyStrip(series, yearStartMonth, months) {
   const dayMs = 86400000;
   const perDay = Math.max(1, Math.round(1440 / series.step));
   const stepMs = series.step * 60000;
@@ -316,7 +316,8 @@ function dailyStrip(series, yearStartMonth) {
     const doy = Math.floor((Date.UTC(y, d.getUTCMonth(), d.getUTCDate()) - Date.UTC(y, 0, 1)) / dayMs);
     const row = years.indexOf(y);
     if (row < 0) continue;
-    z[row][doy] = s.miss > 0.2 * perDay ? -1 : s.s; // -1 marks a (mostly) missing day
+    // -1 marks a (mostly) missing day, -2 a day in a month the record does not observe (seasonal records)
+    z[row][doy] = months && months.length < 12 && !months.includes(d.getUTCMonth() + 1) ? -2 : s.miss > 0.2 * perDay ? -1 : s.s;
   }
   return { years, z };
 }

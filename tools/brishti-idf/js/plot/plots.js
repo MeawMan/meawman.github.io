@@ -150,6 +150,7 @@ export function plotToDataURL(el, width = 900, height = 520) {
 export function recordStrip(el, strip, unit = 'mm') {
   const zMain = strip.z.map((r) => r.map((v) => (v == null || v < 0 ? null : v)));
   const zMiss = strip.z.map((r) => r.map((v) => (v === -1 ? 1 : null)));
+  const zOff = strip.z.map((r) => r.map((v) => (v === -2 ? 1 : null))); // months a seasonal record does not observe
   const vals = zMain.flat().filter((v) => v != null && v > 0).sort((a, b) => a - b);
   const vmax = vals.length ? vals[Math.floor(0.995 * (vals.length - 1))] : 1;
   const ground = css('--surface');
@@ -158,6 +159,9 @@ export function recordStrip(el, strip, unit = 'mm') {
       colorscale: [[0, ground], [0.0001, isDark() ? '#1f3d44' : '#d9ecec'], [0.3, isDark() ? '#3f8d93' : '#5fb0b3'], [0.7, isDark() ? '#8fb7ef' : '#1f5f86'], [1, isDark() ? '#e2d4ff' : '#1a0f3d']],
       colorbar: { title: { text: `daily ${unit}` }, thickness: 10, len: 0.9 }, hovertemplate: 'year %{y}, day %{x}<br>%{z:.1f} ' + unit + '<extra></extra>', xgap: 0, ygap: 1 },
     { type: 'heatmap', z: zMiss, x: Array.from({ length: 366 }, (_, i) => i + 1), y: strip.years, colorscale: [[0, css('--red')], [1, css('--red')]], showscale: false, hovertemplate: 'year %{y}, day %{x}: missing<extra></extra>', ygap: 1 },
+    ...(zOff.some((r) => r.some((v) => v))
+      ? [{ type: 'heatmap', z: zOff, x: Array.from({ length: 366 }, (_, i) => i + 1), y: strip.years, colorscale: [[0, css('--rule-soft')], [1, css('--rule-soft')]], showscale: false, hovertemplate: 'year %{y}, day %{x}: not observed (outside the recorded months)<extra></extra>', ygap: 1 }]
+      : []),
   ], {
     margin: { l: 52, r: 10, t: 10, b: 40 },
     xaxis: { title: { text: 'day of year' }, tickvals: [1, 32, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335], ticktext: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'], gridcolor: 'rgba(0,0,0,0)' },
