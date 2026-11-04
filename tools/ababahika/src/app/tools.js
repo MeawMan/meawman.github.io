@@ -14,7 +14,7 @@ const AREA = { km2: { label: 'km²', f: 1e-6, d: 3 }, ha: { label: 'ha', f: 1e-4
 let worker = null, jobSeq = 0; const pending = new Map();
 function getWorker() {
   if (worker) return worker;
-  worker = new Worker(new URL('worker.js', import.meta.url), { type: 'module' });
+  worker = new Worker(new URL(`worker.js?v=${__BUILD__}`, import.meta.url), { type: 'module' });
   worker.onmessage = (e) => { const p = pending.get(e.data.id); if (!p) return; if (e.data.progress != null) p.progress(e.data.progress); else { pending.delete(e.data.id); e.data.error ? p.reject(new Error(e.data.error)) : p.resolve(e.data); } };
   worker.onerror = (e) => { for (const p of pending.values()) p.reject(new Error(e.message || 'worker failed')); pending.clear(); worker = null; };
   return worker;

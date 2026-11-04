@@ -102,10 +102,18 @@ export function epsgFromGeoKeys(k) {
  * central meridian 90°" without an EPSG code. Read the ESRI PE string (full WKT) when present, else build a proj4
  * definition from the projection parameter keys. Returns a registered code, or null when the keys do not say enough.
  */
+/** The PROJCS[...] (or GEOGCS[...]) block of an "ESRI PE String" citation, brackets balanced; null when absent. */
+function peWkt(cit) {
+  const m = /ESRI PE String = /.exec(cit); if (!m) return null;
+  const s = cit.slice(m.index + m[0].length), st = s.search(/PROJCS\[|GEOGCS\[/); if (st < 0) return null;
+  let d = 0;
+  for (let n = s.indexOf('[', st); n < s.length; n++) { if (s[n] === '[') d++; else if (s[n] === ']' && --d === 0) return s.slice(st, n + 1); }
+  return null;
+}
 function customFromGeoKeys(k) {
-  const cit = [k.PCSCitationGeoKey, k.GTCitationGeoKey, k.GeogCitationGeoKey].filter(Boolean).join(' ');
-  const pe = /ESRI PE String = ((?:PROJCS|GEOGCS)[.*])/s.exec(cit);
-  if (pe) { try { const code = registerWkt(pe[1]); if (proj4.defs(code)) return code; } catch (e) { /* fall through to the keys */ } }
+  const cit = [k.PCSCitationGeoKey, k.GTCitationGeoKey, k.GeogCitationGeoKey].filter(Boolean).join('|');
+  const pe = peWkt(cit); // ArcGIS: the full WKT ("ESRI PE String"), sometimes followed by a VERTCS block that is not needed here
+  if (pe) { try { const code = registerWkt(pe); if (proj4.defs(code)) { const n = /^\w+\["([^"]+)"/.exec(pe); NAMES[code] = `${n ? n[1] + ' — ' : ''}${/Transverse_Mercator/i.test(pe) ? 'Transverse Mercator' : 'custom projection'}${(/Central_Meridian",\s*([-\d.]+)/i.exec(pe) || [])[1] ? `, central meridian ${+/Central_Meridian",\s*([-\d.]+)/i.exec(pe)[1]}°` : ''}${/D_WGS_1984/i.test(pe) ? ', WGS 84' : ''} (from the GeoTIFF)`; return code; } } catch (e) { /* fall through to the keys */ } }
   if (k.GTModelTypeGeoKey !== 1 || !k.ProjCoordTransGeoKey) return null;
   // datum / ellipsoid
   const gcs = k.GeographicTypeGeoKey, dat = k.GeogGeodeticDatumGeoKey;
@@ -132,7 +140,7 @@ function customFromGeoKeys(k) {
   const def = P();
   if (/undefined/.test(def)) return null;
   const tm = k.ProjCoordTransGeoKey === 1;
-  const cite = k.PCSCitationGeoKey && !pe ? String(k.PCSCitationGeoKey).split('|')[0].trim() : '';
+  const cite = (/PCS Name = ([^|]+)/.exec(cit) || /^\s*([^|=]+?)\s*(?:\||$)/.exec(String(k.PCSCitationGeoKey || '')) || [])[1]?.trim() || '';
   const name = `${cite ? cite + ' — ' : ''}${tm ? 'Transverse Mercator' : 'custom projection'}, central meridian ${lon0}°${datum.includes('WGS84') ? ', WGS 84' : ''} (from the GeoTIFF)`;
   return registerProj4(def, name);
 }

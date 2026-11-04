@@ -7,7 +7,7 @@ import { MAX_CELLS } from '../engine/hydro.js';
 let app, worker = null, seq = 0; const pending = new Map();
 function call(msg, onStep) {
   if (!worker) {
-    worker = new Worker(new URL('hydroworker.js', import.meta.url), { type: 'module' });
+    worker = new Worker(new URL(`hydroworker.js?v=${__BUILD__}`, import.meta.url), { type: 'module' });
     worker.onmessage = (e) => { const p = pending.get(e.data.id); if (!p) return; if (e.data.step != null || e.data.progress != null) { p.step(e.data.step, e.data.progress); return; } pending.delete(e.data.id); e.data.error ? p.reject(new Error(e.data.error)) : p.resolve(e.data.result); };
     worker.onerror = (e) => { for (const p of pending.values()) p.reject(new Error(e.message || 'Hydrology worker stopped (out of memory?)')); pending.clear(); worker = null; model = null; render(); };
   }
