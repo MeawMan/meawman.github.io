@@ -1,11 +1,11 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
 title: "Ababahika: catchment slope, land-cover and soil statistics in the browser"
-version: 0.1.0
-date-released: 2026-11-03
+version: 0.2.0
+date-released: 2026-11-04
 license: MIT
 authors:
   - family-names: Joy
     given-names: Mahfujur Rahman
     affiliation: "Center for Environmental and Geographic Information Services (CEGIS), Dhaka"
-keywords: [zonal statistics, slope, land use land cover, soil texture, catchment, GIS, WebAssembly, GDAL]
+keywords: [D8 flow direction, watershed delineation, polder, zonal statistics, slope, land use land cover, soil texture, catchment, GIS, WebAssembly, GDAL]

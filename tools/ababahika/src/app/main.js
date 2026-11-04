@@ -14,6 +14,8 @@ import GeoJSON from 'ol/format/GeoJSON.js';
 import { Style, Fill, Stroke, Text, Circle as CircleStyle } from 'ol/style.js';
 import { ScaleLine, Zoom, Attribution } from 'ol/control.js';
 import Overlay from 'ol/Overlay.js';
+import Draw from 'ol/interaction/Draw.js';
+import Snap from 'ol/interaction/Snap.js';
 import { register } from 'ol/proj/proj4.js';
 import { transformExtent, toLonLat, get as getProj, transform } from 'ol/proj.js';
 import { createEmpty, extend as extendExtent, isEmpty } from 'ol/extent.js';
@@ -21,13 +23,14 @@ import proj4 from 'proj4';
 
 import { state, on, emit, newId, byId } from './state.js';
 import { $, $$, h, toast, icon, iconBtn, fmt, fmtBytes, esc, download } from './ui.js';
-import { groupFiles, loadJob, fieldsOf, geomKind } from './io.js';
+import { groupFiles, loadJob, fieldsOf, geomKind, reprojectFC } from './io.js';
 import { crsName, isGeographic, metresPerDegree, COMMON, ensureCrs, isKnown } from '../engine/crs.js';
 import { SCHEMES, guessScheme, classTable, rampColor, rampCss, hexToRgb, qualColor, RAMPS } from './palettes.js';
 import { exportVector, VECTOR_FORMATS } from './gp.js';
-import { initTools } from './tools.js';
+import { initTools, useZones } from './tools.js';
+import { initHydro } from './hydro.js';
 
-export const VERSION = '0.1.0';
+export const VERSION = '0.2.0';
 register(proj4);
 const reg = () => register(proj4);
 
@@ -88,7 +91,16 @@ async function addFiles(files) {
     const t = toast(`Loading ${nm}…`, 'info', 60000);
     try {
       const specs = await loadJob(job, (s) => { t.textContent = s || `Loading ${nm}…`; });
-      for (const s of specs) { const L = await addLayer(s); if (s.warn) toast(s.warn, 'warn', 8000); if (L) zoomTo(L); }
+      for (const s of specs) {
+        if (s.needsCrs) {
+          t.textContent = `${s.name}: which coordinate system?`;
+          const code = await askCrs(s);
+          if (!code) { toast(`${s.name} not added (no coordinate system).`, 'warn'); continue; }
+          reprojectFC(s.fc, code, 'EPSG:4326'); s.srcCrs = code;
+          toast(`${s.name}: read as ${crsName(code)} and converted to WGS 84.`, 'info', 7000);
+        }
+        const L = await addLayer(s); if (s.info) toast(s.info, 'info', 8000); if (s.warn) toast(s.warn, 'warn', 8000); if (L) zoomTo(L);
+      }
     } catch (e) { toast(e.message, 'error', 9000); console.error(e); }
     t.remove();
   }
@@ -99,13 +111,15 @@ const mapEl = $('#mapWrap');
 ['dragenter', 'dragover'].forEach((ev) => document.addEventListener(ev, (e) => { if ([...(e.dataTransfer?.types || [])].includes('Files')) { e.preventDefault(); mapEl.classList.add('drop'); } }));
 ['dragleave', 'drop'].forEach((ev) => document.addEventListener(ev, (e) => { if (ev === 'dragleave' && e.relatedTarget) return; mapEl.classList.remove('drop'); }));
 document.addEventListener('drop', (e) => { if (e.dataTransfer?.files?.length) { e.preventDefault(); addFiles(e.dataTransfer.files); } });
-$('#demoBtn')?.addEventListener('click', loadDemo);
+$('#demoBtn')?.addEventListener('click', () => loadDemo('catchments'));
+$('#demoPolderBtn')?.addEventListener('click', async () => { await loadDemo('polder'); openPanel('hydro'); });
 
-async function loadDemo() {
+async function loadDemo(kind = 'catchments') {
   const t = toast('Loading demo data…', 'info', 60000);
   try {
     const base = new URL('../data/demo/', import.meta.url);
-    const files = await Promise.all(['catchments.zip', 'dem_utm.tif', 'lulc.tif', 'soil_poly.zip'].map(async (n) => new File([await (await fetch(new URL(n, base))).blob()], n)));
+    const names = kind === 'polder' ? ['polder_dem.tif', 'embankment.geojson', 'sluices.geojson', 'khals.geojson'] : ['catchments.zip', 'dem_utm.tif', 'lulc.tif', 'soil_poly.zip'];
+    const files = await Promise.all(names.map(async (n) => new File([await (await fetch(new URL(n, base))).blob()], n)));
     await addFiles(files);
     const lu = state.layers.find((l) => l.name === 'lulc'); if (lu) { lu.name = 'LULC (demo classes)'; renderContents(); }
   } catch (e) { toast('Demo data could not be loaded: ' + e.message, 'error'); }
@@ -116,9 +130,12 @@ async function loadDemo() {
 export async function addLayer(spec) {
   const L = { id: newId(), name: spec.name, type: spec.type, visible: true, opacity: spec.type === 'raster' ? 0.85 : 1 };
   if (spec.type === 'vector') {
+    spec.fc.features = (spec.fc.features || []).filter((f) => f && f.geometry);
+    spec.fc.features.forEach((f, i) => { f.id = i; f.properties = f.properties || {}; });
     Object.assign(L, { fc: spec.fc, crs: spec.srcCrs || 'EPSG:4326', geom: geomKind(spec.fc), fields: fieldsOf(spec.fc) });
     const color = qualColor(state.layers.filter((l) => l.type === 'vector').length + 1);
-    L.sym = { stroke: color, fill: color, fillOpacity: L.geom === 'polygon' ? 0.12 : 0.8, width: L.geom === 'line' ? 2 : 1.6, label: '', choro: null };
+    L.sym = { stroke: color, fill: color, fillOpacity: L.geom === 'polygon' ? 0.12 : 0.8, width: L.geom === 'line' ? 2 : 1.6, label: '', choro: null, ...(spec.sym || {}) };
+    if (spec.role) L.role = spec.role;
     L.source = new VectorSource({ features: new GeoJSON().readFeatures(spec.fc, { dataProjection: 'EPSG:4326', featureProjection: 'EPSG:3857' }) });
     L.ol = new VectorLayer({ source: L.source, style: (f) => vectorStyle(L, f), declutter: false });
   } else {
@@ -180,11 +197,12 @@ function vectorStyle(L, f) {
   }
   const fo = s.choro && s.choro.field ? Math.max(0.6, s.fillOpacity) : s.fillOpacity;
   const label = s.label ? String(f.get(s.label) ?? '') : '';
-  const key = `${fill}|${fo}|${s.stroke}|${s.width}|${label}|${sel}|${L.geom}|${root.dataset.theme}`;
+  const wd = s.widthBy ? s.width * (0.4 + 0.45 * (Number(f.get(s.widthBy)) || 1)) : s.width;
+  const key = `${fill}|${fo}|${s.stroke}|${wd}|${label}|${sel}|${L.geom}|${root.dataset.theme}|${s.dash || ''}`;
   if (styleCache.has(key)) return styleCache.get(key);
   const rgb = fill.startsWith('#') ? hexToRgb(fill) : fill.match(/\d+/g).map(Number);
   const fillC = `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${fo})`;
-  const stroke = new Stroke({ color: sel ? '#ffd400' : s.stroke, width: sel ? s.width + 2 : s.width });
+  const stroke = new Stroke({ color: sel ? '#ffd400' : s.stroke, width: sel ? wd + 2 : wd, lineDash: s.dash || undefined });
   const st = new Style({
     fill: new Fill({ color: fillC }), stroke,
     image: new CircleStyle({ radius: 5, fill: new Fill({ color: s.fill }), stroke: new Stroke({ color: '#fff', width: 1.2 }) }),
@@ -473,6 +491,29 @@ function exportDialog(L) {
   } } }, 'Export')]);
 }
 /** A coordinate system picker: common systems + any EPSG code. Returns {el, value():Promise<code>}. */
+/** A first guess from the coordinates in metres: northings below 1 500 000 are BTM as used in Bangladesh, larger ones UTM. */
+function guessCrs(fc) {
+  for (const f of fc.features || []) {
+    if (!f.geometry) continue;
+    let c = f.geometry.coordinates; while (Array.isArray(c[0])) c = c[0];
+    if (c[1] < 1.5e6 && c[0] > 2e5 && c[0] < 8e5) return 'BTM:BD';
+    return 'EPSG:32646';
+  }
+  return 'EPSG:32646';
+}
+/** Ask which coordinate system a layer without a usable .prj uses. Resolves to a code, or null when cancelled. */
+function askCrs(spec) {
+  const pk = crsPicker(guessCrs(spec.fc));
+  return new Promise((res) => {
+    const d = modal(`${spec.name}: coordinate system`, h('div.form', h('p', `The coordinates are in metres, but ${spec.why}. Choose the coordinate system the data was made in; the layer will be converted to WGS 84.`), pk.el),
+      [h('button.primary', { value: 'ok' }, 'Use and convert')]);
+    let done = false;
+    const end = async (ok) => { if (done) return; done = true; if (d.open) d.close(); if (!ok) return res(null); try { res(await pk.value()); } catch (e) { toast(e.message, 'error'); res(null); } };
+    // answered from the buttons themselves (not only the dialog's close event)
+    d.addEventListener('click', (e) => { const b = e.target.closest('button[value]'); if (!b) return; e.preventDefault(); end(b.value === 'ok'); });
+    d.addEventListener('close', () => end(false));
+  });
+}
 export function crsPicker(def) {
   const sel = h('select', [...COMMON.map((c) => h('option', { value: c, selected: c === def }, `${crsName(c)} — ${c}`)), h('option', { value: 'other' }, 'Other EPSG code…')]);
   const inp = h('input', { type: 'text', placeholder: 'EPSG code, e.g. 32645', hidden: true });
@@ -505,11 +546,48 @@ export function highlight(L, fid, zoom) {
   if (zoom) { const f = L.source.getFeatureById(fid); if (f) map.getView().fit(f.getGeometry().getExtent(), { padding: [60, 60, 60, 60], duration: 300, maxZoom: 17 }); }
 }
 
+// ---------------- drawing (points / lines) ----------------
+let drawing = null;
+/** Draw features into a layer (created if needed). kind 'Point' | 'LineString'. Returns the layer. */
+export async function startDraw(kind, name, spec = {}) {
+  stopDraw();
+  let L = state.layers.find((l) => l.type === 'vector' && l.name === name);
+  if (!L) L = await addLayer({ type: 'vector', name, fc: { type: 'FeatureCollection', features: [] }, ...spec });
+  L.geom = kind === 'Point' ? 'point' : 'line';
+  const draw = new Draw({ source: L.source, type: kind });
+  const snaps = state.layers.filter((l) => l.type === 'vector' && l.visible).map((l) => new Snap({ source: l.source, pixelTolerance: 10 }));
+  draw.on('drawend', (e) => {
+    const gj = new GeoJSON().writeFeatureObject(e.feature, { dataProjection: 'EPSG:4326', featureProjection: 'EPSG:3857' });
+    const n = L.fc.features.length + 1;
+    gj.properties = { name: `${spec.prefix || (kind === 'Point' ? 'Point' : 'Line')} ${n}` }; gj.id = n - 1;
+    e.feature.setId(n - 1); e.feature.setProperties(gj.properties);
+    L.fc.features.push(gj); L.fields = fieldsOf(L.fc); renderContents(); emit('layers');
+  });
+  map.addInteraction(draw); snaps.forEach((x) => map.addInteraction(x));
+  drawing = { draw, snaps, L };
+  $('#drawBar').hidden = false; $('#drawMsg').textContent = kind === 'Point' ? `Click to add points to “${name}”.` : `Click to add vertices to “${name}”, double-click to finish a line.`;
+  return L;
+}
+export function stopDraw() {
+  if (!drawing) return;
+  map.removeInteraction(drawing.draw); drawing.snaps.forEach((x) => map.removeInteraction(x));
+  drawing = null; $('#drawBar').hidden = true; emit('layers');
+}
+$('#drawDone').addEventListener('click', stopDraw);
+$('#drawUndo').addEventListener('click', () => {
+  if (!drawing) return;
+  if (drawing.L.geom === 'line') { try { drawing.draw.removeLastPoint(); } catch (e) { /* ignore */ } }
+  const L = drawing.L, last = L.fc.features.pop(); if (!last) return;
+  const f = L.source.getFeatureById(last.id); if (f) L.source.removeFeature(f); renderContents(); emit('layers');
+});
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') stopDraw(); });
+
 // ---------------- identify ----------------
 const popup = new Overlay({ element: $('#popup'), autoPan: { animation: { duration: 200 } }, positioning: 'bottom-center', offset: [0, -10] });
 map.addOverlay(popup);
 $('#popupClose').addEventListener('click', () => popup.setPosition(undefined));
 map.on('singleclick', async (e) => {
+  if (drawing) return;
   const parts = [];
   let hit = null;
   map.forEachFeatureAtPixel(e.pixel, (f, layer) => { if (!hit) { const L = state.layers.find((l) => l.ol === layer); if (L) hit = { L, f }; } }, { hitTolerance: 4 });
@@ -544,7 +622,8 @@ window.addEventListener('resize', () => map.updateSize());
 $('#helpBtn').addEventListener('click', () => modal('How to use Ababahika', h('div.prose',
   h('h4', '1 · Add data'), h('p', 'Drop files on the map or press ＋ Add data. Shapefiles: a .zip, or select the .shp, .dbf and .prj together. Rasters: GeoTIFF of any size (read in pieces, never loaded whole); .img, .asc and others are converted with GDAL.'),
   h('h4', '2 · Catchment stats'), h('p', 'Pick the catchment layer and the DEM, land-cover and soil maps, then Calculate. You get slope statistics and slope classes, the area and percentage of every land-cover and soil class for each catchment, an Excel workbook, a methods paragraph, and the results joined to the catchment layer (coloured by mean slope).'),
-  h('h4', '3 · Tools'), h('p', 'Project, clip, merge and dissolve run real GDAL in the browser; results appear as new layers. Export any vector layer as shapefile, GeoPackage, GeoJSON or KML in any coordinate system.'),
+  h('h4', '3 · Hydrology'), h('p', 'Build a D8 flow model from a DEM, with embankments burned in as walls, sluices as openings and khals as channels (shapefiles, or draw them on the map). Each sluice gets its drainage unit; other outlets can be clicked or loaded and are snapped to the largest flow nearby. Download flow direction (ESRI codes), accumulation and filled DEM as GeoTIFF. In flat polder land, read the Flat % and Filled % of each unit: where they are high the terrain did not decide the boundary.'),
+  h('h4', '4 · Tools'), h('p', 'Project, clip, merge and dissolve run real GDAL in the browser; results appear as new layers. Export any vector layer as shapefile, GeoPackage, GeoJSON or KML in any coordinate system.'),
   h('h4', 'How the numbers are made'), h('ul',
     h('li', 'A cell counts for a catchment when its centre is inside the polygon (GDAL/ArcGIS rule).'),
     h('li', 'Slope: Horn (1981) 3×3 method, as ArcGIS Slope. Geographic DEMs (degrees) are handled with true metre spacing per row, so you do not need to project them first.'),
@@ -554,7 +633,8 @@ $('#helpBtn').addEventListener('click', () => modal('How to use Ababahika', h('d
 if (matchMedia('(max-width: 900px)').matches) { $('#contents').classList.add('collapsed'); $('#side').classList.add('collapsed'); }
 
 renderContents(); renderLayerPanel();
-initTools({ addLayer, openDrawer, openPanel, refreshVector, updateVectorData, highlight, crsPicker, modal, renderLayerPanel, zoomTo });
+const callbacks = { startDraw, stopDraw, addLayer, removeLayer, useZones, openDrawer, openPanel, refreshVector, updateVectorData, highlight, crsPicker, modal, renderLayerPanel, zoomTo };
+initTools(callbacks); initHydro(callbacks);
 openPanel('analysis');
-if (/[?&]demo\b/.test(location.search)) loadDemo();
+if (/[?&]demo=polder\b/.test(location.search)) loadDemo('polder').then(() => openPanel('hydro')); else if (/[?&]demo\b/.test(location.search)) loadDemo();
 void isKnown; void getProj;

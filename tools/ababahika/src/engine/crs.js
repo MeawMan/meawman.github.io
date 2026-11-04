@@ -5,20 +5,23 @@ import proj4 from 'proj4';
 const DEFS = {
   'EPSG:4326': '+proj=longlat +datum=WGS84 +no_defs',
   'EPSG:3857': '+proj=merc +a=6378137 +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null +wktext +no_defs',
-  // Gulshan 303 / Bangladesh Transverse Mercator (BTM), Everest 1830 (1937 adj.); datum shift = EPSG 3-parameter transformation to WGS 84
-  'EPSG:3106': '+proj=tmerc +lat_0=0 +lon_0=90 +k=0.9996 +x_0=500000 +y_0=0 +a=6377276.345 +rf=300.8017 +towgs84=283.7,735.9,261.1,0,0,0,0 +units=m +no_defs',
-  'EPSG:4682': '+proj=longlat +a=6377276.345 +rf=300.8017 +towgs84=283.7,735.9,261.1,0,0,0,0 +no_defs', // Gulshan 303 geographic
+  // Gulshan 303 / Bangladesh Transverse Mercator as registered by EPSG (false northing 0), Everest 1830 (1937 adj.);
+  // datum shift = EPSG transformation 1919 (Gulshan 303 to WGS 84), as published on epsg.io
+  'EPSG:3106': '+proj=tmerc +lat_0=0 +lon_0=90 +k=0.9996 +x_0=500000 +y_0=0 +a=6377276.345 +rf=300.8017 +towgs84=283.729,735.942,261.143,0,0,0,0 +units=m +no_defs',
+  'EPSG:4682': '+proj=longlat +a=6377276.345 +rf=300.8017 +towgs84=283.729,735.942,261.143,0,0,0,0 +no_defs', // Gulshan 303 geographic
+  // BTM as used in Bangladesh practice (BWDB, SoB; ArcGIS "UTM_Bangladesh_(BTM)"): same as EPSG:3106 but false northing -2 000 000 m
+  'BTM:BD': '+proj=tmerc +lat_0=0 +lon_0=90 +k=0.9996 +x_0=500000 +y_0=-2000000 +a=6377276.345 +rf=300.8017 +towgs84=283.729,735.942,261.143,0,0,0,0 +units=m +no_defs',
 };
 for (let z = 1; z <= 60; z++) {
   DEFS[`EPSG:${32600 + z}`] = `+proj=utm +zone=${z} +datum=WGS84 +units=m +no_defs`;
   DEFS[`EPSG:${32700 + z}`] = `+proj=utm +zone=${z} +south +datum=WGS84 +units=m +no_defs`;
 }
 export const NAMES = {
-  'EPSG:4326': 'WGS 84 (geographic)', 'EPSG:3857': 'WGS 84 / Web Mercator', 'EPSG:3106': 'Gulshan 303 / BTM (Bangladesh TM)',
+  'EPSG:4326': 'WGS 84 (geographic)', 'EPSG:3857': 'WGS 84 / Web Mercator', 'EPSG:3106': 'Gulshan 303 / Bangladesh TM, EPSG version (false northing 0)', 'BTM:BD': 'BTM, Bangladesh practice (Gulshan 303, false northing −2 000 000)',
   'EPSG:4682': 'Gulshan 303 (geographic)',
   'EPSG:32645': 'WGS 84 / UTM zone 45N', 'EPSG:32646': 'WGS 84 / UTM zone 46N',
 };
-export const COMMON = ['EPSG:4326', 'EPSG:32646', 'EPSG:32645', 'EPSG:3106', 'EPSG:3857', 'EPSG:4682'];
+export const COMMON = ['EPSG:4326', 'EPSG:32646', 'EPSG:32645', 'BTM:BD', 'EPSG:3106', 'EPSG:3857', 'EPSG:4682'];
 Object.entries(DEFS).forEach(([k, v]) => proj4.defs(k, v));
 /** Definitions registered at run time (epsg.io lookups, .prj WKT, custom proj4), so workers can be told about them. */
 export const EXTRA = {};
@@ -46,8 +49,28 @@ export async function ensureCrs(code) {
   remember(code, txt); NAMES[code] = NAMES[code] || `EPSG:${m[1]}`;
   return code;
 }
+/**
+ * Repair a .prj before use. ArcGIS writes the Gulshan 303 datum without a TOWGS84 shift, so proj4 would treat it as
+ * WGS 84 and every coordinate would be off by a few hundred metres. Add the EPSG 1919 shift when it is missing.
+ * Returns { wkt, fixed } where fixed names what was changed (or is null).
+ */
+export function fixPrj(wkt) {
+  if (!wkt || /TOWGS84/i.test(wkt) || !/DATUM\["[^"]*gulshan/i.test(wkt)) return { wkt, fixed: null };
+  const out = wkt.replace(/(DATUM\["[^"]*gulshan[^"]*",\s*SPHEROID\[[^\]]*\])/i, '$1,TOWGS84[283.729,735.942,261.143,0,0,0,0]');
+  return out === wkt ? { wkt, fixed: null } : { wkt: out, fixed: 'Gulshan 303 datum shift to WGS 84 added (EPSG transformation 1919)' };
+}
+/** The -t_srs / -s_srs argument for GDAL: EPSG codes as they are, anything else as its proj4 definition. */
+export function srsArg(code) {
+  if (!code || /^EPSG:\d+$/.test(code)) return code;
+  const d = DEFS[code] || EXTRA[code];
+  return typeof d === 'string' ? d : code; // proj4 string or WKT: GDAL reads both
+}
+/** Short label for a layer's coordinate system, used when several layers are compared. */
+export const crsLabel = (code) => crsName(code) + (code && /^EPSG:\d+$/.test(code) ? ` (${code})` : '');
+
 /** Register a CRS from WKT (.prj) text; returns a code-like key. */
 export function registerWkt(wkt) {
+  wkt = fixPrj(wkt).wkt;
   const em = /AUTHORITY\["EPSG","(\d+)"\]\]\s*$/.exec(wkt.trim()) || /ID\["EPSG",(\d+)\]\]\s*$/.exec(wkt.trim());
   if (em && isKnown(`EPSG:${em[1]}`)) return `EPSG:${em[1]}`;
   const key = 'WKT:' + hash(wkt);

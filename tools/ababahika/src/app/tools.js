@@ -1,9 +1,8 @@
 // tools.js - the Analysis pane (catchment statistics), the Tools pane (geoprocessing) and the results drawer.
-import * as turf from '@turf/turf';
 import { state, on, byId, vectors, rasters } from './state.js';
 import { $, $$, h, toast, icon, fmt, download, esc } from './ui.js';
-import { DEFAULT_SLOPE_BREAKS, overlayAreas } from '../engine/zonal.js';
-import { crsName, isGeographic, EXTRA } from '../engine/crs.js';
+import { DEFAULT_SLOPE_BREAKS } from '../engine/zonal.js';
+import { crsName, isGeographic, EXTRA, crsLabel } from '../engine/crs.js';
 import { projectRaster, clipRaster, mergeRasters, clipVector, dissolve } from './gp.js';
 import { openRaster } from '../engine/raster.js';
 import { qualColor } from './palettes.js';
@@ -24,21 +23,40 @@ function runZonal(L, features, mode, opts, progress) {
   const id = ++jobSeq, w = getWorker();
   return { id, promise: new Promise((resolve, reject) => { pending.set(id, { resolve, reject, progress }); w.postMessage({ id, file: L.file, features, mode, opts: { ...opts, crsOverride: L.crsOverride || null }, crsDefs: EXTRA }); }) };
 }
+function runOverlay(L, features, field, progress) {
+  const id = ++jobSeq, w = getWorker();
+  const layer = L.fc.features.map((f) => ({ type: 'Feature', properties: { [field]: f.properties[field] }, geometry: f.geometry }));
+  return { id, promise: new Promise((resolve, reject) => { pending.set(id, { resolve, reject, progress }); w.postMessage({ id, cmd: 'overlay', features, layer, field, crsDefs: EXTRA }); }) };
+}
 const cancelAll = () => { for (const id of pending.keys()) worker && worker.postMessage({ id, cmd: 'cancel' }); };
 
 // ---------------- analysis pane ----------------
 const A = { zones: '', nameField: '', doSlope: true, dem: '', slopeUnit: 'deg', breaks: DEFAULT_SLOPE_BREAKS.slice(0, -1).join(', '), zFactor: 1,
-  doLulc: true, lulc: '', doSoil: true, soil: '', soilField: '', area: 'km2' };
+  doLulc: true, lulc: '', lulcField: '', doSoil: true, soil: '', soilField: '', area: 'km2' };
 
 function opt(list, val, label) { return list.map((l) => h('option', { value: l.id, selected: l.id === val }, label ? label(l) : l.name)); }
 function pickDefaults() {
   const polys = vectors('polygon'), rs = rasters();
-  if (!byId(A.zones) || byId(A.zones).geom !== 'polygon') A.zones = (polys.find((l) => /catch|basin|watershed|sub|zone|union|upazila|district/i.test(l.name)) || polys[0] || {}).id || '';
+  // catchments: until the user picks one, the best-named polygon layer (layers loaded later can be better: LULC before SubCat)
+  if (!A.zonesByUser || !byId(A.zones) || byId(A.zones).geom !== 'polygon') {
+    const classLayer = /lulc|land.?use|land.?cover|landcover|soil|texture|hsg/i;
+    A.zones = (polys.find((l) => /catch|basin|watershed|sub|zone|union|upazila|district|polder/i.test(l.name) && !classLayer.test(l.name))
+      || polys.find((l) => !classLayer.test(l.name)) || polys[0] || {}).id || '';
+  }
   const Z = byId(A.zones);
-  if (Z && !Z.fields.some((f) => f.name === A.nameField)) A.nameField = (Z.fields.find((f) => /name|id|code|basin|catch/i.test(f.name)) || Z.fields[0] || {}).name || '';
+  if (Z && (A.nameZones !== Z.id || !Z.fields.some((f) => f.name === A.nameField))) {
+    // a name field only when it tells the catchments apart (every value present and different); otherwise feature numbers
+    const unique = (n) => { const v = Z.fc.features.map((ft) => ft.properties[n]); return v.every((x) => x != null && String(x).trim() !== '') && new Set(v.map(String)).size === v.length; };
+    const named = Z.fields.filter((f) => /name|id|code|basin|catch/i.test(f.name));
+    A.nameField = ((named.find((f) => unique(f.name))) || {}).name || '';
+    A.nameZones = Z.id;
+  }
   if (!byId(A.dem)) A.dem = (rs.find((l) => l.role === 'dem') || rs.find((l) => l.sym.type === 'continuous') || {}).id || '';
-  if (!byId(A.lulc)) A.lulc = (rs.find((l) => l.role === 'lulc') || {}).id || '';
-  if (!byId(A.soil)) A.soil = (rs.find((l) => l.role === 'soil') || polys.find((l) => l.id !== A.zones && /soil|texture|hsg/i.test(l.name)) || {}).id || '';
+  // land cover: a class raster, or a polygon layer with a class field (e.g. a LULC shapefile)
+  if (!byId(A.lulc) || A.lulc === A.zones) A.lulc = (rs.find((l) => l.role === 'lulc') || polys.find((l) => l.id !== A.zones && /lulc|land.?use|land.?cover|landcover|\blu\b|\blc\b/i.test(l.name)) || {}).id || '';
+  const L = byId(A.lulc);
+  if (L && L.type === 'vector' && !L.fields.some((f) => f.name === A.lulcField)) A.lulcField = (L.fields.find((f) => /lulc|land.?use|land.?cover|class|type|desc|name|category|lu_?\w*/i.test(f.name)) || L.fields[0] || {}).name || '';
+  if (!byId(A.soil) || A.soil === A.zones) A.soil = (rs.find((l) => l.role === 'soil') || polys.find((l) => l.id !== A.zones && l.id !== A.lulc && /soil|texture|hsg/i.test(l.name)) || {}).id || '';
   const S = byId(A.soil);
   if (S && S.type === 'vector' && !S.fields.some((f) => f.name === A.soilField)) A.soilField = (S.fields.find((f) => /text|soil|class|type|hsg/i.test(f.name)) || S.fields[0] || {}).name || '';
 }
@@ -47,8 +65,9 @@ function renderAnalysis() {
   const pane = $('#pane-analysis'); pane.innerHTML = '';
   const polys = vectors('polygon'), rs = rasters();
   pane.append(h('p.lead', 'Slope, land cover and soil composition for every catchment, in one run.'));
-  if (!polys.length || !rs.length) {
-    pane.append(h('div.callout', h('b', 'Add your data first'), h('p', 'You need a polygon layer of catchments and at least one raster (DEM, LULC or soil). Drop the files on the map or use ', h('b', '＋ Add data'), '.'),
+  // catchments plus something to summarise: a raster (DEM, LULC, soil) or a second polygon layer (LULC or soil polygons)
+  if (!polys.length || (!rs.length && polys.length < 2)) {
+    pane.append(h('div.callout', h('b', 'Add your data first'), h('p', 'You need a polygon layer of catchments and at least one map to summarise: a raster (DEM, LULC or soil) or a land-cover / soil polygon layer. Drop the files on the map or use ', h('b', '＋ Add data'), '.'),
       h('p.hint', 'Shapefile (.zip or .shp + .dbf + .prj together), GeoJSON, GeoPackage, KML · GeoTIFF of any size; .img/.asc are converted.'),
       h('button.link', { type: 'button', on: { click: () => $('#demoBtn').click() } }, 'Or load the demo data')));
     return;
@@ -57,7 +76,7 @@ function renderAnalysis() {
   const sel = (key, list, label, onch) => h('select', { on: { change: (e) => { A[key] = e.target.value; if (onch) onch(); renderAnalysis(); } } }, opt(list, A[key], label));
   const Z = byId(A.zones);
   pane.append(h('section.step', h('h4', h('span.n', '1'), 'Catchments'),
-    f('Polygon layer', sel('zones', polys, (l) => `${l.name} (${l.fc.features.length})`)),
+    f('Polygon layer', sel('zones', polys, (l) => `${l.name} (${l.fc.features.length})`, () => { A.zonesByUser = true; })),
     Z ? f('Name field', h('select', { on: { change: (e) => { A.nameField = e.target.value; } } }, [h('option', { value: '' }, '(feature number)'), ...Z.fields.map((x) => h('option', { value: x.name, selected: x.name === A.nameField }, x.name))])) : null));
 
   const chk = (key, title) => h('label.check.big', h('input', { type: 'checkbox', checked: A[key], on: { change: (e) => { A[key] = e.target.checked; renderAnalysis(); } } }), h('b', title));
@@ -72,8 +91,13 @@ function renderAnalysis() {
       h('details', h('summary', 'Z-factor'), f('Vertical unit factor', h('input', { type: 'number', step: 'any', value: A.zFactor, on: { change: (e) => { A.zFactor = +e.target.value || 1; } } }), '1 for elevations in metres; 0.3048 if elevations are in feet.'))));
   }
   sSlope.append(chk('doLulc', 'Land use / land cover'));
-  if (A.doLulc) sSlope.append(h('div.sub', f('LULC raster', sel('lulc', rs.filter((l) => l.sym.type === 'categorical'), (l) => l.name)),
-    !rs.some((l) => l.sym.type === 'categorical') ? h('p.hint.warn', 'No class raster loaded. A raster counts as classes when it has integer values (change it under its symbology).') : null));
+  if (A.doLulc) {
+    const lsrcs = [...rs.filter((l) => l.sym.type === 'categorical'), ...polys.filter((l) => l.id !== A.zones)];
+    const L = byId(A.lulc);
+    sSlope.append(h('div.sub', f('Land-cover map (raster or polygons)', sel('lulc', lsrcs, (l) => `${l.name} · ${l.type === 'raster' ? 'raster' : 'polygons'}`)),
+      L && L.type === 'vector' ? f('Class field', h('select', { on: { change: (e) => { A.lulcField = e.target.value; } } }, L.fields.map((x) => h('option', { value: x.name, selected: x.name === A.lulcField }, x.name)))) : null,
+      !lsrcs.length ? h('p.hint.warn', 'No land-cover map loaded: add a class raster (integer values) or a polygon layer with a class field.') : null));
+  }
   sSlope.append(chk('doSoil', 'Soil texture'));
   if (A.doSoil) {
     const srcs = [...rs.filter((l) => l.sym.type === 'categorical'), ...polys.filter((l) => l.id !== A.zones)];
@@ -100,22 +124,27 @@ async function run() {
   const btn = $('#runA'), prog = $('#runProg');
   const tasks = [];
   if (A.doSlope && byId(A.dem)) tasks.push({ key: 'slope', L: byId(A.dem), mode: 'slope' });
-  if (A.doLulc && byId(A.lulc)) tasks.push({ key: 'lulc', L: byId(A.lulc), mode: 'categorical' });
-  if (A.doSoil && byId(A.soil)) tasks.push({ key: 'soil', L: byId(A.soil), mode: byId(A.soil).type === 'raster' ? 'categorical' : 'overlay' });
+  if (A.doLulc && byId(A.lulc)) tasks.push({ key: 'lulc', L: byId(A.lulc), mode: byId(A.lulc).type === 'raster' ? 'categorical' : 'overlay', field: A.lulcField });
+  if (A.doSoil && byId(A.soil)) tasks.push({ key: 'soil', L: byId(A.soil), mode: byId(A.soil).type === 'raster' ? 'categorical' : 'overlay', field: A.soilField });
   if (!tasks.length) { toast('Choose at least one dataset to calculate.', 'warn'); return; }
+  // Layers made in different coordinate systems: say so, then bring them together and carry on
+  const used = [Z, ...tasks.map((t) => t.L)].filter((L, i, a) => a.indexOf(L) === i);
+  const crsSet = [...new Set(used.map((L) => L.crs || 'EPSG:4326'))];
+  if (crsSet.length > 1 && !(await confirmCrs(used))) return;
   const br = parseBreaks();
   btn.disabled = true; btn.textContent = 'Calculating…';
   prog.replaceChildren(...tasks.map((t) => h('div.prog', { 'data-k': t.key }, h('span', `${t.key === 'slope' ? 'Slope' : t.key === 'lulc' ? 'Land cover' : 'Soil'} · ${t.L.name}`), h('i', h('b', { style: { width: '0%' } })))));
   prog.append(h('button.link', { type: 'button', on: { click: cancelAll } }, 'Cancel'));
   const features = Z.fc.features.map((ft) => ({ type: 'Feature', properties: ft.properties, geometry: ft.geometry }));
-  const out = { zones: Z.id, zonesName: Z.name, nameField: A.nameField, area: A.area, names: features.map((ft, i) => (A.nameField ? String(ft.properties[A.nameField] ?? i + 1) : String(i + 1))), breaks: br, slopeUnit: A.slopeUnit, at: new Date() };
+  const out = { crsMixed: crsSet.length > 1 ? used.map((L) => `"${L.name}" (${crsLabel(L.crs || 'EPSG:4326')})`) : null, zones: Z.id, zonesName: Z.name, nameField: A.nameField, area: A.area, names: features.map((ft, i) => (A.nameField ? String(ft.properties[A.nameField] ?? i + 1) : String(i + 1))), breaks: br, slopeUnit: A.slopeUnit, at: new Date() };
   const t0 = performance.now();
   try {
     await Promise.all(tasks.map(async (t) => {
       const bar = prog.querySelector(`[data-k="${t.key}"] b`);
       if (t.mode === 'overlay') {
-        out.soil = overlayAreas(features, t.L.fc.features, A.soilField, (a, b) => turf.intersect(turf.featureCollection([a, b])));
-        out.soilSrc = { name: t.L.name, type: 'polygons', field: A.soilField }; bar.style.width = '100%'; return;
+        // polygon class layer (soil or land cover): intersect each catchment with the class polygons
+        out[t.key] = (await runOverlay(t.L, features, t.field, (p) => { bar.style.width = `${Math.round(p * 100)}%`; }).promise).result;
+        out[t.key + 'Src'] = { name: t.L.name, type: 'polygons', field: t.field }; bar.style.width = '100%'; return;
       }
       const job = runZonal(t.L, features, t.mode, { breaks: br.deg, zFactor: A.zFactor }, (p) => { bar.style.width = `${Math.round(p * 100)}%`; });
       const r = await job.promise; bar.style.width = '100%';
@@ -130,6 +159,24 @@ async function run() {
     toast(`Done in ${out.seconds.toFixed(1)} s. Results were added to ${Z.name}'s attributes.`, 'ok');
   } catch (e) { toast(e.message === 'Cancelled' ? 'Cancelled.' : e.message, e.message === 'Cancelled' ? 'info' : 'error', 9000); console.error(e); }
   btn.disabled = false; btn.replaceChildren(icon('play'), ' Calculate');
+}
+
+/** Tell the user the inputs are in different coordinate systems and how they are matched. Resolves true to continue. */
+function confirmCrs(layers) {
+  return new Promise((res) => {
+    const list = h('ul', layers.map((L) => h('li', h('b', L.name), ' — ', crsLabel(L.crs || 'EPSG:4326'))));
+    let done = false;
+    const end = (ok) => { if (done) return; done = true; if (d.open) d.close(); d.remove(); res(ok); };
+    const btn = (sel, label, ok, extra = {}) => h(sel, { type: 'button', ...extra, on: { click: () => end(ok) } }, label);
+    const d = h('dialog.modal', h('form', { on: { submit: (e) => e.preventDefault() } },
+      h('header', h('h3', 'Layers in different coordinate systems'), btn('button.ib', icon('x'), false, { 'aria-label': 'Close' })),
+      h('div.form', h('p', 'The selected layers were made in different coordinate systems:'), list,
+        h('p', 'They will be matched automatically: polygon layers are already converted to WGS 84 (with the datum shift), catchments are reprojected onto each raster’s own grid, and areas are measured in each catchment’s UTM zone. Nothing in your files is changed.')),
+      h('footer', btn('button', 'Cancel', false), btn('button.primary', 'Reproject and continue', true))));
+    document.body.append(d);
+    d.addEventListener('close', () => end(false)); // Esc
+    d.showModal();
+  });
 }
 
 // ---------------- results ----------------
@@ -266,9 +313,12 @@ async function exportExcel(o) {
 function methodsText(o) {
   const p = [];
   const cell = (s) => (s.geographic ? `${(s.cell * 3600).toPrecision(3)} arc-second` : `${+s.cell.toPrecision(4)} m`);
-  p.push(`Catchment statistics were computed for ${o.names.length} polygons (${o.zonesName}) with Ababahika v0.1 (Joy 2026), which runs in the web browser. Polygons were reprojected to each raster's coordinate system with PROJ (proj4js). A cell was assigned to a catchment when its centre lies inside the polygon (GDAL rasterisation rule, equivalent to ArcGIS Zonal Statistics). Areas are true cell areas${[o.slopeSrc, o.lulcSrc, o.soilSrc].some((s) => s && s.geographic) ? ' (exact ellipsoidal WGS 84 cell areas for rasters in geographic coordinates)' : ''}; catchment areas are geodesic on WGS 84.`);
+  p.push(`Catchment statistics were computed for ${o.names.length} polygons (${o.zonesName}) with Ababahika v0.2 (Joy 2026), which runs in the web browser. Polygons were reprojected to each raster's coordinate system with PROJ (proj4js). A cell was assigned to a catchment when its centre lies inside the polygon (GDAL rasterisation rule, equivalent to ArcGIS Zonal Statistics). Areas are true cell areas${[o.slopeSrc, o.lulcSrc, o.soilSrc].some((s) => s && s.geographic) ? ' (exact ellipsoidal WGS 84 cell areas for rasters in geographic coordinates)' : ''}; catchment areas are geodesic on WGS 84.`);
   if (o.slope) p.push(`Slope was derived from the ${cell(o.slopeSrc)} DEM "${o.slopeSrc.name}" with Horn's (1981) third-order finite-difference method, as in ArcGIS Slope and GDAL gdaldem${o.slopeSrc.geographic ? '; for the geographic DEM the horizontal spacing of each row was converted to metres from the WGS 84 radii of curvature at its latitude' : ''}. NoData neighbours were replaced by the centre cell value. For each catchment the mean, standard deviation, median and 10th/90th percentiles of slope (degrees; percent slope = 100·tan θ) and the area in the classes ${breaksLabels(o).join(', ')} are reported, with the mean, minimum and maximum elevation, relief and hypsometric integral (mean − min)/(max − min).`);
-  if (o.lulc) p.push(`Land cover was summarised from "${o.lulcSrc.name}" (${cell(o.lulcSrc)} cells) as the area and percentage of each class within each catchment; percentages are of the catchment area with valid (non-NoData) cells.`);
+  if (o.crsMixed) p.push(`The input layers were in different coordinate systems (${o.crsMixed.join('; ')}). Vector layers were converted to WGS 84 on loading (Gulshan 303 to WGS 84 by EPSG transformation 1919: ΔX = 283.729, ΔY = 735.942, ΔZ = 261.143 m, where applicable) and the catchments were reprojected to each raster's coordinate system before the statistics were computed.`);
+  if (o.lulc) p.push(o.lulcSrc.type === 'polygons'
+    ? `Land cover was summarised by intersecting the catchments with the land-cover polygons "${o.lulcSrc.name}" (field ${o.lulcSrc.field}) using Turf.js, as the area and percentage of each class within each catchment; intersection areas were measured in the UTM zone of each catchment, and percentages are of the catchment area covered by the land-cover polygons.`
+    : `Land cover was summarised from "${o.lulcSrc.name}" (${cell(o.lulcSrc)} cells) as the area and percentage of each class within each catchment; percentages are of the catchment area with valid (non-NoData) cells.`);
   if (o.soil) p.push(o.soilSrc.type === 'polygons' ? `Soil texture shares were computed by intersecting the catchments with the soil polygons "${o.soilSrc.name}" (field ${o.soilSrc.field}) using Turf.js; intersection areas were measured in the UTM zone of each catchment.` : `Soil texture was summarised from "${o.soilSrc.name}" (${cell(o.soilSrc)} cells) in the same way as land cover.`);
   p.push('References: Horn, B.K.P. (1981). Hill shading and the reflectance map. Proceedings of the IEEE, 69(1), 14–47. · Strahler, A.N. (1952). Hypsometric (area-altitude) analysis of erosional topography. GSA Bulletin, 63, 1117–1142.');
   return p.join('\n\n');
@@ -391,6 +441,9 @@ function renderTools() {
     go('Open export…', async () => { app.renderLayerPanel(); const L = byId(inp.value); state.selected = L.id; app.renderLayerPanel(); app.openPanel('layer'); document.querySelector('#pane-layer [aria-label="Export"]').click(); });
   }
 }
+
+/** Point the catchment-statistics pane at a polygon layer (e.g. new drainage units). */
+export function useZones(id) { A.zones = id; A.zonesByUser = true; A.nameZones = id; const Z = byId(id); A.nameField = Z && Z.fields.some((x) => x.name === 'name') ? 'name' : ''; renderAnalysis(); app.openPanel('analysis'); }
 
 export function initTools(callbacks) {
   app = callbacks;

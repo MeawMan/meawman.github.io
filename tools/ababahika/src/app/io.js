@@ -2,7 +2,8 @@
 import shp from 'shpjs';
 import proj4 from 'proj4';
 import { openRaster } from '../engine/raster.js';
-import { ensureCrs, registerWkt, isKnown } from '../engine/crs.js';
+import { ensureCrs, registerWkt, isKnown, fixPrj } from '../engine/crs.js';
+import { unzipSync, strFromU8 } from 'fflate';
 import { gdalToGeoJSON, gdalToGeoTiff } from './gp.js';
 
 const ext = (n) => (n.match(/\.([^.]+)$/) || [, ''])[1].toLowerCase();
@@ -27,18 +28,25 @@ export function groupFiles(files) {
 export async function loadJob(job, onStatus = () => {}) {
   if (job.kind === 'shp') {
     const p = job.parts;
-    const prj = p.prj ? await p.prj.text() : null;
-    const fc = await shp({ shp: await p.shp.arrayBuffer(), dbf: p.dbf ? await p.dbf.arrayBuffer() : undefined, prj: prj || undefined, cpg: p.cpg ? await p.cpg.text() : undefined });
-    checkLonLat(fc, job.name);
-    return [{ type: 'vector', name: job.name, fc: tidy(fc), srcCrs: prj ? registerWkt(prj) : null, warn: prj ? null : 'No .prj file: coordinates assumed to be longitude/latitude (WGS 84).' }];
+    return [await readShapefile(job.name, { shp: await p.shp.arrayBuffer(), dbf: p.dbf ? await p.dbf.arrayBuffer() : undefined,
+      prj: p.prj ? await p.prj.text() : null, cpg: p.cpg ? await p.cpg.text() : undefined })];
   }
   const f = job.file, e = ext(f.name);
   if (e === 'zip') {
-    const buf = await f.arrayBuffer();
-    let out = await shp(buf);
-    out = Array.isArray(out) ? out : [out];
-    out.forEach((fc) => checkLonLat(fc, f.name));
-    return out.map((fc) => ({ type: 'vector', name: fc.fileName ? fc.fileName.split('/').pop() : base(f.name), fc: tidy(fc) }));
+    // unzipped here (not inside shpjs) so that every .prj can be repaired before it is used
+    const files = unzipSync(new Uint8Array(await f.arrayBuffer()));
+    const sets = new Map();
+    for (const [path, data] of Object.entries(files)) {
+      const x = ext(path); if (!['shp', 'dbf', 'prj', 'cpg'].includes(x) || /__MACOSX/.test(path)) continue;
+      const k = path.replace(/\.[^.]+$/, '').toLowerCase();
+      if (!sets.has(k)) sets.set(k, { name: base(path.split('/').pop()) });
+      sets.get(k)[x] = data;
+    }
+    const out = [];
+    for (const v of sets.values()) if (v.shp) out.push(await readShapefile(v.name, { shp: v.shp.buffer.slice(v.shp.byteOffset, v.shp.byteOffset + v.shp.byteLength),
+      dbf: v.dbf ? v.dbf.buffer.slice(v.dbf.byteOffset, v.dbf.byteOffset + v.dbf.byteLength) : undefined, prj: v.prj ? strFromU8(v.prj) : null, cpg: v.cpg ? strFromU8(v.cpg) : undefined }));
+    if (!out.length) throw new Error(`${f.name}: no shapefile (.shp) inside the zip`);
+    return out;
   }
   if (e === 'geojson' || e === 'json') {
     const fc = JSON.parse(await f.text());
@@ -67,6 +75,32 @@ export async function loadJob(job, onStatus = () => {}) {
     return [{ type: 'raster', name: base(f.name), raster, file, converted: true }];
   }
   throw new Error(`${f.name}: unsupported file type`);
+}
+
+/**
+ * One shapefile from its parts. The .prj is repaired first (fixPrj: e.g. the Gulshan 303 datum shift ArcGIS leaves out).
+ * Without a usable .prj, projected coordinates are not guessed: the layer comes back with needsCrs and the map asks
+ * which coordinate system it uses (see addFiles in main.js), then reprojects it.
+ */
+async function readShapefile(name, parts) {
+  const fx = parts.prj ? fixPrj(parts.prj) : { wkt: null, fixed: null };
+  const fc = await shp({ shp: parts.shp, dbf: parts.dbf, prj: fx.wkt || undefined, cpg: parts.cpg });
+  if (projectedCoords(fc)) {
+    return { type: 'vector', name, fc: tidy(fc), srcCrs: null, needsCrs: true,
+      why: fx.wkt ? 'its .prj file could not be read' : 'it has no .prj file' };
+  }
+  return { type: 'vector', name, fc: tidy(fc), srcCrs: fx.wkt ? registerWkt(fx.wkt) : null,
+    info: fx.fixed ? `${name}: ${fx.fixed}.` : null,
+    warn: fx.wkt ? null : 'No .prj file: coordinates assumed to be longitude/latitude (WGS 84).' };
+}
+/** True when the first coordinates are outside longitude/latitude range, i.e. still projected (metres). */
+function projectedCoords(fc) {
+  for (const ft of (fc.features || []).slice(0, 50)) {
+    if (!ft.geometry) continue;
+    let c = ft.geometry.coordinates; while (Array.isArray(c[0])) c = c[0];
+    return Math.abs(c[0]) > 180 || Math.abs(c[1]) > 90;
+  }
+  return false;
 }
 
 /** shpjs silently keeps projected coordinates when it cannot read a .prj: refuse rather than misplace the layer. */

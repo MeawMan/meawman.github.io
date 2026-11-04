@@ -1,0 +1,10 @@
+{
+"type": "FeatureCollection",
+"name": "khals",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "name": "Main khal" }, "geometry": { "type": "LineString", "coordinates": [ [ 92.361958256643803, 22.767286832647091 ], [ 92.36059808079564, 22.74560140636023 ], [ 92.362199073960738, 22.715391224151535 ] ] } },
+{ "type": "Feature", "properties": { "name": "East khal" }, "geometry": { "type": "LineString", "coordinates": [ [ 92.362058944580937, 22.745607246344878 ], [ 92.379626036864508, 22.73754639686598 ], [ 92.393807603728916, 22.734890803806564 ] ] } },
+{ "type": "Feature", "properties": { "name": "North khal" }, "geometry": { "type": "LineString", "coordinates": [ [ 92.341528970981571, 22.761783900621872 ], [ 92.353255506978073, 22.753701843925391 ], [ 92.36059808079564, 22.74560140636023 ] ] } }
+]
+}

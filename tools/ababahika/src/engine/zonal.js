@@ -107,7 +107,7 @@ export async function zonal(raster, features, mode, opts = {}) {
   const res = polys.map((p) => (p ? { outside: !(p.bbox[2] > m.left && p.bbox[0] < m.right && p.bbox[3] > m.bottom && p.bbox[1] < m.top) } : null));
   if (X1 <= X0 || Y1 <= Y0) return finish();
   const wid = X1 - X0;
-  const block = Math.max(16, Math.min(1024, Math.floor(16e6 / Math.max(1, wid)))); // ~16 M cells per block
+  const th = m.tiled ? m.tileH : 1, block = Math.max(th, Math.floor(Math.max(16, Math.min(2048, 16e6 / Math.max(1, wid))) / th) * th); // ~16 M cells, whole tile rows
   const cellAreaRow = (r) => (geo ? cellAreaGeo(m.top - r * m.ry, m.top - (r + 1) * m.ry, m.rx) : m.rx * m.ry);
   const halo = mode === 'slope' ? 1 : 0;
 
@@ -187,6 +187,15 @@ export async function zonal(raster, features, mode, opts = {}) {
  * intersect: a function(polyA, polyB) -> GeoJSON geometry|null (turf.intersect), passed in to keep this module light.
  */
 export function overlayAreas(zones, layer, field, intersect, opts = {}) {
+  // Class polygons are split into their parts, each with its own box; a part that reaches a catchment's box is first cut
+  // to that box (Sutherland–Hodgman, linear time) so the exact intersection only sees the vertices near the catchment.
+  // Same result, far faster for detailed land-cover maps (hundreds of thousands of vertices).
+  const parts = [];
+  for (const f of layer) {
+    const g = f && f.geometry; if (!g) continue;
+    const key = f.properties ? String(f.properties[field]) : '';
+    for (const rings of g.type === 'Polygon' ? [g.coordinates] : g.type === 'MultiPolygon' ? g.coordinates : []) parts.push({ key, rings, box: bboxOf({ coordinates: rings }) });
+  }
   return zones.map((z, i) => {
     let lon = 0, lat = 0, k = 0;
     const g = z.geometry, polys = g.type === 'Polygon' ? [g.coordinates] : g.coordinates;
@@ -197,17 +206,51 @@ export function overlayAreas(zones, layer, field, intersect, opts = {}) {
       let a = 0; for (const p of ps) p.forEach((ring, j) => { const ar = ringAreaPlanar(ring.map((c) => fw([c[0], c[1]]))); a += j ? -ar : ar; }); return a;
     };
     const zb = bboxOf(z), out = new Map(); let total = 0;
-    for (const f of layer) {
-      if (!f.geometry || !overlaps(zb, bboxOf(f))) continue;
-      const x = intersect(z, f); if (!x) continue;
+    const pad = Math.max(zb[2] - zb[0], zb[3] - zb[1]) * 1e-3, cb = [zb[0] - pad, zb[1] - pad, zb[2] + pad, zb[3] + pad];
+    // the parts near this catchment, cut to its box and gathered per class: one exact intersection per class
+    const near = new Map();
+    for (const pt of parts) {
+      if (!overlaps(zb, pt.box)) continue;
+      const inside = pt.box[0] >= cb[0] && pt.box[1] >= cb[1] && pt.box[2] <= cb[2] && pt.box[3] <= cb[3];
+      let rings = pt.rings;
+      if (!inside) {
+        const outer = clipRing(pt.rings[0], cb); if (outer.length < 4) continue; // nothing of this part is in the box
+        rings = [outer, ...pt.rings.slice(1).map((r) => clipRing(r, cb)).filter((r) => r.length >= 4)];
+      }
+      if (!near.has(pt.key)) near.set(pt.key, []);
+      near.get(pt.key).push(rings);
+    }
+    for (const [key, polys] of near) {
+      const x = intersect(z, { type: 'Feature', properties: {}, geometry: { type: 'MultiPolygon', coordinates: polys } }); if (!x) continue;
       const a = area(x.geometry || x); if (!(a > 0)) continue;
-      const key = f.properties ? String(f.properties[field]) : '';
       out.set(key, (out.get(key) || 0) + a); total += a;
     }
     const zoneArea = area(g);
     return { index: i, props: z.props || z.properties, polygonArea: zoneArea, validArea: total, coverage: zoneArea ? total / zoneArea : NaN, crs,
       classes: [...out].sort((a, b) => b[1] - a[1]).map(([value, a]) => ({ value, area: a, pct: total ? 100 * a / total : NaN })) };
   });
+}
+/** Cut a closed ring to a box (Sutherland–Hodgman). Returns a closed ring, or [] when nothing is left. */
+function clipRing(ring, b) {
+  let pts = ring;
+  const edges = [[(c) => c[0] >= b[0], (p, q) => [b[0], p[1] + (q[1] - p[1]) * (b[0] - p[0]) / (q[0] - p[0])]],
+    [(c) => c[0] <= b[2], (p, q) => [b[2], p[1] + (q[1] - p[1]) * (b[2] - p[0]) / (q[0] - p[0])]],
+    [(c) => c[1] >= b[1], (p, q) => [p[0] + (q[0] - p[0]) * (b[1] - p[1]) / (q[1] - p[1]), b[1]]],
+    [(c) => c[1] <= b[3], (p, q) => [p[0] + (q[0] - p[0]) * (b[3] - p[1]) / (q[1] - p[1]), b[3]]]];
+  for (const [inside, cut] of edges) {
+    if (!pts.length) break;
+    const out = []; let prev = pts[pts.length - 1], pin = inside(prev);
+    for (const cur of pts) {
+      const cin = inside(cur);
+      if (cin) { if (!pin) out.push(cut(prev, cur)); out.push(cur); } else if (pin) out.push(cut(prev, cur));
+      prev = cur; pin = cin;
+    }
+    pts = out;
+  }
+  if (pts.length < 3) return [];
+  const f = pts[0], l = pts[pts.length - 1];
+  if (f[0] !== l[0] || f[1] !== l[1]) pts.push([f[0], f[1]]);
+  return pts;
 }
 export function bboxOf(f) {
   const b = [Infinity, Infinity, -Infinity, -Infinity];

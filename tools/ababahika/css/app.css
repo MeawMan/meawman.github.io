@@ -99,6 +99,17 @@ table.kv{border-collapse:collapse;font-size:12px;width:100%}
 table.kv th{text-align:left;color:var(--dim);font-weight:500;padding:2px 8px 2px 0;vertical-align:top;white-space:nowrap}
 table.kv td{color:var(--strong);padding:2px 0;overflow-wrap:anywhere}
 
+.drawbar{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:6;display:flex;gap:8px;align-items:center;background:var(--panel);border:1px solid var(--accent);border-radius:10px;padding:6px 8px 6px 12px;box-shadow:var(--shadow);font-size:13px;max-width:calc(100% - 120px)}
+.drawbar button{padding:4px 10px}
+.summary{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;font-size:12.5px;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+.summary b{color:var(--strong);font-family:var(--mono);font-weight:600}
+.warnbox{border:1px solid color-mix(in srgb,var(--warn) 55%,transparent);background:color-mix(in srgb,var(--warn) 8%,transparent);color:var(--fg);border-radius:10px;padding:9px 11px;font-size:12.5px}
+.inl{display:flex;gap:6px;align-items:end}
+.inl>label{flex:1}
+.inl>button{flex:none;padding:6px 9px}
+.dl{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.dl button{font-weight:500;font-size:12px;text-align:left}
+
 /* ---------- drawer (tables) ---------- */
 .drawer{flex:none;height:min(42vh,420px);display:flex;flex-direction:column;background:var(--panel);border-top:1px solid var(--line2);box-shadow:0 -12px 30px -22px rgba(0,0,0,.6)}
 .drawer>header{display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--line);flex-wrap:wrap}
@@ -119,6 +130,7 @@ table.grid th:first-child{background:var(--panel2);z-index:3}
 table.grid td{padding:5px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
 table.grid td.n{text-align:right}
 table.grid td.note{color:var(--warn);font-size:11.5px}
+table.grid td.warnv{color:var(--warn);font-weight:700}
 table.grid tbody tr{cursor:pointer}
 table.grid tbody tr:hover td{background:color-mix(in srgb,var(--accent) 7%,var(--panel))}
 .dot{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:0}
@@ -129,7 +141,7 @@ table.grid tbody tr:hover td{background:color-mix(in srgb,var(--accent) 7%,var(-
 
 /* ---------- side panel ---------- */
 .stabs{display:flex;gap:2px;padding:6px 6px 0;border-bottom:1px solid var(--line);flex:none;align-items:flex-end}
-.stabs button{border:0;border-bottom:2px solid transparent;border-radius:0;background:none;padding:8px 10px;color:var(--dim);white-space:nowrap}
+.stabs button{border:0;border-bottom:2px solid transparent;border-radius:0;background:none;padding:8px 8px;color:var(--dim);white-space:nowrap;font-size:12.5px}
 .stabs button[aria-selected="true"]{color:var(--strong);border-bottom-color:var(--accent)}
 .stabs .collapse{margin-left:auto;border-radius:7px;align-self:center;font-size:18px;line-height:1;transition:transform .2s}
 .sidepane{flex:1;min-height:0;overflow:auto;padding:14px;display:flex;flex-direction:column;gap:14px}
@@ -198,4 +210,25 @@ dialog.modal footer{display:flex;justify-content:flex-end;gap:8px;padding:10px 1
   .side .collapse{transform:rotate(90deg)}
   .contents{width:250px}
   .drawer{height:50vh}
+}
+
+/* Portfolio: larger text on tablets and desktops (every size above is in px, so each group is raised by about
+   1 px here), and a slightly wider side panel so the larger text keeps its line breaks. Phones keep the sizes above. */
+@media (min-width: 901px) {
+  html[data-theme] body.gis { font-size: 15px; }
+  .side { width: 390px; }
+  h2, .tagline, .hint, label.f, table.kv, .dl button, .prog, .grp h4, .form .status { font-size: 13px; }
+  h4, button, input[type=text], input[type=number], select, textarea, .check, .lname, .empty, .lead, .callout,
+  .p.empty, .sidepane .empty, .toolcard b, .toast { font-size: 14px; }
+  h3, button.big, .check.big, .pane-head input { font-size: 15px; }
+  .summary, table.grid, table.classes, table.classes input[type=text], details.props summary, details summary { font-size: 13.5px; }
+  .lname small, .bm-menu b, table.grid th, table.grid td.note, .toolcard span, .legend-ramp, .statusbar { font-size: 12.5px; }
+  .prose { font-size: 14.5px; }
+}
+
+/* Portfolio: on phones the layers panel overlaid the full height (covering the bottom panel) and the zoom buttons sat
+   on top of it. It now ends where the bottom panel starts, and the zoom buttons move beside it while it is open. */
+@media (max-width: 900px) {
+  .contents { bottom: 46%; width: 230px; border-bottom: 1px solid var(--line2); }
+  .contents:not(.collapsed) ~ .mapwrap .ol-zoom { left: 240px; transition: left .2s; }
 }

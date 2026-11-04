@@ -56,7 +56,8 @@
     <div class="empty" id="emptyLayers">
       <p><b>Drop files on the map</b> or use <b>＋ Add data</b>.</p>
       <p class="hint">GeoTIFF (any size) · shapefile (.zip, or .shp + .dbf + .prj together) · GeoJSON · GeoPackage · KML</p>
-      <button class="link" type="button" id="demoBtn">Load demo data</button>
+      <button class="link" type="button" id="demoBtn">Demo: catchment statistics</button>
+      <button class="link" type="button" id="demoPolderBtn">Demo: polder drainage units</button>
     </div>
     <p class="hint tip">Drag layers to reorder · double-click to zoom · click the map to identify</p>
   </aside>
@@ -72,6 +73,7 @@
         <div class="bm-menu" id="basemapMenu" hidden><b>Basemap</b><div id="basemaps"></div></div>
       </div>
     </div>
+    <div class="drawbar" id="drawBar" hidden><span id="drawMsg"></span><button type="button" id="drawUndo">Undo</button><button type="button" class="primary" id="drawDone">Done</button></div>
     <div class="dropzone" aria-hidden="true"><span>Drop to add layers</span></div>
     <div id="popup" class="popup"><button class="x" id="popupClose" type="button" aria-label="Close">×</button><div id="popupBody"></div></div>
     <div class="statusbar"><span id="coords">Move over the map for coordinates</span><span id="scale"></span><span id="ver"></span></div>
@@ -85,11 +87,13 @@
   <aside class="side" id="side" aria-label="Panels">
     <nav class="stabs" id="sideTabs" role="tablist">
       <button type="button" role="tab" data-tab="analysis">Catchment stats</button>
+      <button type="button" role="tab" data-tab="hydro">Hydrology</button>
       <button type="button" role="tab" data-tab="tools">Tools</button>
       <button type="button" role="tab" data-tab="layer">Layer</button>
       <button class="ib collapse" type="button" id="sideToggle" title="Collapse panel" aria-label="Collapse panel">›</button>
     </nav>
     <div class="sidepane" id="pane-analysis"></div>
+    <div class="sidepane" id="pane-hydro" hidden></div>
     <div class="sidepane" id="pane-tools" hidden></div>
     <div class="sidepane" id="pane-layer" hidden></div>
   </aside>

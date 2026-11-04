@@ -2,6 +2,7 @@
 // Every operation runs inside GDAL's own worker; inputs are copied into its in-memory file system, so
 // the inputs and outputs of these tools must fit in browser memory (unlike zonal statistics, which stream).
 import { zipSync } from 'fflate';
+import { srsArg } from '../engine/crs.js';
 
 let gdalPromise = null;
 const BASE = new URL('../vendor/gdal/', import.meta.url).href;
@@ -64,7 +65,7 @@ const TIFF_OUT = ['-of', 'GTiff', '-co', 'TILED=YES', '-co', 'COMPRESS=DEFLATE',
 export async function projectRaster(file, { crs, resampling = 'near', res = null }, onStatus) {
   const G = await loadGdal(onStatus);
   const [ds] = await openFile(G, file);
-  const args = [...TIFF_OUT, '-t_srs', crs, '-r', resampling, ...(res ? ['-tr', String(res), String(res)] : [])];
+  const args = [...TIFF_OUT, '-t_srs', srsArg(crs), '-r', resampling, ...(res ? ['-tr', String(res), String(res)] : [])];
   const o = await G.gdalwarp(ds, args, uid('proj'));
   const b = new Blob([await bytes(G, o)], { type: 'image/tiff' }); await G.close(ds); return b;
 }
@@ -95,7 +96,7 @@ export async function mergeRasters(files, { crs = null, resampling = 'near', nod
   const G = await loadGdal(onStatus);
   const dss = [];
   for (const f of files) dss.push((await openFile(G, f))[0]);
-  const args = [...TIFF_OUT, '-r', resampling, ...(crs ? ['-t_srs', crs] : []), ...(nodata != null ? ['-srcnodata', String(nodata), '-dstnodata', String(nodata)] : [])];
+  const args = [...TIFF_OUT, '-r', resampling, ...(crs ? ['-t_srs', srsArg(crs)] : []), ...(nodata != null ? ['-srcnodata', String(nodata), '-dstnodata', String(nodata)] : [])];
   const o = await G.gdalwarp(dss, args, uid('mosaic'));
   const b = new Blob([await bytes(G, o)], { type: 'image/tiff' });
   for (const d of dss) await G.close(d);
@@ -137,7 +138,7 @@ export const VECTOR_FORMATS = {
 export async function exportVector(fc, name, { format = 'shp', crs = 'EPSG:4326' }, onStatus) {
   const G = await loadGdal(onStatus), F = VECTOR_FORMATS[format], nm = safe(name);
   const [ds] = await openFile(G, geojsonFile(fc, nm));
-  const args = ['-f', F.driver, ...(format === 'kml' ? [] : ['-t_srs', crs]), '-nln', nm, ...(format === 'shp' ? ['-lco', 'ENCODING=UTF-8'] : []), ...(format === 'csv' ? ['-lco', 'GEOMETRY=AS_WKT'] : [])];
+  const args = ['-f', F.driver, ...(format === 'kml' ? [] : ['-t_srs', srsArg(crs)]), '-nln', nm, ...(format === 'shp' ? ['-lco', 'ENCODING=UTF-8'] : []), ...(format === 'csv' ? ['-lco', 'GEOMETRY=AS_WKT'] : [])];
   const o = await G.ogr2ogr(ds, args, nm);
   let blob, filename;
   if (format === 'shp') {
