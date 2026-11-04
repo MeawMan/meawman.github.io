@@ -142,9 +142,10 @@ export async function addLayer(spec) {
     Object.assign(L, { raster: spec.raster, file: spec.file, meta: spec.raster.meta, crs: spec.raster.meta.crs });
     L.ol = new LayerGroup();
     if (!L.crs) {
-      const code = prompt(`${spec.name}: the coordinate system is not stored in the file.\nEnter its EPSG code (e.g. 32646 for UTM 46N, 4326 for WGS 84):`, '32646');
+      const m = spec.raster.meta;
+      const code = await askCrsDialog(spec.name, `The coordinate system is not stored in this GeoTIFF (top-left corner ${fmt(m.left, 1)}, ${fmt(m.top, 1)}). Choose the one it was made in; for an ArcGIS raster it is under Layer Properties → Source → Spatial Reference.`, guessXY(m.left, m.top), 'Use');
       if (!code) { toast(`${spec.name} not added (no coordinate system).`, 'warn'); return null; }
-      L.crs = await ensureCrs(`EPSG:${code.replace(/\D/g, '')}`); L.meta.crs = L.crs; L.meta.geographic = isGeographic(L.crs); L.crsOverride = L.crs;
+      L.crs = code; L.meta.crs = L.crs; L.meta.geographic = isGeographic(L.crs); L.crsOverride = L.crs;
     }
     reg();
     await prepareRaster(L);
@@ -492,21 +493,28 @@ function exportDialog(L) {
 }
 /** A coordinate system picker: common systems + any EPSG code. Returns {el, value():Promise<code>}. */
 /** A first guess from the coordinates in metres: northings below 1 500 000 are BTM as used in Bangladesh, larger ones UTM. */
+function guessXY(x, y) {
+  if (Math.abs(x) <= 180 && Math.abs(y) <= 90) return 'EPSG:4326';
+  if (y < 1.5e6 && x > 2e5 && x < 8e5) return 'BTM:BD';
+  return 'EPSG:32646';
+}
 function guessCrs(fc) {
   for (const f of fc.features || []) {
     if (!f.geometry) continue;
     let c = f.geometry.coordinates; while (Array.isArray(c[0])) c = c[0];
-    if (c[1] < 1.5e6 && c[0] > 2e5 && c[0] < 8e5) return 'BTM:BD';
-    return 'EPSG:32646';
+    return guessXY(c[0], c[1]);
   }
   return 'EPSG:32646';
 }
 /** Ask which coordinate system a layer without a usable .prj uses. Resolves to a code, or null when cancelled. */
 function askCrs(spec) {
-  const pk = crsPicker(guessCrs(spec.fc));
+  return askCrsDialog(spec.name, `The coordinates are in metres, but ${spec.why}. Choose the coordinate system the data was made in; the layer will be converted to WGS 84.`, guessCrs(spec.fc), 'Use and convert');
+}
+/** The coordinate-system question (list of common systems, or any EPSG code). Resolves to a code, or null. */
+function askCrsDialog(name, text, def, okLabel) {
+  const pk = crsPicker(def);
   return new Promise((res) => {
-    const d = modal(`${spec.name}: coordinate system`, h('div.form', h('p', `The coordinates are in metres, but ${spec.why}. Choose the coordinate system the data was made in; the layer will be converted to WGS 84.`), pk.el),
-      [h('button.primary', { value: 'ok' }, 'Use and convert')]);
+    const d = modal(`${name}: coordinate system`, h('div.form', h('p', text), pk.el), [h('button.primary', { value: 'ok' }, okLabel)]);
     let done = false;
     const end = async (ok) => { if (done) return; done = true; if (d.open) d.close(); if (!ok) return res(null); try { res(await pk.value()); } catch (e) { toast(e.message, 'error'); res(null); } };
     // answered from the buttons themselves (not only the dialog's close event)

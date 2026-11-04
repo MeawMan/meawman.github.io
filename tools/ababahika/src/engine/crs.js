@@ -10,6 +10,8 @@ const DEFS = {
   'EPSG:3106': '+proj=tmerc +lat_0=0 +lon_0=90 +k=0.9996 +x_0=500000 +y_0=0 +a=6377276.345 +rf=300.8017 +towgs84=283.729,735.942,261.143,0,0,0,0 +units=m +no_defs',
   'EPSG:4682': '+proj=longlat +a=6377276.345 +rf=300.8017 +towgs84=283.729,735.942,261.143,0,0,0,0 +no_defs', // Gulshan 303 geographic
   // BTM as used in Bangladesh practice (BWDB, SoB; ArcGIS "UTM_Bangladesh_(BTM)"): same as EPSG:3106 but false northing -2 000 000 m
+  // Transverse Mercator 90°E on WGS 84 with false northing 0 (common for DEMs in Bangladesh; ArcGIS "TRANSVERSE_MERCATOR_M_WGS84")
+  'TM90:WGS84': '+proj=tmerc +lat_0=0 +lon_0=90 +k=0.9996 +x_0=500000 +y_0=0 +datum=WGS84 +units=m +no_defs',
   'BTM:BD': '+proj=tmerc +lat_0=0 +lon_0=90 +k=0.9996 +x_0=500000 +y_0=-2000000 +a=6377276.345 +rf=300.8017 +towgs84=283.729,735.942,261.143,0,0,0,0 +units=m +no_defs',
 };
 for (let z = 1; z <= 60; z++) {
@@ -17,11 +19,11 @@ for (let z = 1; z <= 60; z++) {
   DEFS[`EPSG:${32700 + z}`] = `+proj=utm +zone=${z} +south +datum=WGS84 +units=m +no_defs`;
 }
 export const NAMES = {
-  'EPSG:4326': 'WGS 84 (geographic)', 'EPSG:3857': 'WGS 84 / Web Mercator', 'EPSG:3106': 'Gulshan 303 / Bangladesh TM, EPSG version (false northing 0)', 'BTM:BD': 'BTM, Bangladesh practice (Gulshan 303, false northing −2 000 000)',
+  'EPSG:4326': 'WGS 84 (geographic)', 'EPSG:3857': 'WGS 84 / Web Mercator', 'EPSG:3106': 'Gulshan 303 / Bangladesh TM, EPSG version (false northing 0)', 'BTM:BD': 'BTM, Bangladesh practice (Gulshan 303, false northing −2 000 000)', 'TM90:WGS84': 'Transverse Mercator 90°E, WGS 84 (k 0.9996, false northing 0)',
   'EPSG:4682': 'Gulshan 303 (geographic)',
   'EPSG:32645': 'WGS 84 / UTM zone 45N', 'EPSG:32646': 'WGS 84 / UTM zone 46N',
 };
-export const COMMON = ['EPSG:4326', 'EPSG:32646', 'EPSG:32645', 'BTM:BD', 'EPSG:3106', 'EPSG:3857', 'EPSG:4682'];
+export const COMMON = ['EPSG:4326', 'EPSG:32646', 'EPSG:32645', 'BTM:BD', 'TM90:WGS84', 'EPSG:3106', 'EPSG:3857', 'EPSG:4682'];
 Object.entries(DEFS).forEach(([k, v]) => proj4.defs(k, v));
 /** Definitions registered at run time (epsg.io lookups, .prj WKT, custom proj4), so workers can be told about them. */
 export const EXTRA = {};
@@ -92,7 +94,47 @@ export function epsgFromGeoKeys(k) {
   if (k.ProjectedCSTypeGeoKey && k.ProjectedCSTypeGeoKey !== 32767) return `EPSG:${k.ProjectedCSTypeGeoKey}`;
   if (k.GTModelTypeGeoKey === 2 && k.GeographicTypeGeoKey && k.GeographicTypeGeoKey !== 32767) return `EPSG:${k.GeographicTypeGeoKey}`;
   if (k.GeographicTypeGeoKey && !k.ProjectedCSTypeGeoKey && k.GeographicTypeGeoKey !== 32767) return `EPSG:${k.GeographicTypeGeoKey}`;
-  return null;
+  return customFromGeoKeys(k);
+}
+
+/**
+ * A user-defined ("custom") projection stored in GeoTIFF keys, as ArcGIS writes for e.g. "Transverse Mercator, WGS 84,
+ * central meridian 90°" without an EPSG code. Read the ESRI PE string (full WKT) when present, else build a proj4
+ * definition from the projection parameter keys. Returns a registered code, or null when the keys do not say enough.
+ */
+function customFromGeoKeys(k) {
+  const cit = [k.PCSCitationGeoKey, k.GTCitationGeoKey, k.GeogCitationGeoKey].filter(Boolean).join(' ');
+  const pe = /ESRI PE String = ((?:PROJCS|GEOGCS)[.*])/s.exec(cit);
+  if (pe) { try { const code = registerWkt(pe[1]); if (proj4.defs(code)) return code; } catch (e) { /* fall through to the keys */ } }
+  if (k.GTModelTypeGeoKey !== 1 || !k.ProjCoordTransGeoKey) return null;
+  // datum / ellipsoid
+  const gcs = k.GeographicTypeGeoKey, dat = k.GeogGeodeticDatumGeoKey;
+  let datum;
+  if (gcs === 4326 || dat === 6326) datum = '+datum=WGS84';
+  else if (gcs === 4682 || dat === 6682) datum = `+a=6377276.345 +rf=300.8017 ${'+towgs84=283.729,735.942,261.143,0,0,0,0'}`;
+  else if (k.GeogSemiMajorAxisGeoKey && k.GeogInvFlatteningGeoKey) datum = `+a=${k.GeogSemiMajorAxisGeoKey} +rf=${k.GeogInvFlatteningGeoKey}`;
+  else if (gcs && gcs !== 32767) return null; // another named datum: not guessed
+  else datum = '+datum=WGS84';
+  const lon0 = k.ProjNatOriginLongGeoKey ?? k.ProjCenterLongGeoKey ?? k.ProjFalseOriginLongGeoKey ?? 0;
+  const lat0 = k.ProjNatOriginLatGeoKey ?? k.ProjCenterLatGeoKey ?? k.ProjFalseOriginLatGeoKey ?? 0;
+  const x0 = k.ProjFalseEastingGeoKey ?? k.ProjFalseOriginEastingGeoKey ?? 0, y0 = k.ProjFalseNorthingGeoKey ?? k.ProjFalseOriginNorthingGeoKey ?? 0;
+  const unit = !k.ProjLinearUnitsGeoKey || k.ProjLinearUnitsGeoKey === 9001 ? '+units=m' : k.ProjLinearUnitsGeoKey === 9002 ? '+units=ft' : k.ProjLinearUnitsGeoKey === 9003 ? '+units=us-ft' : null;
+  if (!unit) return null;
+  const tail = `+lat_0=${lat0} +lon_0=${lon0} +x_0=${x0} +y_0=${y0} ${datum} ${unit} +no_defs`;
+  const P = {
+    1: () => `+proj=tmerc ${tail} +k=${k.ProjScaleAtNatOriginGeoKey ?? 1}`, // Transverse Mercator
+    7: () => `+proj=merc ${tail} +k=${k.ProjScaleAtNatOriginGeoKey ?? 1}`, // Mercator
+    8: () => `+proj=lcc +lat_1=${k.ProjStdParallel1GeoKey} +lat_2=${k.ProjStdParallel2GeoKey ?? k.ProjStdParallel1GeoKey} ${tail}`, // Lambert conformal conic 2SP
+    9: () => `+proj=lcc +lat_1=${lat0} ${tail} +k_0=${k.ProjScaleAtNatOriginGeoKey ?? 1}`, // Lambert conformal conic 1SP
+    11: () => `+proj=aea +lat_1=${k.ProjStdParallel1GeoKey} +lat_2=${k.ProjStdParallel2GeoKey} ${tail}`, // Albers equal area
+  }[k.ProjCoordTransGeoKey];
+  if (!P) return null;
+  const def = P();
+  if (/undefined/.test(def)) return null;
+  const tm = k.ProjCoordTransGeoKey === 1;
+  const cite = k.PCSCitationGeoKey && !pe ? String(k.PCSCitationGeoKey).split('|')[0].trim() : '';
+  const name = `${cite ? cite + ' — ' : ''}${tm ? 'Transverse Mercator' : 'custom projection'}, central meridian ${lon0}°${datum.includes('WGS84') ? ', WGS 84' : ''} (from the GeoTIFF)`;
+  return registerProj4(def, name);
 }
 
 // ---- WGS84 ellipsoid helpers (exact cell areas and metre cell sizes for geographic rasters) ----
