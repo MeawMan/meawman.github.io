@@ -194,8 +194,10 @@ function tables(o, unitKey = o.area) {
   const U = AREA[unitKey], T = {};
   const nm = o.names;
   const covWarn = (r) => (r && Number.isFinite(r.coverage) && r.coverage < 0.98 ? `${(r.coverage * 100).toFixed(1)}%` : '');
+  // class polygons that overlap each other count the shared area in each class: their total is then more than the catchment
+  const overlapWarn = (r) => (r && r.type === 'overlay' && r.coverage > 1.0005 ? `${(r.coverage * 100).toFixed(1)}%` : '');
   // summary
-  const head = ['Catchment', `Area (${U.label})`];
+  const head = ['Catchment', `Catchment area (${U.label})`];
   if (o.slope) head.push('Mean slope (°)', 'Median slope (°)', 'Mean slope (%)', 'Mean elevation', 'Relief');
   const lc = o.lulc ? classColumns(o.lulc, o.lulcSrc) : null, sc = o.soil ? classColumns(o.soil, o.soilSrc) : null;
   if (o.lulc) head.push('Dominant land cover', 'Share (%)');
@@ -209,7 +211,7 @@ function tables(o, unitKey = o.area) {
     if (o.lulc) r.push(...dom(l, o.lulcSrc));
     if (o.soil) r.push(...dom(so, o.soilSrc));
     const notes = [];
-    [['DEM', s], ['LULC', l], ['soil', so]].forEach(([k, x]) => { if (x && covWarn(x)) notes.push(`${k} covers ${covWarn(x)}`); if (x && x.cells === 0) notes.push(`no ${k} cells`); });
+    [['DEM', s], ['LULC', l], ['soil', so]].forEach(([k, x]) => { if (x && covWarn(x)) notes.push(`${k} covers ${covWarn(x)}`); if (x && overlapWarn(x)) notes.push(`${k} polygons overlap: classes add up to ${overlapWarn(x)} of the catchment`); if (x && x.cells === 0) notes.push(`no ${k} cells`); });
     r.push(notes.join('; '));
     return r;
   })];
@@ -220,8 +222,9 @@ function tables(o, unitKey = o.area) {
     T.slopeClasses = [['Catchment', ...lab.map((l) => `${l} (${U.label})`), ...lab.map((l) => `${l} (%)`)],
       ...o.slope.map((s, i) => [nm[i], ...(s.classes || []).map((c) => c.area * U.f), ...(s.classes || []).map((c) => c.pct)])];
   }
-  const classTable = (rows, cols) => [['Catchment', `Total (${U.label})`, ...cols.map((c) => `${c.name} (${U.label})`), ...cols.map((c) => `${c.name} (%)`), 'Coverage (%)'],
-    ...rows.map((x, i) => { const m = new Map((x.classes || []).map((c) => [c.value, c])); return [nm[i], x.validArea * U.f, ...cols.map((c) => (m.get(c.key)?.area || 0) * U.f), ...cols.map((c) => m.get(c.key)?.pct || 0), 100 * x.coverage]; })];
+  // catchment area, then the area the classes add up to (cells with data, or the overlaid class polygons), then each class
+  const classTable = (rows, cols) => [['Catchment', `Catchment area (${U.label})`, `Classes total (${U.label})`, ...cols.map((c) => `${c.name} (${U.label})`), ...cols.map((c) => `${c.name} (%)`), 'Coverage (%)'],
+    ...rows.map((x, i) => { const m = new Map((x.classes || []).map((c) => [c.value, c])); return [nm[i], x.polygonArea * U.f, x.validArea * U.f, ...cols.map((c) => (m.get(c.key)?.area || 0) * U.f), ...cols.map((c) => m.get(c.key)?.pct || 0), 100 * x.coverage]; })];
   if (o.lulc) T.lulc = classTable(o.lulc, lc);
   if (o.soil) T.soil = classTable(o.soil, sc);
   T._cols = { lc, sc };
@@ -317,9 +320,9 @@ function methodsText(o) {
   if (o.slope) p.push(`Slope was derived from the ${cell(o.slopeSrc)} DEM "${o.slopeSrc.name}" with Horn's (1981) third-order finite-difference method, as in ArcGIS Slope and GDAL gdaldem${o.slopeSrc.geographic ? '; for the geographic DEM the horizontal spacing of each row was converted to metres from the WGS 84 radii of curvature at its latitude' : ''}. NoData neighbours were replaced by the centre cell value. For each catchment the mean, standard deviation, median and 10th/90th percentiles of slope (degrees; percent slope = 100·tan θ) and the area in the classes ${breaksLabels(o).join(', ')} are reported, with the mean, minimum and maximum elevation, relief and hypsometric integral (mean − min)/(max − min).`);
   if (o.crsMixed) p.push(`The input layers were in different coordinate systems (${o.crsMixed.join('; ')}). Vector layers were converted to WGS 84 on loading (Gulshan 303 to WGS 84 by EPSG transformation 1919: ΔX = 283.729, ΔY = 735.942, ΔZ = 261.143 m, where applicable) and the catchments were reprojected to each raster's coordinate system before the statistics were computed.`);
   if (o.lulc) p.push(o.lulcSrc.type === 'polygons'
-    ? `Land cover was summarised by intersecting the catchments with the land-cover polygons "${o.lulcSrc.name}" (field ${o.lulcSrc.field}) using Turf.js, as the area and percentage of each class within each catchment; intersection areas were measured in the UTM zone of each catchment, and percentages are of the catchment area covered by the land-cover polygons.`
+    ? `Land cover was summarised by intersecting the catchments with the land-cover polygons "${o.lulcSrc.name}" (field ${o.lulcSrc.field}) using Turf.js, as the area and percentage of each class within each catchment; areas are geodesic on WGS 84, and percentages are of the total area of the land-cover classes within the catchment. Where land-cover polygons overlap one another, the shared area is counted in each class, so the classes can add up to slightly more than the catchment (reported as coverage above 100%).`
     : `Land cover was summarised from "${o.lulcSrc.name}" (${cell(o.lulcSrc)} cells) as the area and percentage of each class within each catchment; percentages are of the catchment area with valid (non-NoData) cells.`);
-  if (o.soil) p.push(o.soilSrc.type === 'polygons' ? `Soil texture shares were computed by intersecting the catchments with the soil polygons "${o.soilSrc.name}" (field ${o.soilSrc.field}) using Turf.js; intersection areas were measured in the UTM zone of each catchment.` : `Soil texture was summarised from "${o.soilSrc.name}" (${cell(o.soilSrc)} cells) in the same way as land cover.`);
+  if (o.soil) p.push(o.soilSrc.type === 'polygons' ? `Soil texture shares were computed by intersecting the catchments with the soil polygons "${o.soilSrc.name}" (field ${o.soilSrc.field}) using Turf.js; areas are geodesic on WGS 84.` : `Soil texture was summarised from "${o.soilSrc.name}" (${cell(o.soilSrc)} cells) in the same way as land cover.`);
   p.push('References: Horn, B.K.P. (1981). Hill shading and the reflectance map. Proceedings of the IEEE, 69(1), 14–47. · Strahler, A.N. (1952). Hypsometric (area-altitude) analysis of erosional topography. GSA Bulletin, 63, 1117–1142.');
   return p.join('\n\n');
 }

@@ -201,9 +201,10 @@ export function overlayAreas(zones, layer, field, intersect, opts = {}) {
     const g = z.geometry, polys = g.type === 'Polygon' ? [g.coordinates] : g.coordinates;
     for (const p of polys) for (const c of p[0]) { lon += c[0]; lat += c[1]; k++; }
     const crs = opts.crs || utmFor(lon / k, lat / k), fw = proj4('EPSG:4326', crs).forward;
+    // areas are geodesic on the WGS 84 ellipsoid (as for raster cells), or planar in opts.crs when one is given
     const area = (geom) => {
       const ps = geom.type === 'Polygon' ? [geom.coordinates] : geom.type === 'MultiPolygon' ? geom.coordinates : [];
-      let a = 0; for (const p of ps) p.forEach((ring, j) => { const ar = ringAreaPlanar(ring.map((c) => fw([c[0], c[1]]))); a += j ? -ar : ar; }); return a;
+      let a = 0; for (const p of ps) p.forEach((ring, j) => { const ar = opts.crs ? ringAreaPlanar(ring.map((c) => fw([c[0], c[1]]))) : ringAreaGeo(ring); a += j ? -ar : ar; }); return a;
     };
     const zb = bboxOf(z), out = new Map(); let total = 0;
     const pad = Math.max(zb[2] - zb[0], zb[3] - zb[1]) * 1e-3, cb = [zb[0] - pad, zb[1] - pad, zb[2] + pad, zb[3] + pad];
@@ -226,7 +227,7 @@ export function overlayAreas(zones, layer, field, intersect, opts = {}) {
       out.set(key, (out.get(key) || 0) + a); total += a;
     }
     const zoneArea = area(g);
-    return { index: i, props: z.props || z.properties, polygonArea: zoneArea, validArea: total, coverage: zoneArea ? total / zoneArea : NaN, crs,
+    return { index: i, type: 'overlay', props: z.props || z.properties, polygonArea: zoneArea, validArea: total, coverage: zoneArea ? total / zoneArea : NaN, crs: opts.crs || 'geodesic (WGS 84)',
       classes: [...out].sort((a, b) => b[1] - a[1]).map(([value, a]) => ({ value, area: a, pct: total ? 100 * a / total : NaN })) };
   });
 }
