@@ -232,30 +232,8 @@
       ]
     },
     {
-      "name": "Series Generator",
-      "group": "Data preparation",
-      "tagline": "Extend records with plausible synthetic years",
-      "description": "Learns the seasonal pattern, spread and day-to-day memory of a series, then fills the missing values or adds plausible years before or after the record. Includes an accuracy test for the filled values.",
-      "url": "tools/hydro-series/#generator",
-      "icon": "extend",
-      "accent": "violet",
-      "status": "live",
-      "updated": "2026-10-17",
-      "features": [
-        "Gap filling: model, random, linear or seasonal",
-        "Extend by years: statistical model or resampled years",
-        "Built-in accuracy test for filled holes",
-        "Multi-sheet workbooks, plots and Excel export"
-      ],
-      "tags": [
-        "Gap filling",
-        "Synthetic series",
-        "Discharge"
-      ]
-    },
-    {
       "name": "Min-Max-Avg Terminal",
-      "group": "Analysis",
+      "group": "Data preparation",
       "tagline": "Daily, monthly & yearly statistics from any time series",
       "description": "Load a water-level, discharge or rainfall record and get the minimum, maximum and average for every day, month and year — with an interactive range chart, a sortable table and Excel export.",
       "url": "tools/hydro-series/#minmax",
@@ -276,28 +254,25 @@
       ]
     },
     {
-      "name": "Dependability Analyzer",
-      "group": "Analysis",
-      "tagline": "Dependable water level, flow & rainfall for reports",
-      "description": "Rank a long record with the Weibull plotting position (or Gringorten, Cunnane, Hazen) and read off dependable low and high values at any P. Filter years and months, convert the datum (e.g. mPWD to mMSL), and export report-style figures, a dependability table, a methods paragraph and an Excel workbook.",
-      "url": "tools/dependability/",
-      "icon": "depend",
-      "accent": "lime",
+      "name": "Series Generator",
+      "group": "Data preparation",
+      "tagline": "Extend records with plausible synthetic years",
+      "description": "Learns the seasonal pattern, spread and day-to-day memory of a series, then fills the missing values or adds plausible years before or after the record. Includes an accuracy test for the filled values.",
+      "url": "tools/hydro-series/#generator",
+      "icon": "extend",
+      "accent": "violet",
       "status": "live",
-      "updated": "2026-10-25",
+      "updated": "2026-10-17",
       "features": [
-        "Dependable low and high values at any P",
-        "One value per year or every value, whole series or by month",
-        "Year and month filters, incomplete-year warnings",
-        "Datum conversion, e.g. mPWD to mMSL",
-        "Daily, monthly or yearly data, incl. Year × Jan…Dec tables",
-        "Reads BWDB files: title rows, REGULAR rows, daily mean of readings",
-        "Report-style figures (PNG), dependability table, Excel and report text"
+        "Gap filling: model, random, linear or seasonal",
+        "Extend by years: statistical model or resampled years",
+        "Built-in accuracy test for filled holes",
+        "Multi-sheet workbooks, plots and Excel export"
       ],
       "tags": [
-        "Dependable flow",
-        "Water level",
-        "Reports"
+        "Gap filling",
+        "Synthetic series",
+        "Discharge"
       ]
     },
     {
@@ -332,7 +307,7 @@
       "description": "Load a rainfall record (1-minute to daily, BMD daily sheets or annual-maximum tables) and build intensity–duration–frequency curves: quality checks, annual maxima or peaks over threshold, eight distributions fitted by L-moments, moments or maximum likelihood, IDF equations, short durations from daily data, design storms and a methods report. Every option has an explanation, and the numerics are tested against SciPy.",
       "url": "tools/brishti-idf/",
       "icon": "idf",
-      "accent": "teal",
+      "accent": "blue",
       "status": "live",
       "updated": "2026-11-03",
       "features": [
@@ -351,33 +326,33 @@
       ]
     },
     {
-      "name": "Ababahika",
+      "name": "Dependability Analyzer",
       "group": "Analysis",
-      "tagline": "Catchment slope, land cover, soil & drainage units — a GIS in your browser",
-      "description": "Load a DEM, a land-cover map, a soil map and your catchments, and get slope statistics and slope classes plus the area and percentage of every land-cover and soil class for each catchment, with an Excel workbook and a methods paragraph. Delineate drainage units from a DEM, even in polders: embankments act as walls, sluices as outlets and khals are burned in, and every unit reports how much of it is flat or filled. A map with layers, symbology and identify, and GDAL tools to project, clip, merge, dissolve and export. GeoTIFFs of any size are streamed, never uploaded.",
-      "url": "tools/ababahika/",
-      "icon": "catchment",
-      "accent": "earth",
-      "status": "beta",
-      "updated": "2026-11-04",
+      "tagline": "Dependable water level, flow & rainfall for reports",
+      "description": "Rank a long record with the Weibull plotting position (or Gringorten, Cunnane, Hazen) and read off dependable low and high values at any P. Filter years and months, convert the datum (e.g. mPWD to mMSL), and export report-style figures, a dependability table, a methods paragraph and an Excel workbook.",
+      "url": "tools/dependability/",
+      "icon": "depend",
+      "accent": "lime",
+      "status": "live",
+      "updated": "2026-10-25",
       "features": [
-        "Slope per catchment: mean, median, P10–P90, classes (Horn, as ArcGIS)",
-        "Land cover and soil (raster or polygons): area and % per catchment",
-        "Drainage units by D8 with embankments as walls, sluices as outlets, khals burned in",
-        "Flow direction, accumulation and filled DEM as GeoTIFF; validated against pysheds",
-        "Streams GeoTIFFs of any size; geographic DEMs handled exactly",
-        "Project, clip, merge, dissolve, slope raster with real GDAL (WebAssembly)",
-        "Export shapefile, GeoPackage, GeoJSON, KML in any CRS; Excel and methods text"
+        "Dependable low and high values at any P",
+        "One value per year or every value, whole series or by month",
+        "Year and month filters, incomplete-year warnings",
+        "Datum conversion, e.g. mPWD to mMSL",
+        "Daily, monthly or yearly data, incl. Year × Jan…Dec tables",
+        "Reads BWDB files: title rows, REGULAR rows, daily mean of readings",
+        "Report-style figures (PNG), dependability table, Excel and report text"
       ],
       "tags": [
-        "GIS",
-        "Drainage units",
-        "Land cover"
+        "Dependable flow",
+        "Water level",
+        "Reports"
       ]
     },
     {
       "name": "Composite CN Calculator",
-      "group": "Modelling",
+      "group": "Analysis",
       "tagline": "SCS curve number and runoff for every sub-catchment",
       "description": "Paste a land-use table straight from Excel, one row per sub-catchment, and get the area-weighted SCS curve number (TR-55 / NEH-4) for AMC I, II and III, retention S, initial abstraction, design-storm runoff, runoff coefficient and volume. Soil textures map to hydrologic soil groups, open water can count at CN 100 or be left out, and the CN lookup for Bangladesh land-cover classes is editable.",
       "url": "tools/cn-calculator/",
@@ -401,7 +376,7 @@
     },
     {
       "name": "River Profile Studio",
-      "group": "Modelling",
+      "group": "Modelling & Spatial",
       "tagline": "River cross-sections, SOBEK Y-Z profiles & thalweg analysis",
       "description": "Convert surveyed river cross-section points (Excel / CSV) into SOBEK 2.1x Y-Z definitions (PROFILE.DEF). Interactively inspect and edit elevations and distances, add or delete specific survey points, select custom left and right bank codes for orientation, add vertical boundary walls, apply datum shifts (MSL to PWD), and merge into existing model files.",
       "url": "tools/river-profile/",
@@ -425,8 +400,33 @@
       ]
     },
     {
+      "name": "Ababahika",
+      "group": "Modelling & Spatial",
+      "tagline": "Catchment slope, land cover, soil & drainage units — a GIS in your browser",
+      "description": "Load a DEM, a land-cover map, a soil map and your catchments, and get slope statistics and slope classes plus the area and percentage of every land-cover and soil class for each catchment, with an Excel workbook and a methods paragraph. Delineate drainage units from a DEM, even in polders: embankments act as walls, sluices as outlets and khals are burned in, and every unit reports how much of it is flat or filled. A map with layers, symbology and identify, and GDAL tools to project, clip, merge, dissolve and export. GeoTIFFs of any size are streamed, never uploaded.",
+      "url": "tools/ababahika/",
+      "icon": "catchment",
+      "accent": "earth",
+      "status": "beta",
+      "updated": "2026-11-04",
+      "features": [
+        "Slope per catchment: mean, median, P10–P90, classes (Horn, as ArcGIS)",
+        "Land cover and soil (raster or polygons): area and % per catchment",
+        "Drainage units by D8 with embankments as walls, sluices as outlets, khals burned in",
+        "Flow direction, accumulation and filled DEM as GeoTIFF; validated against pysheds",
+        "Streams GeoTIFFs of any size; geographic DEMs handled exactly",
+        "Project, clip, merge, dissolve, slope raster with real GDAL (WebAssembly)",
+        "Export shapefile, GeoPackage, GeoJSON, KML in any CRS; Excel and methods text"
+      ],
+      "tags": [
+        "GIS",
+        "Drainage units",
+        "Land cover"
+      ]
+    },
+    {
       "name": "Hydro ML Studio",
-      "group": "Modelling",
+      "group": "Modelling & Spatial",
       "tagline": "Machine learning for water level, discharge & rainfall",
       "description": "Train and compare eight machine-learning models to simulate or forecast a hydrological series: automatic lag, rolling and seasonal features, cross-validation, Grid / Random / Bayesian tuning, NSE · KGE · PBIAS with Moriasi ratings, gap filling and Excel export.",
       "url": "tools/hydro-ml/",
@@ -452,12 +452,12 @@
     },
     {
       "name": "DSBC Studio",
-      "group": "Modelling",
+      "group": "Modelling & Spatial",
       "tagline": "Downscaling & bias correction of climate data",
       "description": "Statistical downscaling and bias correction of daily, weekly or monthly climate series. Screen predictors with partial informational correlation, train and honestly validate 11 regression models, then correct climate-model runs with 10 univariate and 5 multivariate methods, checking that each correction keeps the model's projected change. Real Python (Pyodide) running in your browser.",
       "url": "tools/dsbc/",
       "icon": "dsbc",
-      "accent": "blue",
+      "accent": "cyan",
       "status": "live",
       "updated": "2026-10-25",
       "features": [

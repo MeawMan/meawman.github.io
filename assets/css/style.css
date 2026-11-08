@@ -551,7 +551,7 @@ body.is-preview::before { content: 'PREVIEW · DRAFT'; position: fixed; bottom: 
 .tb-txt small { font-size: 12.5px; color: var(--dim); line-height: 1.35; }
 .tb-tab[aria-selected='true'] .tb-txt small { color: var(--muted); }
 .tb-more { margin-top: auto; padding: 10px 12px; border: 1px dashed var(--line-2); border-radius: 10px; font-size: 11.5px; color: var(--dim); text-align: center; }
-.tb-panel { display: grid; grid-template-columns: 1.35fr .65fr; gap: 24px; padding: 22px 24px; align-items: center; min-height: 0; }
+.tb-panel { display: grid; grid-template-columns: 1.35fr .65fr; gap: 24px; padding: 22px 24px; align-items: start; min-height: 0; }
 .tb-group { padding: 8px 12px 0; font-size: 12px; color: var(--muted); }
 .tb-group:first-child { padding-top: 2px; }
 .tb-kicker { font-size: 12px; color: var(--tc); margin-bottom: 6px; }
