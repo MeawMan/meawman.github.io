@@ -123,6 +123,40 @@ pre.out{margin:0;max-height:220px;overflow:auto;background:var(--bg);border:1px 
 .bank-box{background:var(--soft);border-radius:var(--r);padding:10px;display:flex;flex-direction:column;gap:8px;border:1px solid var(--line)}
 .wall-box{background:var(--soft);border-radius:var(--r);padding:10px;display:flex;flex-direction:column;gap:8px;border:1px solid var(--line);margin-top:4px}
 .empty{color:var(--muted);padding:24px;text-align:center}
+/* Mode bar */
+.mode-nav{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px}
+.mode-nav .seg{display:inline-flex;border:1px solid var(--line);border-radius:var(--r);background:var(--panel);padding:3px;gap:2px}
+.mode-nav .seg button{border:0;background:none;padding:8px 16px;border-radius:6px;font-size:13.5px;font-weight:600;color:var(--muted);cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:background .15s,color .15s}
+.mode-nav .seg button:hover{color:var(--ink);background:var(--soft)}
+.mode-nav .seg button[aria-selected="true"]{background:var(--water);color:#fff}
+html[data-theme="dark"] .mode-nav .seg button[aria-selected="true"]{color:#04141a}
+
+/* Thalweg profiler card & layout */
+.thalweg-work{display:flex;flex-direction:column;gap:16px;min-width:0}
+.th-card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.th-top-bar{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px 18px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.th-reach-wrap{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.th-reach-wrap select{width:auto;min-width:220px;font-weight:600}
+.th-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.th-kpi{background:var(--soft);border:1px solid var(--line);border-radius:6px;padding:9px 12px;display:flex;flex-direction:column;gap:2px}
+.th-kpi small{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-family:var(--f-mono)}
+.th-kpi b{font-size:15.5px;font-family:var(--f-mono);font-variant-numeric:tabular-nums;color:var(--ink)}
+.th-chart-box{background:var(--bg);border:1px solid var(--line);border-radius:var(--r);padding:12px;overflow-x:auto;position:relative}
+.th-chart-box svg{display:block;width:100%;height:auto;min-width:700px}
+.th-legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:12px;color:var(--muted);align-items:center}
+.th-legend i{display:inline-block;width:14px;height:0;border-top:2px solid;vertical-align:middle;margin-right:4px}
+.th-split{display:grid;grid-template-columns:minmax(320px,1fr) minmax(320px,1fr);gap:16px;align-items:start}
+@media (max-width:960px){.th-split{grid-template-columns:1fr}}
+.th-pane{background:var(--soft);border:1px solid var(--line);border-radius:var(--r);padding:12px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.th-pane h4{margin:0;font-family:var(--f-display);font-size:14px;font-weight:700;display:flex;justify-content:space-between;align-items:center}
+.th-tbl-box{max-height:240px;overflow:auto;border:1px solid var(--line);border-radius:6px;background:var(--panel)}
+.th-tooltip{position:absolute;z-index:20;pointer-events:none;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:8px 11px;font-family:var(--f-mono);font-size:11.5px;line-height:1.45;box-shadow:0 10px 25px rgba(0,0,0,.3);transform:translate(-50%,-115%);display:none;white-space:nowrap}
+.th-node{cursor:pointer;transition:r .15s}
+.th-node:hover{r:6.5;fill:var(--water-2)}
+.th-node.active{r:7.5;fill:var(--sediment);stroke:var(--panel);stroke-width:2.5}
+.th-map-node{cursor:pointer;transition:r .15s}
+.th-map-node:hover{r:6;fill:var(--water-2)}
+.th-map-node.active{r:7.5;fill:var(--sediment);stroke:var(--panel);stroke-width:2.5}
 footer.tool-foot{margin-top:32px;padding-top:14px;border-top:1px solid var(--line);color:var(--muted);font-size:12px;display:flex;flex-wrap:wrap;gap:6px 20px;justify-content:space-between}
 </style>
 </head>
@@ -189,6 +223,25 @@ footer.tool-foot{margin-top:32px;padding-top:14px;border-top:1px solid var(--lin
             </div>
             <p class="hint">Select which code represents the left bank and which represents the right bank.</p>
           </div>
+
+          <!-- Coordinates & Reach mapping (optional for Thalweg & Plan Map) -->
+          <details id="geoMapWrap" style="border-top:1px dashed var(--line);padding-top:6px;margin-top:4px">
+            <summary style="font-size:12px;font-weight:600;color:var(--muted)">Coordinates &amp; Reach mapping (for Thalweg &amp; Map)</summary>
+            <div class="dg" style="margin-top:8px">
+              <div class="row2">
+                <label>Easting / Longitude (X)
+                  <select id="cXCoord"></select>
+                </label>
+                <label>Northing / Latitude (Y)
+                  <select id="cYCoord"></select>
+                </label>
+              </div>
+              <label>River / Reach / Khal name
+                <select id="cReach"></select>
+              </label>
+              <p class="hint">Automatically tracks the lowest bed points to plot longitudinal thalweg profiles and 2D alignment maps.</p>
+            </div>
+          </details>
         </div>
       </section>
 
@@ -267,7 +320,22 @@ footer.tool-foot{margin-top:32px;padding-top:14px;border-top:1px solid var(--lin
     <main class="main">
       <div class="summary" id="summary"><span>No survey loaded yet.</span></div>
       
-      <div class="work">
+      <!-- Studio View Mode Switcher -->
+      <div class="mode-nav" id="modeNav">
+        <div class="seg" role="tablist" aria-label="Studio Mode">
+          <button type="button" role="tab" id="btnModeCS" aria-selected="true" class="mode-btn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6 C 5 7, 7 16, 12 17 S 19 7, 21 6"/><path d="M6 10 h 12" stroke-dasharray="2 1.5"/><circle cx="12" cy="17" r="1.5" fill="currentColor"/></svg>
+            Cross-Section Inspector (Y-Z)
+          </button>
+          <button type="button" role="tab" id="btnModeThalweg" aria-selected="false" class="mode-btn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18 L 8 13 L 13 16 L 21 6"/><circle cx="8" cy="13" r="2.5" fill="currentColor"/><circle cx="13" cy="16" r="2.5" fill="currentColor"/><circle cx="21" cy="6" r="2.5" fill="currentColor"/></svg>
+            Thalweg &amp; Longitudinal Profiler (L-Profile)
+          </button>
+        </div>
+      </div>
+
+      <!-- Work Mode 1: Cross-Section Transverse Inspector -->
+      <div class="work" id="workCS">
         <!-- Section Picker List -->
         <div class="list" id="listBox">
           <div class="flt">
@@ -285,6 +353,89 @@ footer.tool-foot{margin-top:32px;padding-top:14px;border-top:1px solid var(--lin
         <!-- Interactive Visualizer & Point Editor -->
         <div class="view" id="view">
           <div class="empty">Select a cross-section to view and edit.</div>
+        </div>
+      </div>
+
+      <!-- Work Mode 2: Thalweg & Longitudinal Profiler -->
+      <div class="thalweg-work" id="workThalweg" hidden>
+        <div class="th-card">
+          <div class="th-top-bar">
+            <div class="th-reach-wrap">
+              <label for="thReachSelect" style="font-weight:600;color:var(--ink)">Channel / Reach:</label>
+              <select id="thReachSelect"></select>
+              <button type="button" id="thReverseBtn" title="Invert reach direction (upstream ↔ downstream)">⇄ Invert Direction</button>
+            </div>
+            <div class="btns">
+              <label class="inline" title="Overlay flood or water level on the L-profile" style="font-size:12px">
+                Water Level (m):
+                <input type="number" id="thWaterLevel" step="0.1" style="width:85px;padding:4px 6px" placeholder="optional">
+              </label>
+              <button type="button" id="thExportCsvBtn" class="primary">📥 Export Thalweg CSV</button>
+              <button type="button" id="thExportGeoJsonBtn">🗺 Export 3D GeoJSON</button>
+            </div>
+          </div>
+
+          <!-- KPI Summary Ribbon -->
+          <div class="th-kpis" id="thKpis"></div>
+
+          <!-- Longitudinal profile chart -->
+          <div class="th-chart-box" id="thChartBox">
+            <div id="thPlot"></div>
+            <div class="th-tooltip" id="thTooltip"></div>
+          </div>
+
+          <div class="th-legend">
+            <span><i style="border-color:var(--water);border-top-width:3px"></i>Thalweg Bed Profile</span>
+            <span><i style="border-color:var(--warn);border-style:dashed"></i>Left Bank Crest</span>
+            <span><i style="border-color:var(--bad);border-style:dashed"></i>Right Bank Crest</span>
+            <span><i style="border-color:var(--muted);border-style:dotted"></i>Mean Bed Gradient (S₀)</span>
+            <span id="thWlLegend" hidden><i style="border-color:var(--water);border-style:dashed;opacity:.7"></i>Water Surface</span>
+            <span style="margin-left:auto;font-family:var(--f-mono);font-size:11px">Click any station to select</span>
+          </div>
+
+          <!-- Split map and section preview -->
+          <div class="th-split">
+            <!-- 2D Plan Map -->
+            <div class="th-pane">
+              <h4>
+                <span>2D Alignment Plan Map</span>
+                <small class="hint" id="thMapCoords"></small>
+              </h4>
+              <div id="thPlanMap" style="background:var(--bg);border:1px solid var(--line);border-radius:6px;overflow:hidden;position:relative"></div>
+            </div>
+
+            <!-- Transverse Section Preview -->
+            <div class="th-pane">
+              <h4>
+                <span id="thStationTitle">Station Cross-Section Preview</span>
+                <button type="button" id="thGoToEditorBtn" style="font-size:11.5px;padding:3px 8px">✏ Edit Points in Inspector →</button>
+              </h4>
+              <div id="thStationPlot" style="background:var(--bg);border:1px solid var(--line);border-radius:6px;overflow:hidden"></div>
+            </div>
+          </div>
+
+          <!-- Station Sequence Checklist Table -->
+          <details>
+            <summary style="font-weight:600;font-size:13px">Reach Stations Checklist &amp; Local Gradients</summary>
+            <div class="th-tbl-box" style="margin-top:8px">
+              <table id="thStationTbl">
+                <thead>
+                  <tr>
+                    <th class="c">#</th>
+                    <th class="l">CS ID</th>
+                    <th>Chainage (m)</th>
+                    <th>Bed Z (m)</th>
+                    <th>Left Bank (m)</th>
+                    <th>Right Bank (m)</th>
+                    <th>Width (m)</th>
+                    <th>Local Slope (m/km)</th>
+                    <th class="c">Include</th>
+                  </tr>
+                </thead>
+                <tbody id="thStationTblBody"></tbody>
+              </table>
+            </div>
+          </details>
         </div>
       </div>
     </main>
@@ -334,7 +485,10 @@ const Core = (() => {
       const z = parseFloat(String(row[m.z] ?? "").replace(",", "."));
       if (!id || !isFinite(y) || !isFinite(z)) { skipped++; return; }
       if (!by.has(id)) by.set(id, []);
-      by.get(id).push({ y, z, code: m.code != null && m.code !== "" ? String(row[m.code] ?? "").trim() : "", src: i });
+      const east = m.xCoord && row[m.xCoord] !== undefined && row[m.xCoord] !== "" ? parseFloat(String(row[m.xCoord]).replace(",", ".")) : NaN;
+      const north = m.yCoord && row[m.yCoord] !== undefined && row[m.yCoord] !== "" ? parseFloat(String(row[m.yCoord]).replace(",", ".")) : NaN;
+      const reach = m.reach && row[m.reach] !== undefined ? String(row[m.reach]).trim() : "";
+      by.get(id).push({ y, z, code: m.code != null && m.code !== "" ? String(row[m.code] ?? "").trim() : "", east, north, reach, src: i });
     });
     return { by, skipped };
   }
@@ -444,9 +598,19 @@ const Core = (() => {
       flags.push(["warn", `wide channel (${Math.round(width)} m)`]);
     }
 
+    const bedPt = p[bedIdx] || p[0] || {};
+    let lbZ = NaN, rbZ = NaN;
+    if (Li.length) lbZ = p[Li[0]].z;
+    else if (p.length) lbZ = p[0].z;
+    if (Ri.length) rbZ = p[Ri[Ri.length - 1]].z;
+    else if (p.length) rbZ = p[p.length - 1].z;
+
     return {
       id, all: p, lc, rc, bedIdx, flipped, basis, out, width,
-      bedZ: wet.length ? Math.min(...wet.map(q => q.z)) : NaN,
+      bedZ: wet.length ? Math.min(...wet.map(q => q.z)) : (bedPt ? bedPt.z : NaN),
+      thalwegPt: bedPt,
+      lbZ, rbZ,
+      reach: rawPoints[0]?.reach || "",
       flags, check: flags.some(f => f[0] === "warn" || f[0] === "bad")
     };
   }
@@ -529,7 +693,13 @@ const st = {
   defName: "",
   out: null,
   rep: "",
-  sample: false
+  sample: false,
+  mode: "cs",
+  thReach: "all",
+  thReversed: false,
+  thExcluded: new Set(),
+  thHoverIdx: null,
+  thWaterLevel: null
 };
 
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -566,6 +736,9 @@ function opts() {
     startId: Math.max(1, parseInt($("startId").value, 10) || 1),
     customL: $("lCodeSelect").value || null,
     customR: $("rCodeSelect").value || null,
+    xCoord: $("cXCoord") ? $("cXCoord").value || null : null,
+    yCoord: $("cYCoord") ? $("cYCoord").value || null : null,
+    reach: $("cReach") ? $("cReach").value || null : null,
     tok: {
       l: ["LB", "LS", "BLLS", "BLL", "BLNLS", "BLSL", "KHALNLS", "LEFT"],
       r: ["RB", "RS", "BLRS", "BLR", "BLNRS", "BLSR", "KHALNRS", "RIGHT"],
@@ -579,12 +752,24 @@ function loadRows(rows, label) {
   st.rows = rows;
   st.editedPoints.clear();
   st.manualFlips.clear();
+  st.thExcluded.clear();
   st.cols = rows.length ? Object.keys(rows.reduce((a, r) => Object.assign(a, r), {})) : [];
   const c = st.cols;
   fillSelect($("cId"), c, guess(c, [/^cs.?id$/i, /cs.?id/i, /cegis/i, /section/i, /^id$/i]));
   fillSelect($("cY"), c, guess(c, [/distance/i, /chainage/i, /offset/i, /^y$/i, /station/i]));
   fillSelect($("cZ"), c, guess(c, [/pwd/i, /^rl\b/i, /level/i, /elev/i, /^z$/i], /msl/i) || guess(c, [/rl|level|elev|^z$/i]));
   fillSelect($("cCode"), c, guess(c, [/data.?code/i, /bank.?code/i, /code/i, /desc/i, /remark/i]), true);
+
+  const xGuess = guess(c, [/easting|^east$|utm_x|^x$|coord_x/i, /longitude|^lon$|^lng$/i]);
+  const yGuess = guess(c, [/northing|^north$|utm_y|^y$|coord_y/i, /latitude|^lat$/i]);
+  const reachGuess = guess(c, [/reach|khal.?name|khal|river|stream|channel/i]);
+  fillSelect($("cXCoord"), c, xGuess, true);
+  fillSelect($("cYCoord"), c, yGuess, true);
+  fillSelect($("cReach"), c, reachGuess, true);
+  if (xGuess || yGuess || reachGuess) {
+    const geoWrap = $("geoMapWrap");
+    if (geoWrap) geoWrap.open = true;
+  }
   
   $("mapBox").hidden = false;
   setStatus($("loadStatus"), label, "okk");
@@ -642,7 +827,15 @@ function useSheet(name) {
 function run() {
   if (!st.rows.length) return;
   const o = opts();
-  const m = { id: $("cId").value, y: $("cY").value, z: $("cZ").value, code: $("cCode").value || null };
+  const m = {
+    id: $("cId").value,
+    y: $("cY").value,
+    z: $("cZ").value,
+    code: $("cCode").value || null,
+    xCoord: $("cXCoord") ? $("cXCoord").value || null : null,
+    yCoord: $("cYCoord") ? $("cYCoord").value || null : null,
+    reach: $("cReach") ? $("cReach").value || null : null
+  };
   if (!m.id || !m.y || !m.z) return;
 
   const { by, skipped } = Core.group(st.rows, m);
@@ -665,6 +858,7 @@ function run() {
     st.selPtIdx = null;
   }
   renderView();
+  renderThalweg();
 
   const pv = st.out.text.split(/\r?\n/);
   $("defPreview").textContent = pv.slice(0, 70).join("\n") + (pv.length > 70 ? `\n… ${(pv.length - 70).toLocaleString()} more lines` : "");
@@ -1039,6 +1233,616 @@ function save(filename, text) {
   }
 }
 
+/* ---------- Geographic & Longitudinal Profiler Utilities ---------- */
+function haversineMeters(lat1, lon1, lat2, lon2) {
+  const R = 6371000;
+  const toRad = deg => deg * Math.PI / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+function calcStepDist(p1, p2) {
+  if (!p1 || !p2) return 0;
+  const e1 = p1.east, n1 = p1.north, e2 = p2.east, n2 = p2.north;
+  if (!isFinite(e1) || !isFinite(n1) || !isFinite(e2) || !isFinite(n2)) return 0;
+  if (Math.abs(e1) <= 180 && Math.abs(e2) <= 180 && Math.abs(n1) <= 90 && Math.abs(n2) <= 90) {
+    return haversineMeters(n1, e1, n2, e2);
+  }
+  return Math.hypot(e2 - e1, n2 - n1);
+}
+
+function utm46NToLatLng(easting, northing) {
+  const a = 6378137.0;
+  const f = 1 / 298.257223563;
+  const k0 = 0.9996;
+  const e = Math.sqrt(2 * f - f * f);
+  const e1 = (1 - Math.sqrt(1 - e * e)) / (1 + Math.sqrt(1 - e * e));
+  const lon0 = 93 * Math.PI / 180;
+  const x = easting - 500000;
+  const y = northing;
+  const M = y / k0;
+  const mu = M / (a * (1 - e * e / 4 - 3 * Math.pow(e, 4) / 64 - 5 * Math.pow(e, 6) / 256));
+  const phi1 = mu + (3 * e1 / 2 - 27 * Math.pow(e1, 3) / 32) * Math.sin(2 * mu)
+    + (21 * Math.pow(e1, 2) / 16 - 55 * Math.pow(e1, 4) / 32) * Math.sin(4 * mu)
+    + (151 * Math.pow(e1, 3) / 96) * Math.sin(6 * mu);
+  const N1 = a / Math.sqrt(1 - e * e * Math.sin(phi1) * Math.sin(phi1));
+  const T1 = Math.tan(phi1) * Math.tan(phi1);
+  const C1 = (e * e / (1 - e * e)) * Math.cos(phi1) * Math.cos(phi1);
+  const R1 = a * (1 - e * e) / Math.pow(1 - e * e * Math.sin(phi1) * Math.sin(phi1), 1.5);
+  const D = x / (N1 * k0);
+  const lat = phi1 - (N1 * Math.tan(phi1) / R1) * (
+    D * D / 2 - (5 + 3 * T1 + 10 * C1 - 4 * C1 * C1 - 9 * (e * e / (1 - e * e))) * Math.pow(D, 4) / 24
+    + (61 + 90 * T1 + 298 * C1 + 45 * T1 * T1 - 252 * (e * e / (1 - e * e)) - 3 * C1 * C1) * Math.pow(D, 6) / 720
+  );
+  const lon = lon0 + (
+    D - (1 + 2 * T1 + C1) * Math.pow(D, 3) / 6
+    + (5 - 2 * C1 + 28 * T1 - 3 * C1 * C1 + 8 * (e * e / (1 - e * e)) + 24 * T1 * T1) * Math.pow(D, 5) / 120
+  ) / Math.cos(phi1);
+  return { lat: lat * 180 / Math.PI, lon: lon * 180 / Math.PI };
+}
+
+function toGeoWgs84(e, n) {
+  if (!isFinite(e) || !isFinite(n)) return null;
+  if (Math.abs(e) <= 180 && Math.abs(n) <= 90) return { lat: n, lon: e };
+  if (e >= 100000 && e <= 900000 && n >= 2200000 && n <= 3000000) {
+    return utm46NToLatLng(e, n);
+  }
+  return null;
+}
+
+function linearRegression(pts) {
+  const n = pts.length;
+  if (n < 2) return { slope: 0, intercept: pts[0]?.y || 0 };
+  let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+  for (const p of pts) {
+    sumX += p.x;
+    sumY += p.y;
+    sumXY += p.x * p.y;
+    sumX2 += p.x * p.x;
+  }
+  const denom = (n * sumX2 - sumX * sumX);
+  if (denom === 0) return { slope: 0, intercept: sumY / n };
+  const slope = (n * sumXY - sumX * sumY) / denom;
+  const intercept = (sumY - slope * sumX) / n;
+  return { slope, intercept };
+}
+
+function setMode(mode) {
+  st.mode = mode;
+  $("btnModeCS").setAttribute("aria-selected", mode === "cs");
+  $("btnModeThalweg").setAttribute("aria-selected", mode === "thalweg");
+  $("workCS").hidden = (mode !== "cs");
+  $("workThalweg").hidden = (mode !== "thalweg");
+  if (mode === "thalweg") {
+    renderThalweg();
+  } else {
+    renderView();
+  }
+}
+
+/* ---------- Thalweg & Longitudinal Profiler Renderer ---------- */
+function renderThalweg() {
+  const allSecs = st.secs;
+  if (!allSecs || !allSecs.length) {
+    $("thKpis").innerHTML = '<div class="empty">No cross-sections loaded.</div>';
+    $("thPlot").innerHTML = '';
+    $("thPlanMap").innerHTML = '';
+    $("thStationPlot").innerHTML = '';
+    $("thStationTblBody").innerHTML = '';
+    return;
+  }
+
+  // Populate Reach Selector
+  const reaches = Array.from(new Set(allSecs.map(s => s.reach).filter(Boolean))).sort();
+  const reachSel = $("thReachSelect");
+  const curReachVal = reachSel.value;
+  let reachOptions = `<option value="all">All Reaches (${allSecs.length} cross-sections)</option>`;
+  reaches.forEach(r => {
+    const cnt = allSecs.filter(s => s.reach === r).length;
+    reachOptions += `<option value="${esc(r)}">${esc(r)} (${cnt} cross-sections)</option>`;
+  });
+  reachSel.innerHTML = reachOptions;
+  if (curReachVal && (curReachVal === "all" || reaches.includes(curReachVal))) {
+    reachSel.value = curReachVal;
+    st.thReach = curReachVal;
+  } else if (reaches.length > 0) {
+    st.thReach = reaches[0];
+    reachSel.value = reaches[0];
+  } else {
+    st.thReach = "all";
+    reachSel.value = "all";
+  }
+
+  // Filter cross-sections by reach
+  let reachSecs = allSecs.filter(s => st.thReach === "all" || !s.reach || s.reach === st.thReach);
+  if (st.thReversed) {
+    reachSecs = reachSecs.slice().reverse();
+  }
+
+  if (!reachSecs.length) {
+    $("thKpis").innerHTML = '<div class="empty">No cross-sections in selected reach.</div>';
+    return;
+  }
+
+  // Compute Chainage
+  let cumDist = 0;
+  const stations = reachSecs.map((s, idx) => {
+    let step = 0;
+    if (idx > 0) {
+      const prev = reachSecs[idx - 1];
+      step = calcStepDist(prev.thalwegPt, s.thalwegPt);
+      if (!step || !isFinite(step)) step = 500; // fallback if no coordinates
+    }
+    cumDist += step;
+    return {
+      idx,
+      id: s.id,
+      sec: s,
+      chainage: cumDist,
+      stepDist: step,
+      bedZ: s.bedZ,
+      lbZ: s.lbZ,
+      rbZ: s.rbZ,
+      width: s.width,
+      east: s.thalwegPt?.east,
+      north: s.thalwegPt?.north,
+      reach: s.reach,
+      excluded: st.thExcluded.has(s.id)
+    };
+  });
+
+  const activeStations = stations.filter(s => !s.excluded);
+  const totLen = stations[stations.length - 1].chainage;
+
+  // Linear Regression
+  const regPts = activeStations.filter(s => isFinite(s.bedZ)).map(s => ({ x: s.chainage, y: s.bedZ }));
+  const { slope, intercept } = linearRegression(regPts);
+  const slopeKm = slope * 1000;
+  const ratio = Math.abs(slope) > 1e-6 ? `1:${Math.round(1 / Math.abs(slope)).toLocaleString()}` : "flat";
+
+  // KPIs
+  const beds = activeStations.filter(s => isFinite(s.bedZ));
+  const minBed = beds.length ? beds.reduce((a, b) => b.bedZ < a.bedZ ? b : a, beds[0]) : null;
+  const maxBed = beds.length ? beds.reduce((a, b) => b.bedZ > a.bedZ ? b : a, beds[0]) : null;
+  const avgWidth = activeStations.length ? activeStations.reduce((a, b) => a + (b.width || 0), 0) / activeStations.length : 0;
+
+  $("thKpis").innerHTML = `
+    <div class="th-kpi">
+      <small>Reach Length</small>
+      <b>${totLen >= 2000 ? (totLen / 1000).toFixed(2) + " km" : Math.round(totLen) + " m"}</b>
+    </div>
+    <div class="th-kpi">
+      <small>Stations</small>
+      <b>${activeStations.length} <span style="font-size:11px;color:var(--muted)">/ ${stations.length}</span></b>
+    </div>
+    <div class="th-kpi">
+      <small>Mean Bed Slope (S₀)</small>
+      <b>${slopeKm.toFixed(2)} m/km <span style="font-size:11px;color:var(--muted)">(${ratio})</span></b>
+    </div>
+    <div class="th-kpi">
+      <small>Deepest Bed (Scour)</small>
+      <b style="color:var(--water)">${minBed ? minBed.bedZ.toFixed(2) + " m" : "–"} <span style="font-size:11px;color:var(--muted)">${minBed ? "(" + esc(minBed.id) + ")" : ""}</span></b>
+    </div>
+    <div class="th-kpi">
+      <small>Highest Bed (Shoal)</small>
+      <b style="color:var(--warn)">${maxBed ? maxBed.bedZ.toFixed(2) + " m" : "–"} <span style="font-size:11px;color:var(--muted)">${maxBed ? "(" + esc(maxBed.id) + ")" : ""}</span></b>
+    </div>
+    <div class="th-kpi">
+      <small>Avg Bank Width</small>
+      <b>${avgWidth.toFixed(1)} m</b>
+    </div>
+  `;
+
+  // Render SVG L-Profile Plot
+  renderThalwegPlot(stations, activeStations, totLen, slope, intercept);
+
+  // Render 2D Alignment Plan Map
+  renderThalwegPlanMap(stations);
+
+  // Render Selected Station Preview
+  if (!st.sel || !stations.find(s => s.id === st.sel)) {
+    st.sel = stations[0]?.id;
+  }
+  renderThalwegStationPreview();
+
+  // Render Checklist Table
+  renderThalwegTable(stations);
+}
+
+function renderThalwegPlot(stations, activeStations, totLen, slope, intercept) {
+  const W = 1000, H = 360;
+  const m = { l: 65, r: 35, t: 25, b: 45 };
+  const pw = W - m.l - m.r;
+  const ph = H - m.t - m.b;
+
+  const validZ = activeStations.flatMap(s => [s.bedZ, s.lbZ, s.rbZ].filter(isFinite));
+  const wlVal = parseFloat($("thWaterLevel").value);
+  const hasWl = isFinite(wlVal);
+  $("thWlLegend").hidden = !hasWl;
+  if (hasWl) validZ.push(wlVal);
+
+  if (!validZ.length) {
+    $("thPlot").innerHTML = '<div class="empty">No elevation data available.</div>';
+    return;
+  }
+
+  let z0 = Math.min(...validZ);
+  let z1 = Math.max(...validZ);
+  const padZ = Math.max((z1 - z0) * 0.15, 1.0);
+  z0 = Math.floor(z0 - padZ);
+  z1 = Math.ceil(z1 + padZ);
+  if (z0 === z1) { z0 -= 2; z1 += 2; }
+
+  const spanX = Math.max(totLen, 1);
+  const X = s => m.l + (s / spanX) * pw;
+  const Y = z => m.t + (z1 - z) / (z1 - z0) * ph;
+
+  const xt = niceTicks(0, totLen, 8);
+  const zt = niceTicks(z0, z1, 6);
+
+  // Grid lines
+  let gridSvg = "";
+  zt.forEach(v => {
+    gridSvg += `<line x1="${m.l}" x2="${W - m.r}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--gridc)"/>
+      <text x="${m.l - 8}" y="${Y(v) + 4}" text-anchor="end" font-size="11" fill="var(--muted)" font-family="var(--f-mono)">${+v.toFixed(1)}</text>`;
+  });
+  xt.forEach(v => {
+    const lbl = totLen >= 2000 ? (v / 1000).toFixed(1) + "k" : Math.round(v);
+    gridSvg += `<line x1="${X(v)}" x2="${X(v)}" y1="${m.t}" y2="${H - m.b}" stroke="var(--gridc)"/>
+      <text x="${X(v)}" y="${H - m.b + 18}" text-anchor="middle" font-size="11" fill="var(--muted)" font-family="var(--f-mono)">${lbl}</text>`;
+  });
+
+  // Bed profile path and polygon fill
+  const bedPts = activeStations.filter(s => isFinite(s.bedZ));
+  let bedPath = "";
+  let bedFillPath = "";
+  if (bedPts.length >= 2) {
+    bedPath = bedPts.map((s, i) => `${i ? "L" : "M"}${X(s.chainage).toFixed(1)},${Y(s.bedZ).toFixed(1)}`).join("");
+    bedFillPath = bedPath + ` L${X(bedPts[bedPts.length - 1].chainage).toFixed(1)},${Y(z0).toFixed(1)} L${X(bedPts[0].chainage).toFixed(1)},${Y(z0).toFixed(1)} Z`;
+  }
+
+  // Left & Right bank lines
+  const lbPts = activeStations.filter(s => isFinite(s.lbZ));
+  const lbPath = lbPts.length >= 2 ? lbPts.map((s, i) => `${i ? "L" : "M"}${X(s.chainage).toFixed(1)},${Y(s.lbZ).toFixed(1)}`).join("") : "";
+
+  const rbPts = activeStations.filter(s => isFinite(s.rbZ));
+  const rbPath = rbPts.length >= 2 ? rbPts.map((s, i) => `${i ? "L" : "M"}${X(s.chainage).toFixed(1)},${Y(s.rbZ).toFixed(1)}`).join("") : "";
+
+  // Mean slope line
+  const slopePath = `M${X(0).toFixed(1)},${Y(intercept).toFixed(1)} L${X(totLen).toFixed(1)},${Y(intercept + slope * totLen).toFixed(1)}`;
+
+  // Water level line
+  let wlSvg = "";
+  if (hasWl) {
+    wlSvg = `<line x1="${m.l}" x2="${W - m.r}" y1="${Y(wlVal)}" y2="${Y(wlVal)}" stroke="var(--water)" stroke-dasharray="6 4" stroke-width="1.8" opacity="0.8"/>
+      <text x="${W - m.r - 8}" y="${Y(wlVal) - 6}" text-anchor="end" font-size="11" font-weight="700" fill="var(--water)" font-family="var(--f-mono)">WL ${wlVal.toFixed(2)} m</text>`;
+  }
+
+  // Active station vertical indicator
+  const curStn = stations.find(s => s.id === st.sel);
+  let activeStnSvg = "";
+  if (curStn) {
+    activeStnSvg = `<line x1="${X(curStn.chainage)}" x2="${X(curStn.chainage)}" y1="${m.t}" y2="${H - m.b}" stroke="var(--sediment)" stroke-width="2" stroke-dasharray="4 3"/>`;
+  }
+
+  // Station node dots
+  const nodesSvg = stations.map(s => {
+    if (!isFinite(s.bedZ)) return "";
+    const isCur = s.id === st.sel;
+    const isEx = s.excluded;
+    const cx = X(s.chainage);
+    const cy = Y(s.bedZ);
+    return `<circle class="th-node${isCur ? ' active' : ''}" cx="${cx}" cy="${cy}" r="${isCur ? 6.5 : (isEx ? 3.5 : 4.5)}"
+      fill="${isCur ? 'var(--sediment)' : (isEx ? 'var(--muted)' : 'var(--water)')}"
+      stroke="${isCur ? '#fff' : 'var(--panel)'}" stroke-width="${isCur ? 2 : 1}"
+      data-id="${esc(s.id)}" data-ch="${s.chainage}" data-z="${s.bedZ}" data-lb="${s.lbZ}" data-rb="${s.rbZ}" data-w="${s.width}">
+      <title>${s.id}: Ch ${s.chainage.toFixed(0)}m, Bed ${s.bedZ.toFixed(2)}m</title>
+    </circle>`;
+  }).join("");
+
+  $("thPlot").innerHTML = `
+    <svg viewBox="0 0 ${W} ${H}" role="img">
+      <!-- Grid -->
+      ${gridSvg}
+      <line x1="${m.l}" x2="${W - m.r}" y1="${H - m.b}" y2="${H - m.b}" stroke="var(--muted)"/>
+      <line x1="${m.l}" x2="${m.l}" y1="${m.t}" y2="${H - m.b}" stroke="var(--muted)"/>
+
+      <!-- Fill under bed -->
+      ${bedFillPath ? `<path d="${bedFillPath}" fill="var(--water)" opacity="0.08"/>` : ""}
+
+      <!-- Bank Crests -->
+      ${lbPath ? `<path d="${lbPath}" fill="none" stroke="var(--warn)" stroke-width="1.8" stroke-dasharray="5 3"/>` : ""}
+      ${rbPath ? `<path d="${rbPath}" fill="none" stroke="var(--bad)" stroke-width="1.8" stroke-dasharray="5 3"/>` : ""}
+
+      <!-- Linear Bed Slope S0 -->
+      <path d="${slopePath}" fill="none" stroke="var(--muted)" stroke-width="1.8" stroke-dasharray="3 3"/>
+
+      <!-- Thalweg Bed Line -->
+      ${bedPath ? `<path d="${bedPath}" fill="none" stroke="var(--water)" stroke-width="3" stroke-linejoin="round"/>` : ""}
+
+      <!-- Water Level -->
+      ${wlSvg}
+
+      <!-- Current Station Marker -->
+      ${activeStnSvg}
+
+      <!-- Nodes -->
+      ${nodesSvg}
+
+      <!-- Axis Labels -->
+      <text x="${(m.l + W - m.r) / 2}" y="${H - 8}" text-anchor="middle" font-size="11.5" fill="var(--muted)">Cumulative Chainage Along River (m)</text>
+      <text x="18" y="${(m.t + H - m.b) / 2}" text-anchor="middle" font-size="11.5" fill="var(--muted)" transform="rotate(-90 18 ${(m.t + H - m.b) / 2})">Elevation Z (m PWD)</text>
+    </svg>
+  `;
+
+  bindThalwegPlotEvents();
+}
+
+function bindThalwegPlotEvents() {
+  const tooltip = $("thTooltip");
+  const chartBox = $("thChartBox");
+
+  document.querySelectorAll(".th-node").forEach(node => {
+    node.onclick = () => {
+      st.sel = node.dataset.id;
+      st.selPtIdx = null;
+      renderThalweg();
+    };
+
+    node.onmouseenter = e => {
+      const id = node.dataset.id;
+      const ch = parseFloat(node.dataset.ch);
+      const z = parseFloat(node.dataset.z);
+      const lb = parseFloat(node.dataset.lb);
+      const rb = parseFloat(node.dataset.rb);
+      const w = parseFloat(node.dataset.w);
+
+      tooltip.innerHTML = `
+        <div style="font-weight:700;color:var(--water);margin-bottom:3px">${esc(id)}</div>
+        <div>Chainage: <b>${ch >= 1000 ? (ch / 1000).toFixed(3) + " km" : ch.toFixed(1) + " m"}</b></div>
+        <div>Bed Level: <b>${z.toFixed(2)} m PWD</b></div>
+        <div>Left Bank: <b>${isFinite(lb) ? lb.toFixed(2) + " m" : "–"}</b> | Right: <b>${isFinite(rb) ? rb.toFixed(2) + " m" : "–"}</b></div>
+        <div>Channel Width: <b>${w.toFixed(1)} m</b></div>
+      `;
+      tooltip.style.display = "block";
+      updateTooltipPos(e);
+    };
+
+    node.onmousemove = updateTooltipPos;
+    node.onmouseleave = () => { tooltip.style.display = "none"; };
+  });
+
+  function updateTooltipPos(e) {
+    const rect = chartBox.getBoundingClientRect();
+    const x = e.clientX - rect.left + chartBox.scrollLeft;
+    const y = e.clientY - rect.top;
+    tooltip.style.left = `${x}px`;
+    tooltip.style.top = `${y}px`;
+  }
+}
+
+function renderThalwegPlanMap(stations) {
+  const mapEl = $("thPlanMap");
+  const coordsNote = $("thMapCoords");
+  const W = 520, H = 340;
+  const pad = 35;
+  const pw = W - pad * 2, ph = H - pad * 2;
+
+  const valid = stations.filter(s => isFinite(s.east) && isFinite(s.north));
+  if (valid.length < 2) {
+    coordsNote.textContent = "";
+    mapEl.innerHTML = `
+      <div class="empty" style="padding:48px 20px">
+        <p style="margin:0 0 6px;font-weight:600;color:var(--ink)">No 2D Coordinates Mapped</p>
+        <p class="hint" style="margin:0">Map Easting/Northing or Lat/Lon in Step 1 to visualize the spatial plan alignment.</p>
+      </div>`;
+    return;
+  }
+
+  const isUtm = Math.abs(valid[0].east) > 180 || Math.abs(valid[0].north) > 90;
+  coordsNote.textContent = isUtm ? "Projected meters (UTM/BTM)" : "WGS84 Lat/Lon (degrees)";
+
+  const easts = valid.map(s => s.east);
+  const norths = valid.map(s => s.north);
+  const minE = Math.min(...easts), maxE = Math.max(...easts);
+  const minN = Math.min(...norths), maxN = Math.max(...norths);
+  const spanE = Math.max(1, maxE - minE);
+  const spanN = Math.max(1, maxN - minN);
+
+  const scale = Math.min(pw / spanE, ph / spanN);
+  const cx = pad + (pw - spanE * scale) / 2;
+  const cy = pad + (ph - spanN * scale) / 2;
+
+  const mapX = e => cx + (e - minE) * scale;
+  const mapY = n => H - (cy + (n - minN) * scale);
+
+  const thalwegPoints = valid.map(s => `${mapX(s.east).toFixed(1)},${mapY(s.north).toFixed(1)}`).join(" ");
+
+  const transects = valid.map((s, i) => {
+    let dx = 0, dy = 0;
+    if (valid.length > 1) {
+      if (i === 0) {
+        dx = valid[1].east - s.east;
+        dy = valid[1].north - s.north;
+      } else if (i === valid.length - 1) {
+        dx = s.east - valid[i - 1].east;
+        dy = s.north - valid[i - 1].north;
+      } else {
+        dx = valid[i + 1].east - valid[i - 1].east;
+        dy = valid[i + 1].north - valid[i - 1].north;
+      }
+    }
+    const len = Math.hypot(dx, dy) || 1;
+    const nx = -dy / len;
+    const ny = dx / len;
+
+    const visualHalfWidth = Math.min(Math.max((s.width || 40) * scale * 0.5, 8), 35);
+    const mx = mapX(s.east);
+    const my = mapY(s.north);
+    const x1 = mx - nx * visualHalfWidth;
+    const y1 = my + ny * visualHalfWidth;
+    const x2 = mx + nx * visualHalfWidth;
+    const y2 = my - ny * visualHalfWidth;
+
+    const isCur = s.id === st.sel;
+    return `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}"
+      stroke="${isCur ? 'var(--sediment)' : 'var(--line)'}" stroke-width="${isCur ? 2.5 : 1.5}" stroke-linecap="round"/>`;
+  }).join("");
+
+  const circles = valid.map(s => {
+    const isCur = s.id === st.sel;
+    const mx = mapX(s.east);
+    const my = mapY(s.north);
+    return `<circle class="th-map-node${isCur ? ' active' : ''}" cx="${mx.toFixed(1)}" cy="${my.toFixed(1)}" r="${isCur ? 6.5 : 4}"
+      fill="${isCur ? 'var(--sediment)' : 'var(--water)'}" stroke="${isCur ? '#fff' : 'var(--panel)'}" stroke-width="${isCur ? 2 : 1}"
+      data-id="${esc(s.id)}">
+      <title>${esc(s.id)} (${s.east.toFixed(1)}, ${s.north.toFixed(1)})</title>
+    </circle>`;
+  }).join("");
+
+  let curLbl = "";
+  const curStn = valid.find(s => s.id === st.sel);
+  if (curStn) {
+    const mx = mapX(curStn.east);
+    const my = mapY(curStn.north);
+    curLbl = `<text x="${mx}" y="${my - 10}" text-anchor="middle" font-size="11" font-weight="700" fill="var(--sediment)" font-family="var(--f-mono)">${esc(curStn.id)}</text>`;
+  }
+
+  mapEl.innerHTML = `
+    <svg viewBox="0 0 ${W} ${H}" role="img">
+      <g opacity="0.6">
+        <text x="${W - 24}" y="24" text-anchor="middle" font-size="12" font-weight="700" fill="var(--muted)" font-family="var(--f-mono)">N ↑</text>
+      </g>
+      ${transects}
+      <polyline points="${thalwegPoints}" fill="none" stroke="var(--water)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+      ${circles}
+      ${curLbl}
+    </svg>
+  `;
+
+  mapEl.querySelectorAll(".th-map-node").forEach(node => {
+    node.onclick = () => {
+      st.sel = node.dataset.id;
+      st.selPtIdx = null;
+      renderThalweg();
+    };
+  });
+}
+
+function renderThalwegStationPreview() {
+  const plotEl = $("thStationPlot");
+  const titleEl = $("thStationTitle");
+  const s = st.secs.find(x => x.id === st.sel);
+  if (!s) {
+    titleEl.textContent = "Station Cross-Section Preview";
+    plotEl.innerHTML = '<div class="empty">No station selected.</div>';
+    return;
+  }
+
+  titleEl.innerHTML = `<span style="color:var(--water);font-family:var(--f-mono)">${esc($("prefix").value.trim() + s.id)}</span> · Bed ${isFinite(s.bedZ) ? s.bedZ.toFixed(2) : "–"}m · Width ${s.width.toFixed(1)}m`;
+
+  const W = 520, H = 260, m = { l: 45, r: 20, t: 20, b: 35 };
+  const all = s.all;
+  const out = s.out;
+  if (!all.length) {
+    plotEl.innerHTML = '<div class="empty">No points in this station.</div>';
+    return;
+  }
+
+  const zs = all.map(p => p.z).concat(out.map(p => p.z));
+  const xs = all.map(p => p.y);
+  let x0 = Math.min(...xs), x1 = Math.max(...xs);
+  if (x1 - x0 < 0.5) x1 = x0 + 1;
+  let z0 = Math.min(...zs), z1 = Math.max(...zs);
+  const pad = (z1 - z0) * 0.15 || 0.6;
+  z0 -= pad; z1 += pad;
+
+  const X = v => m.l + (v - x0) / (x1 - x0) * (W - m.l - m.r);
+  const Y = v => m.t + (z1 - v) / (z1 - z0) * (H - m.t - m.b);
+
+  const xt = niceTicks(x0, x1, 6);
+  const zt = niceTicks(z0, z1, 5);
+
+  const allPath = all.map((p, i) => `${i ? "L" : "M"}${X(p.y).toFixed(1)},${Y(p.z).toFixed(1)}`).join("");
+  const outPath = out.map((p, i) => `${i ? "L" : "M"}${X(p.y).toFixed(1)},${Y(p.z).toFixed(1)}`).join("");
+
+  const opt = opts();
+  const marks = all.map(p => {
+    const sd = Core.side(p.code, opt);
+    if (!sd) return "";
+    const col = sd === "L" ? "var(--ok)" : "var(--bad)";
+    return `<g>
+      <circle cx="${X(p.y)}" cy="${Y(p.z)}" r="4" fill="${col}"/>
+      <text x="${X(p.y)}" y="${Y(p.z) - 8}" text-anchor="middle" font-size="9.5" font-weight="700" fill="${col}" font-family="var(--f-mono)">${sd}</text>
+    </g>`;
+  }).join("");
+
+  const bedPt = all.reduce((a, b) => b.z < a.z ? b : a, all[0]);
+
+  plotEl.innerHTML = `
+    <svg viewBox="0 0 ${W} ${H}" role="img">
+      ${zt.map(v => `<line x1="${m.l}" x2="${W - m.r}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--gridc)"/><text x="${m.l - 6}" y="${Y(v) + 3.5}" text-anchor="end" font-size="10" fill="var(--muted)" font-family="var(--f-mono)">${+v.toFixed(1)}</text>`).join("")}
+      ${xt.map(v => `<line x1="${X(v)}" x2="${X(v)}" y1="${m.t}" y2="${H - m.b}" stroke="var(--gridc)"/><text x="${X(v)}" y="${H - m.b + 14}" text-anchor="middle" font-size="10" fill="var(--muted)" font-family="var(--f-mono)">${+v.toFixed(0)}</text>`).join("")}
+      <line x1="${m.l}" x2="${W - m.r}" y1="${H - m.b}" y2="${H - m.b}" stroke="var(--muted)"/>
+      ${allPath ? `<path d="${allPath}" fill="none" stroke="var(--muted)" stroke-width="1.2" stroke-dasharray="3 3"/>` : ""}
+      <path d="${outPath}" fill="none" stroke="var(--water)" stroke-width="2.2" stroke-linejoin="round"/>
+      ${marks}
+      ${bedPt ? `<circle cx="${X(bedPt.y)}" cy="${Y(bedPt.z)}" r="5" fill="var(--sediment)"/><text x="${X(bedPt.y)}" y="${Y(bedPt.z) + 14}" text-anchor="middle" font-size="10" fill="var(--sediment)" font-family="var(--f-mono)">bed ${bedPt.z.toFixed(2)}</text>` : ""}
+      <text x="${(m.l + W - m.r) / 2}" y="${H - 4}" text-anchor="middle" font-size="10" fill="var(--muted)">Distance Y (m)</text>
+      <text x="12" y="${(m.t + H - m.b) / 2}" text-anchor="middle" font-size="10" fill="var(--muted)" transform="rotate(-90 12 ${(m.t + H - m.b) / 2})">Level Z (m)</text>
+    </svg>
+  `;
+}
+
+function renderThalwegTable(stations) {
+  const tbody = $("thStationTblBody");
+  tbody.innerHTML = stations.map((s, i) => {
+    const isCur = s.id === st.sel;
+    let localSlopeStr = "–";
+    if (i > 0 && isFinite(s.bedZ) && isFinite(stations[i - 1].bedZ) && s.stepDist > 0) {
+      const dz = s.bedZ - stations[i - 1].bedZ;
+      const slopeMkm = (dz / s.stepDist) * 1000;
+      localSlopeStr = (slopeMkm >= 0 ? "+" : "") + slopeMkm.toFixed(2);
+    }
+    return `
+      <tr class="${isCur ? 'selected' : ''}" data-id="${esc(s.id)}">
+        <td class="c">${i + 1}</td>
+        <td class="l"><b>${esc(s.id)}</b></td>
+        <td class="r">${s.chainage.toFixed(1)}</td>
+        <td class="r" style="color:var(--water)">${isFinite(s.bedZ) ? s.bedZ.toFixed(2) : "–"}</td>
+        <td class="r">${isFinite(s.lbZ) ? s.lbZ.toFixed(2) : "–"}</td>
+        <td class="r">${isFinite(s.rbZ) ? s.rbZ.toFixed(2) : "–"}</td>
+        <td class="r">${s.width.toFixed(1)}</td>
+        <td class="r">${localSlopeStr}</td>
+        <td class="c">
+          <input type="checkbox" class="th-inc-chk" data-id="${esc(s.id)}" ${s.excluded ? "" : "checked"}>
+        </td>
+      </tr>
+    `;
+  }).join("");
+
+  tbody.querySelectorAll("tr").forEach(tr => {
+    tr.onclick = e => {
+      if (e.target.tagName.toLowerCase() === "input") return;
+      st.sel = tr.dataset.id;
+      st.selPtIdx = null;
+      renderThalweg();
+    };
+  });
+
+  tbody.querySelectorAll(".th-inc-chk").forEach(chk => {
+    chk.onchange = e => {
+      e.stopPropagation();
+      const id = chk.dataset.id;
+      if (chk.checked) st.thExcluded.delete(id);
+      else st.thExcluded.add(id);
+      renderThalweg();
+    };
+  });
+}
+
 /* ---------- Event Listeners & Wiring ---------- */
 const drop = $("drop");
 drop.onclick = () => $("file").click();
@@ -1079,7 +1883,11 @@ $("checkWidth").onchange = () => {
   run();
 };
 
-["cId", "cY", "cZ", "filter"].forEach(id => $(id).addEventListener("change", () => id === "filter" ? renderList() : run()));
+["cId", "cY", "cZ", "cXCoord", "cYCoord", "cReach", "filter"].forEach(id => {
+  const el = $(id);
+  if (el) el.addEventListener("change", () => id === "filter" ? renderList() : run());
+});
+
 ["shift", "prefix", "thr", "spike", "wallVal", "hdr", "startId", "maxW"].forEach(id => {
   $(id).addEventListener("input", () => {
     clearTimeout(run.timer);
@@ -1118,6 +1926,137 @@ $("dlDef").onclick = () => st.out && save("PROFILE.DEF", st.out.text);
 $("cpDef").onclick = () => st.out && copy(st.out.text, $("cpDef"));
 $("dlRep").onclick = () => st.rep && save("profile_report.csv", st.rep);
 
+// Mode Toggle & Thalweg Controls Wiring
+$("btnModeCS").onclick = () => setMode("cs");
+$("btnModeThalweg").onclick = () => setMode("thalweg");
+$("thGoToEditorBtn").onclick = () => {
+  setMode("cs");
+  renderList();
+  renderView();
+  $("view")?.scrollIntoView({ behavior: "smooth", block: "start" });
+};
+$("thReachSelect").onchange = e => {
+  st.thReach = e.target.value;
+  renderThalweg();
+};
+$("thReverseBtn").onclick = () => {
+  st.thReversed = !st.thReversed;
+  renderThalweg();
+};
+$("thWaterLevel").oninput = () => {
+  renderThalweg();
+};
+
+// Thalweg CSV Export
+$("thExportCsvBtn").onclick = () => {
+  const activeSecs = st.secs.filter(s => st.thReach === "all" || !s.reach || s.reach === st.thReach);
+  const ordered = st.thReversed ? activeSecs.slice().reverse() : activeSecs;
+  let cum = 0;
+  const rows = [
+    ["Reach", "CS ID", "Chainage (m)", "Step Distance (m)", "Bed Level (m PWD)", "Left Bank (m)", "Right Bank (m)", "Channel Width (m)", "Easting", "Northing", "Excluded"].join(",")
+  ];
+  ordered.forEach((s, idx) => {
+    let step = 0;
+    if (idx > 0) {
+      step = calcStepDist(ordered[idx - 1].thalwegPt, s.thalwegPt) || 500;
+    }
+    cum += step;
+    const isEx = st.thExcluded.has(s.id) ? "yes" : "no";
+    const east = isFinite(s.thalwegPt?.east) ? s.thalwegPt.east : "";
+    const north = isFinite(s.thalwegPt?.north) ? s.thalwegPt.north : "";
+    rows.push([
+      `"${(s.reach || st.thReach || "").replace(/"/g, '""')}"`,
+      `"${s.id.replace(/"/g, '""')}"`,
+      cum.toFixed(2),
+      step.toFixed(2),
+      isFinite(s.bedZ) ? s.bedZ.toFixed(3) : "",
+      isFinite(s.lbZ) ? s.lbZ.toFixed(3) : "",
+      isFinite(s.rbZ) ? s.rbZ.toFixed(3) : "",
+      s.width.toFixed(2),
+      east,
+      north,
+      isEx
+    ].join(","));
+  });
+
+  const filename = `${st.thReach || "thalweg"}_longitudinal_profile.csv`.replace(/[^a-zA-Z0-9_\-\.]/g, "_");
+  save(filename, rows.join("\r\n") + "\r\n");
+};
+
+// 3D GeoJSON Export
+$("thExportGeoJsonBtn").onclick = () => {
+  const activeSecs = st.secs.filter(s => st.thReach === "all" || !s.reach || s.reach === st.thReach);
+  const ordered = st.thReversed ? activeSecs.slice().reverse() : activeSecs;
+
+  const valid = ordered.filter(s => isFinite(s.thalwegPt?.east) && isFinite(s.thalwegPt?.north));
+  if (!valid.length) {
+    alert("No Easting/Northing or Lat/Lon coordinates are mapped for this reach.");
+    return;
+  }
+
+  const coords3D = [];
+  const pointFeatures = [];
+  let cum = 0;
+
+  ordered.forEach((s, idx) => {
+    let step = 0;
+    if (idx > 0) {
+      step = calcStepDist(ordered[idx - 1].thalwegPt, s.thalwegPt) || 500;
+    }
+    cum += step;
+
+    const e = s.thalwegPt?.east;
+    const n = s.thalwegPt?.north;
+    if (isFinite(e) && isFinite(n)) {
+      const geo = toGeoWgs84(e, n) || { lon: e, lat: n };
+      const z = isFinite(s.bedZ) ? s.bedZ : 0;
+      coords3D.push([+geo.lon.toFixed(6), +geo.lat.toFixed(6), +z.toFixed(3)]);
+
+      pointFeatures.push({
+        type: "Feature",
+        properties: {
+          cs_id: s.id,
+          reach: s.reach || st.thReach,
+          chainage_m: +cum.toFixed(2),
+          bed_z_m: isFinite(s.bedZ) ? s.bedZ : null,
+          left_bank_z: isFinite(s.lbZ) ? s.lbZ : null,
+          right_bank_z: isFinite(s.rbZ) ? s.rbZ : null,
+          width_m: +s.width.toFixed(2),
+          easting: e,
+          northing: n
+        },
+        geometry: {
+          type: "Point",
+          coordinates: [+geo.lon.toFixed(6), +geo.lat.toFixed(6), +z.toFixed(3)]
+        }
+      });
+    }
+  });
+
+  const geoJson = {
+    type: "FeatureCollection",
+    name: `${st.thReach || "Reach"}_Thalweg_Profile`,
+    features: [
+      {
+        type: "Feature",
+        properties: {
+          name: `${st.thReach || "Reach"} Thalweg Centerline`,
+          reach: st.thReach,
+          stations_count: pointFeatures.length
+        },
+        geometry: {
+          type: "LineString",
+          coordinates: coords3D
+        }
+      },
+      ...pointFeatures
+    ]
+  };
+
+  const filename = `${st.thReach || "thalweg"}_3d_profile.geojson`.replace(/[^a-zA-Z0-9_\-\.]/g, "_");
+  save(filename, JSON.stringify(geoJson, null, 2));
+};
+
 $("themeBtn").onclick = () => {
   const cur = document.documentElement.getAttribute("data-theme");
   const next = cur === "dark" ? "light" : "dark";
@@ -1128,12 +2067,29 @@ $("themeBtn").onclick = () => {
 /* ---------- Sample Survey Data ---------- */
 function sampleRows() {
   const S = [];
-  const add = (id, pts) => pts.forEach(([y, z, c]) => S.push({ "CS ID": id, "Distance Y (m)": y, "Level Z (m PWD)": z, "Bank Code": c || "" }));
-  add("KH-01", [[0,1.10],[7,1.06],[15.5,1.19],[29.9,1.08],[39.2,1.22],[45.6,2.12],[47.9,2.70],[51.1,3.00],[52.4,2.91],[53.1,2.69,"BLN_LS"],[55.9,0.11],[58.1,-0.40],[60.0,-0.48],[63.1,-0.13],[64.8,0.26],[66.8,2.13,"BLN_RS"],[69.2,2.21],[73.4,1.99],[78.2,2.01],[87.5,1.92],[92.8,1.86],[100.8,0.98],[108.8,1.03],[118.2,1.01]]);
-  add("KH-02", [[0,2.05],[6.2,2.10],[12.8,2.12],[18.4,2.20,"BLN_RS"],[21.0,1.30],[24.2,0.10],[27.3,-0.62],[30.1,-0.70],[33.4,-0.21],[35.9,0.90],[38.0,1.72,"BLN_LS"],[42.6,1.78],[49.0,1.70],[55.3,1.74]]);
-  add("KH-03", [[0,1.62],[5.1,1.60],[11.2,1.65],[16.3,1.63],[20.8,1.56],[25.5,1.72],[27.1,0.26],[28.7,-0.18],[30.1,-0.22],[32.2,0.05],[33.7,0.38],[34.3,1.34],[39.8,1.49],[46.7,1.59],[55.8,1.53],[64.9,1.94]]);
-  add("KH-04", [[0,1.07],[8.0,1.09],[15.7,1.11],[24.1,1.19],[33.0,1.20],[40.4,1.22],[48.9,1.26],[55.9,1.07],[56.4,1.56],[57.3,1.44,"BLN_LS"],[58.0,0.49],[60.0,0.05],[61.3,-0.21],[63.3,-0.27],[65.6,-0.26],[67.5,0.50],[68.5,0.88],[69.5,1.38],[71.1,2.21,"BLN_RS"],[75.7,2.13],[80.1,2.06],[83.2,2.06],[85.0,1.14],[86.2,0.58],[88.3,1.59],[90.2,1.84],[93.2,1.81],[99.2,-0.52],[106.3,1.44],[112.7,2.29]]);
-  add("KH-05", [[0,1.80],[6.9,1.55],[11.9,1.69],[17.5,1.74],[24.0,1.58],[32.0,1.24],[32.7,0.53],[34.5,0.03],[35.3,-0.26],[37.7,0.00],[39.9,6.10],[42.6,-0.03],[45.8,0.10],[48.6,0.59],[49.9,1.61,"BLN_RS"],[54.8,1.93],[60.0,1.93],[64.5,1.82]]);
+  const add = (id, reach, east, north, pts) => pts.forEach(([y, z, c]) => S.push({
+    "CS ID": id,
+    "Reach": reach,
+    "Easting": east,
+    "Northing": north,
+    "Distance Y (m)": y,
+    "Level Z (m PWD)": z,
+    "Bank Code": c || ""
+  }));
+
+  // Kalibari Khal (5 cross-sections with realistic coordinates)
+  add("KH-01", "Kalibari Khal", 175925.7, 2477436.3, [[0,1.10],[7,1.06],[15.5,1.19],[29.9,1.08],[39.2,1.22],[45.6,2.12],[47.9,2.70],[51.1,3.00],[52.4,2.91],[53.1,2.69,"BLN_LS"],[55.9,0.11],[58.1,-0.40],[60.0,-0.48],[63.1,-0.13],[64.8,0.26],[66.8,2.13,"BLN_RS"],[69.2,2.21],[73.4,1.99],[78.2,2.01],[87.5,1.92],[92.8,1.86],[100.8,0.98],[108.8,1.03],[118.2,1.01]]);
+  add("KH-02", "Kalibari Khal", 175510.2, 2477120.8, [[0,2.05],[6.2,2.10],[12.8,2.12],[18.4,2.20,"BLN_RS"],[21.0,1.30],[24.2,0.10],[27.3,-0.62],[30.1,-0.70],[33.4,-0.21],[35.9,0.90],[38.0,1.72,"BLN_LS"],[42.6,1.78],[49.0,1.70],[55.3,1.74]]);
+  add("KH-03", "Kalibari Khal", 175150.5, 2476710.2, [[0,1.62],[5.1,1.60],[11.2,1.65],[16.3,1.63],[20.8,1.56],[25.5,1.72],[27.1,0.26],[28.7,-0.18],[30.1,-0.22],[32.2,0.05],[33.7,0.38],[34.3,1.34],[39.8,1.49],[46.7,1.59],[55.8,1.53],[64.9,1.94]]);
+  add("KH-04", "Kalibari Khal", 174820.0, 2476250.5, [[0,1.07],[8.0,1.09],[15.7,1.11],[24.1,1.19],[33.0,1.20],[40.4,1.22],[48.9,1.26],[55.9,1.07],[56.4,1.56],[57.3,1.44,"BLN_LS"],[58.0,0.49],[60.0,0.05],[61.3,-0.21],[63.3,-0.27],[65.6,-0.26],[67.5,0.50],[68.5,0.88],[69.5,1.38],[71.1,2.21,"BLN_RS"],[75.7,2.13],[80.1,2.06],[83.2,2.06],[85.0,1.14],[86.2,0.58],[88.3,1.59],[90.2,1.84],[93.2,1.81],[99.2,-0.52],[106.3,1.44],[112.7,2.29]]);
+  add("KH-05", "Kalibari Khal", 174490.4, 2475780.0, [[0,1.80],[6.9,1.55],[11.9,1.69],[17.5,1.74],[24.0,1.58],[32.0,1.24],[32.7,0.53],[34.5,0.03],[35.3,-0.26],[37.7,0.00],[39.9,6.10],[42.6,-0.03],[45.8,0.10],[48.6,0.59],[49.9,1.61,"BLN_RS"],[54.8,1.93],[60.0,1.93],[64.5,1.82]]);
+
+  // Bhola Khal (4 cross-sections)
+  add("BH-01", "Bhola Khal", 170454.1, 2461568.2, [[0,0.91],[25,0.85],[55,0.42],[85,-1.20],[118,-3.38],[150,-2.10],[190,-0.80],[220,0.30],[250,1.19]]);
+  add("BH-02", "Bhola Khal", 170333.6, 2461033.1, [[0,0.94],[30,0.72],[70,-1.50],[111,-7.50],[140,-4.10],[160,-1.20],[178,1.74]]);
+  add("BH-03", "Bhola Khal", 170403.0, 2460538.2, [[0,0.62],[45,0.20],[120,-2.80],[225,-6.64],[260,-2.10],[286,1.60]]);
+  add("BH-04", "Bhola Khal", 170471.5, 2459987.0, [[0,0.80],[50,0.45],[110,-1.90],[180,-4.50],[240,-1.20],[300,1.40]]);
+
   return S;
 }
 
@@ -1141,8 +2097,8 @@ $("sampleBtn").onclick = () => {
   st.wb = null;
   st.sample = true;
   $("sheetWrap").hidden = true;
-  $("prefix").value = "KH_";
-  loadRows(sampleRows(), "Sample survey loaded (5 sections)");
+  $("prefix").value = "";
+  loadRows(sampleRows(), "Sample survey loaded (9 sections in 2 reaches)");
 };
 
 /* Start with sample data loaded */
