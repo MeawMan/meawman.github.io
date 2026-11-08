@@ -299,21 +299,67 @@
     const box = $('#toolbox');
     if (!tools.length) { $('#tools').hidden = true; return; }
     const STATUS_T = { live: 'LIVE', beta: 'BETA', soon: 'SOON' };
-    box.innerHTML = '<div class="tb-tabs" role="tablist" aria-label="Tools">' + tools.map((t, i) =>
-      (t.group && t.group !== (tools[i - 1] || {}).group ? '<p class="tb-group pixel">' + esc(t.group) + '</p>' : '') +
-      '<button class="tb-tab" role="tab" id="tbt-' + i + '" aria-controls="tbp" aria-selected="' + (i === 0) + '" tabindex="' + (i === 0 ? 0 : -1) + '" data-i="' + i + '" style="--tc:' + (TOOL_COLORS[t.accent] || TOOL_COLORS.cyan) + '">' +
-      '<span class="tb-ico">' + svg(TOOL_ICONS[t.icon] || TOOL_ICONS.chart, 20) + '</span>' +
-      '<span class="tb-txt"><b>' + esc(t.name) + '</b><small>' + esc(t.tagline || '') + '</small></span></button>').join('') +
-      '<div class="tb-more mono">+ more tools coming</div></div>' +
-      '<div class="tb-panel" id="tbp" role="tabpanel"></div>';
-    const panel = $('#tbp');
+
+    // Unique groups in order
+    const groups = [];
+    tools.forEach((t) => {
+      if (t.group && !groups.includes(t.group)) groups.push(t.group);
+    });
+
+    let currentCat = 'all';
+    let currentIdx = 0;
+
+    box.innerHTML = '<div class="tb-top">' +
+      '<div class="seg tb-filter" role="tablist" aria-label="Tool category filter">' +
+        '<button role="tab" data-cat="all" aria-selected="true">All <em>' + tools.length + '</em></button>' +
+        groups.map((g) => {
+          const n = tools.filter((t) => t.group === g).length;
+          const label = g === 'Data preparation' ? 'Data prep' : g;
+          return '<button role="tab" data-cat="' + esc(g) + '" aria-selected="false">' + esc(label) + ' <em>' + n + '</em></button>';
+        }).join('') +
+      '</div>' +
+      '<span class="tb-top-note mono">Free · in-browser · no server</span>' +
+    '</div>' +
+    '<div class="tb-body">' +
+      '<div class="tb-tabs" role="tablist" aria-label="Tools list"></div>' +
+      '<div class="tb-panel" id="tbp" role="tabpanel"></div>' +
+    '</div>';
+
+    const tabsBox = $('.tb-tabs', box);
+    const panel = $('#tbp', box);
+
+    const renderTabs = () => {
+      const visible = currentCat === 'all' ? tools : tools.filter((t) => t.group === currentCat);
+      if (!visible.some((t) => tools.indexOf(t) === currentIdx)) {
+        currentIdx = tools.indexOf(visible[0]);
+      }
+      let lastGrp = null;
+      tabsBox.innerHTML = visible.map((t) => {
+        const i = tools.indexOf(t);
+        const showGrp = currentCat === 'all' && t.group && t.group !== lastGrp;
+        if (showGrp) lastGrp = t.group;
+        return (showGrp ? '<p class="tb-group pixel">' + esc(t.group) + '</p>' : '') +
+          '<button class="tb-tab" role="tab" id="tbt-' + i + '" aria-controls="tbp" aria-selected="' + (i === currentIdx) + '" tabindex="' + (i === currentIdx ? 0 : -1) + '" data-i="' + i + '" style="--tc:' + (TOOL_COLORS[t.accent] || TOOL_COLORS.cyan) + '">' +
+          '<span class="tb-ico">' + svg(TOOL_ICONS[t.icon] || TOOL_ICONS.chart, 20) + '</span>' +
+          '<span class="tb-txt"><b>' + esc(t.name) + '</b><small>' + esc(t.tagline || '') + '</small></span></button>';
+      }).join('') +
+      (currentCat === 'all' ? '<div class="tb-more mono">+ more tools coming</div>' : '');
+
+      const activeBtn = $('#tbt-' + currentIdx, tabsBox);
+      if (activeBtn) activeBtn.scrollIntoView({ block: 'nearest' });
+    };
+
     const show = (i) => {
+      currentIdx = i;
       const t = tools[i];
-      $$('.tb-tab', box).forEach((b) => { const on = +b.dataset.i === i; b.setAttribute('aria-selected', on); b.tabIndex = on ? 0 : -1; });
+      $$('.tb-tab', box).forEach((b) => {
+        const on = +b.dataset.i === i;
+        b.setAttribute('aria-selected', on);
+        b.tabIndex = on ? 0 : -1;
+      });
       panel.setAttribute('aria-labelledby', 'tbt-' + i);
       panel.style.setProperty('--tc', TOOL_COLORS[t.accent] || TOOL_COLORS.cyan);
       const st = t.status || 'live', live = st !== 'soon' && t.url;
-      // "updated" is a yyyy-mm-dd date set in the admin panel; shown as e.g. 25 OCT 2026
       const ud = /^(\d{4})-(\d{2})-(\d{2})$/.exec(t.updated || '');
       const upd = ud ? (+ud[3]) + ' ' + ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'][+ud[2] - 1] + ' ' + ud[1] : '';
       panel.innerHTML = '<div class="tb-info">' +
@@ -326,14 +372,36 @@
           '<a class="mini" href="' + esc(safeUrl(t.url)) + '" target="_blank" rel="noopener" title="Open in a new tab">↗</a>' : '<span class="mini">Coming soon</span>') + '</div></div></div>' +
         '<div class="tb-art">' + toolArt(t.icon) + '<span class="tb-art-cap mono">preview</span></div>';
     };
-    box.addEventListener('click', (e) => { const b = e.target.closest('.tb-tab'); if (b) show(+b.dataset.i); });
+
+    box.addEventListener('click', (e) => {
+      const catBtn = e.target.closest('.tb-filter button');
+      if (catBtn) {
+        currentCat = catBtn.dataset.cat;
+        $$('.tb-filter button', box).forEach((b) => b.setAttribute('aria-selected', b === catBtn));
+        renderTabs();
+        show(currentIdx);
+        return;
+      }
+      const b = e.target.closest('.tb-tab');
+      if (b) show(+b.dataset.i);
+    });
+
     box.addEventListener('keydown', (e) => {
       const b = e.target.closest('.tb-tab'); if (!b) return;
       const k = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[e.key]; if (!k) return;
       e.preventDefault();
-      const n = (+b.dataset.i + k + tools.length) % tools.length;
-      show(n); $('#tbt-' + n).focus();
+      const visibleTabs = $$('.tb-tab', box);
+      const cur = visibleTabs.indexOf(b);
+      if (cur === -1) return;
+      const n = (cur + k + visibleTabs.length) % visibleTabs.length;
+      const target = visibleTabs[n];
+      if (target) {
+        show(+target.dataset.i);
+        target.focus();
+      }
     });
+
+    renderTabs();
     show(0);
   }
 
