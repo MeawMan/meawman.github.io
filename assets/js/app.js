@@ -180,6 +180,7 @@
     catchment: '<path d="M4.5 9.5C5 5.5 9 3 13 3.6c4.2.6 7 3.8 6.6 7.6-.3 3.4-2.8 4.4-4 6.6-1.1 2-3.2 3.6-5.6 3-3.4-.8-6.1-6.4-5.5-11.3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M8 9.5c1.6-2.2 5-2.6 7.2-.8M8.6 13.2c1.3-1.4 3.7-1.6 5.4-.3" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".55"/><path d="M12.5 5.5c-.6 3.4.4 6.6-.6 10.4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
     ffa: '<path d="M3 3v18h18" fill="none" stroke="currentColor" stroke-width="1.4" opacity=".55"/><path d="M5 18C9 15.5 13 11 20 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="7" cy="16.3" r="1.3" fill="currentColor"/><circle cx="10.5" cy="14.6" r="1.3" fill="currentColor"/><circle cx="13" cy="11.2" r="1.3" fill="currentColor"/><circle cx="16.5" cy="8.6" r="1.3" fill="currentColor"/><path d="M15 20.5c1-.9 2-.9 3 0s2 .9 3 0" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" opacity=".7"/>',
     idf: '<path d="M4 5c1 6 3 9 7 11s7 2.5 10 3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M4 10c1.5 4 3.5 6.5 7 7.5s6 1.6 10 2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" opacity=".6"/><path d="M8 2.5c-1.2 1.8-1.8 2.9-1.8 3.7a1.8 1.8 0 0 0 3.6 0c0-.8-.6-1.9-1.8-3.7z" fill="currentColor"/>',
+    profile: '<path d="M3 6 C 5 7, 7 16, 12 17 S 19 7, 21 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M6 10 h 12" stroke="currentColor" stroke-width="1.3" stroke-dasharray="2 1.5" opacity=".7"/><circle cx="12" cy="17" r="1.5" fill="currentColor"/>',
   };
   // Small decorative preview drawn from a seeded pseudo-random series
   function toolArt(kind) {
@@ -279,6 +280,14 @@
         '<line x1="' + x(cut) + '" x2="' + x(cut) + '" y1="' + pad + '" y2="' + (H - pad) + '" class="ta-div"/>' +
         '<path d="' + line(pts, 0, cut + 1) + '" class="ta-real"/><path d="' + line(pts, cut, N) + '" class="ta-gen"/>' +
         '<text x="' + (+x(cut) + 6) + '" y="' + (pad + 12) + '" class="ta-lbl">generated →</text></svg>';
+    }
+    if (kind === 'profile') {
+      return '<svg viewBox="0 0 ' + W + ' ' + H + '" aria-hidden="true">' + g +
+        '<path d="M ' + (pad + 8) + ' ' + (pad + 20) + ' C ' + (pad + 50) + ' ' + (pad + 26) + ', ' + (W / 2 - 40) + ' ' + (H - pad - 12) + ', ' + (W / 2) + ' ' + (H - pad - 10) + ' S ' + (W - pad - 50) + ' ' + (pad + 30) + ', ' + (W - pad - 8) + ' ' + (pad + 22) + '" class="ta-avg" style="stroke-width:2.5"/>' +
+        '<line x1="' + (pad + 38) + '" x2="' + (W - pad - 38) + '" y1="' + (H / 2 + 6) + '" y2="' + (H / 2 + 6) + '" class="ta-div" style="stroke-dasharray:4 3"/>' +
+        '<circle cx="' + (W / 2) + '" cy="' + (H - pad - 10) + '" r="3.5" class="ta-dot"/>' +
+        '<text x="' + (W / 2) + '" y="' + (H - pad + 8) + '" text-anchor="middle" class="ta-lbl2">thalweg bed</text>' +
+        '<text x="' + (pad + 6) + '" y="' + (pad + 12) + '" class="ta-lbl2">river cross-section Y-Z profile</text></svg>';
     }
     const hi = pts.map((v) => Math.min(1, v + 0.1 + rnd() * 0.06)), lo = pts.map((v) => Math.max(0, v - 0.1 - rnd() * 0.06));
     const band = hi.map((v, i) => (i ? 'L' : 'M') + x(i) + ' ' + y(v)).join(' ') + ' ' + lo.map((v, i) => 'L' + x(N - 1 - i) + ' ' + y(lo[N - 1 - i])).join(' ') + ' Z';

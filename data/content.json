@@ -3,7 +3,7 @@
     "title": "Mahfujur Rahman Joy — Water Resources Engineer & Researcher",
     "description": "Portfolio of Mahfujur Rahman Joy: Research Consultant at CEGIS, M.Sc. (WRD) candidate at BUET. Hydrodynamic modeling, GIS & remote sensing, CMIP6 downscaling and machine learning for floods and droughts.",
     "siteUrl": "https://meawman.github.io/",
-    "updated": "2026-11-03"
+    "updated": "2026-11-08"
   },
   "settings": {
     "showPhone": false,
@@ -45,11 +45,31 @@
     "cvUrl": ""
   },
   "links": [
-    { "label": "GitHub", "url": "https://github.com/meawman", "icon": "github" },
-    { "label": "LinkedIn", "url": "https://www.linkedin.com/in/mahfujur-rahman-joy", "icon": "linkedin" },
-    { "label": "Google Scholar", "url": "https://scholar.google.com/citations?user=kWzC3RUAAAAJ&hl=en", "icon": "scholar" },
-    { "label": "ResearchGate", "url": "https://www.researchgate.net/profile/Mahfujur-Rahman-Joy", "icon": "researchgate" },
-    { "label": "ORCID", "url": "https://orcid.org/0009-0003-4202-9776", "icon": "orcid" }
+    {
+      "label": "GitHub",
+      "url": "https://github.com/meawman",
+      "icon": "github"
+    },
+    {
+      "label": "LinkedIn",
+      "url": "https://www.linkedin.com/in/mahfujur-rahman-joy",
+      "icon": "linkedin"
+    },
+    {
+      "label": "Google Scholar",
+      "url": "https://scholar.google.com/citations?user=kWzC3RUAAAAJ&hl=en",
+      "icon": "scholar"
+    },
+    {
+      "label": "ResearchGate",
+      "url": "https://www.researchgate.net/profile/Mahfujur-Rahman-Joy",
+      "icon": "researchgate"
+    },
+    {
+      "label": "ORCID",
+      "url": "https://orcid.org/0009-0003-4202-9776",
+      "icon": "orcid"
+    }
   ],
   "avatar": {
     "lines": [
@@ -77,18 +97,114 @@
     }
   },
   "studyAreas": [
-    { "name": "Sandhya-Baleshwar River Basin", "lon": 90.05, "lat": 22.55, "current": true, "what": "Integrated water resources management feasibility study — 1D/2D hydrodynamic modeling", "org": "CEGIS", "year": "2026–" },
-    { "name": "Burishwar-Payra River Basin", "lon": 90.2, "lat": 22.2, "current": false, "what": "Integrated water resources management feasibility study — flood, erosion, polder and estuary management", "org": "BWDB IWRM study", "year": "" },
-    { "name": "Khulna Coastal Polders (5 polders)", "lon": 89.36, "lat": 22.55, "current": false, "what": "Five polders around the Kurulia and Shibsa rivers", "org": "ADB project", "year": "" },
-    { "name": "North Rajshahi Irrigation Project (NRIP)", "lon": 88.45, "lat": 24.58, "current": false, "what": "Irrigation development in the Barind tract of north Rajshahi", "org": "NRIP", "year": "" },
-    { "name": "Cox's Bazar Watersheds", "lon": 92.12, "lat": 21.2, "current": false, "what": "Watershed management for four watersheds: Rezu Khal, Hnila, Baruakhali and Palongkhali", "org": "FAO project", "year": "" },
-    { "name": "Sylhet Region", "lon": 91.87, "lat": 24.89, "current": false, "what": "Extreme floods and their impacts — remote sensing & deep learning", "org": "SUST Research Center", "year": "2025–26" },
-    { "name": "Feni & Southeast Floodplain", "lon": 91.4, "lat": 23.02, "current": false, "what": "Crop damage assessment for the Aug 2024 and Jul 2025 floods", "org": "BRRI Agromet Lab", "year": "2025" },
-    { "name": "Jamuna River (Sirajganj reach)", "lon": 89.7, "lat": 24.45, "current": false, "what": "Spatio-temporal erosion & accretion with satellite imagery and GEE", "org": "ICCEI 2025", "year": "2025" },
-    { "name": "Brahmaputra-Jamuna System", "lon": 89.75, "lat": 25.35, "current": false, "what": "Trends of rainfall and discharge", "org": "RRI Technical Journal", "year": "2025" },
-    { "name": "Ganges (Padma) River", "lon": 89.03, "lat": 24.07, "current": false, "what": "Multi-decadal planform dynamics with Landsat imagery and GIS", "org": "ICCEI 2025", "year": "2025" },
-    { "name": "Rajshahi District", "lon": 88.6, "lat": 24.4, "current": false, "what": "Landfill site suitability with GIS + MCDA", "org": "ICCEI 2025", "year": "2025" },
-    { "name": "Dhaka (Zones W3 & W4)", "lon": 90.41, "lat": 23.73, "current": false, "what": "Sewerage network design and GIS database", "org": "CCECC", "year": "2026" }
+    {
+      "name": "Sandhya-Baleshwar River Basin",
+      "lon": 90.05,
+      "lat": 22.55,
+      "current": true,
+      "what": "Integrated water resources management feasibility study — 1D/2D hydrodynamic modeling",
+      "org": "CEGIS",
+      "year": "2026–"
+    },
+    {
+      "name": "Burishwar-Payra River Basin",
+      "lon": 90.2,
+      "lat": 22.2,
+      "current": false,
+      "what": "Integrated water resources management feasibility study — flood, erosion, polder and estuary management",
+      "org": "BWDB IWRM study",
+      "year": ""
+    },
+    {
+      "name": "Khulna Coastal Polders (5 polders)",
+      "lon": 89.36,
+      "lat": 22.55,
+      "current": false,
+      "what": "Five polders around the Kurulia and Shibsa rivers",
+      "org": "ADB project",
+      "year": ""
+    },
+    {
+      "name": "North Rajshahi Irrigation Project (NRIP)",
+      "lon": 88.45,
+      "lat": 24.58,
+      "current": false,
+      "what": "Irrigation development in the Barind tract of north Rajshahi",
+      "org": "NRIP",
+      "year": ""
+    },
+    {
+      "name": "Cox's Bazar Watersheds",
+      "lon": 92.12,
+      "lat": 21.2,
+      "current": false,
+      "what": "Watershed management for four watersheds: Rezu Khal, Hnila, Baruakhali and Palongkhali",
+      "org": "FAO project",
+      "year": ""
+    },
+    {
+      "name": "Sylhet Region",
+      "lon": 91.87,
+      "lat": 24.89,
+      "current": false,
+      "what": "Extreme floods and their impacts — remote sensing & deep learning",
+      "org": "SUST Research Center",
+      "year": "2025–26"
+    },
+    {
+      "name": "Feni & Southeast Floodplain",
+      "lon": 91.4,
+      "lat": 23.02,
+      "current": false,
+      "what": "Crop damage assessment for the Aug 2024 and Jul 2025 floods",
+      "org": "BRRI Agromet Lab",
+      "year": "2025"
+    },
+    {
+      "name": "Jamuna River (Sirajganj reach)",
+      "lon": 89.7,
+      "lat": 24.45,
+      "current": false,
+      "what": "Spatio-temporal erosion & accretion with satellite imagery and GEE",
+      "org": "ICCEI 2025",
+      "year": "2025"
+    },
+    {
+      "name": "Brahmaputra-Jamuna System",
+      "lon": 89.75,
+      "lat": 25.35,
+      "current": false,
+      "what": "Trends of rainfall and discharge",
+      "org": "RRI Technical Journal",
+      "year": "2025"
+    },
+    {
+      "name": "Ganges (Padma) River",
+      "lon": 89.03,
+      "lat": 24.07,
+      "current": false,
+      "what": "Multi-decadal planform dynamics with Landsat imagery and GIS",
+      "org": "ICCEI 2025",
+      "year": "2025"
+    },
+    {
+      "name": "Rajshahi District",
+      "lon": 88.6,
+      "lat": 24.4,
+      "current": false,
+      "what": "Landfill site suitability with GIS + MCDA",
+      "org": "ICCEI 2025",
+      "year": "2025"
+    },
+    {
+      "name": "Dhaka (Zones W3 & W4)",
+      "lon": 90.41,
+      "lat": 23.73,
+      "current": false,
+      "what": "Sewerage network design and GIS database",
+      "org": "CCECC",
+      "year": "2026"
+    }
   ],
   "tools": [
     {
@@ -101,8 +217,19 @@
       "accent": "pink",
       "status": "beta",
       "updated": "2026-10-18",
-      "features": ["70+ methods: interpolation, seasonal, regression, neighbour stations, ML, state-space", "Hold-out comparison: NSE, KGE, RMSE over a ladder of gap lengths", "Recommends methods from the gap pattern and the data at hand", "Rating curves: live editor, automatic breaks (BIC), year-by-year curves", "Reads Excel and BWDB files: title rows, REGULAR rows, daily means", "Python in the browser: about 40 MB on first start, then cached"],
-      "tags": ["Gap filling", "Rating curve", "Python"]
+      "features": [
+        "70+ methods: interpolation, seasonal, regression, neighbour stations, ML, state-space",
+        "Hold-out comparison: NSE, KGE, RMSE over a ladder of gap lengths",
+        "Recommends methods from the gap pattern and the data at hand",
+        "Rating curves: live editor, automatic breaks (BIC), year-by-year curves",
+        "Reads Excel and BWDB files: title rows, REGULAR rows, daily means",
+        "Python in the browser: about 40 MB on first start, then cached"
+      ],
+      "tags": [
+        "Gap filling",
+        "Rating curve",
+        "Python"
+      ]
     },
     {
       "name": "Series Generator",
@@ -114,8 +241,17 @@
       "accent": "violet",
       "status": "live",
       "updated": "2026-10-17",
-      "features": ["Gap filling: model, random, linear or seasonal", "Extend by years: statistical model or resampled years", "Built-in accuracy test for filled holes", "Multi-sheet workbooks, plots and Excel export"],
-      "tags": ["Gap filling", "Synthetic series", "Discharge"]
+      "features": [
+        "Gap filling: model, random, linear or seasonal",
+        "Extend by years: statistical model or resampled years",
+        "Built-in accuracy test for filled holes",
+        "Multi-sheet workbooks, plots and Excel export"
+      ],
+      "tags": [
+        "Gap filling",
+        "Synthetic series",
+        "Discharge"
+      ]
     },
     {
       "name": "Min-Max-Avg Terminal",
@@ -127,8 +263,17 @@
       "accent": "cyan",
       "status": "live",
       "updated": "2026-10-17",
-      "features": ["Reads .xlsx, .csv, .txt or rows pasted from Excel", "Finds the date and value columns automatically", "Min–max band chart with hover values", "Export results to .xlsx"],
-      "tags": ["Water level", "Discharge", "Statistics"]
+      "features": [
+        "Reads .xlsx, .csv, .txt or rows pasted from Excel",
+        "Finds the date and value columns automatically",
+        "Min–max band chart with hover values",
+        "Export results to .xlsx"
+      ],
+      "tags": [
+        "Water level",
+        "Discharge",
+        "Statistics"
+      ]
     },
     {
       "name": "Dependability Analyzer",
@@ -140,8 +285,20 @@
       "accent": "lime",
       "status": "live",
       "updated": "2026-10-25",
-      "features": ["Dependable low and high values at any P", "One value per year or every value, whole series or by month", "Year and month filters, incomplete-year warnings", "Datum conversion, e.g. mPWD to mMSL", "Daily, monthly or yearly data, incl. Year × Jan…Dec tables", "Reads BWDB files: title rows, REGULAR rows, daily mean of readings", "Report-style figures (PNG), dependability table, Excel and report text"],
-      "tags": ["Dependable flow", "Water level", "Reports"]
+      "features": [
+        "Dependable low and high values at any P",
+        "One value per year or every value, whole series or by month",
+        "Year and month filters, incomplete-year warnings",
+        "Datum conversion, e.g. mPWD to mMSL",
+        "Daily, monthly or yearly data, incl. Year × Jan…Dec tables",
+        "Reads BWDB files: title rows, REGULAR rows, daily mean of readings",
+        "Report-style figures (PNG), dependability table, Excel and report text"
+      ],
+      "tags": [
+        "Dependable flow",
+        "Water level",
+        "Reports"
+      ]
     },
     {
       "name": "OpenFFA",
@@ -153,8 +310,20 @@
       "accent": "orange",
       "status": "live",
       "updated": "2026-11-03",
-      "features": ["11 distributions: GEV, LP3, P3, Gumbel, GLO, LN2/LN3, Gamma, Weibull, GPA, Normal", "L-moments, ML (censored/historic), moments, PWM, Bulletin 17C EMA, Gumbel's method", "Mann-Kendall (Hamed-Rao), Pettitt, independence and Multiple Grubbs-Beck checks", "Bootstrap GOF p-values, AIC/AICc/BIC, L-moment ratio diagram", "Intervals: parametric/non-parametric bootstrap (BC, BCa), delta, profile likelihood", "Peaks over threshold (gap-aware, annual-maximum T) and non-stationary GEV", "Report with methods paragraph, Excel and project file"],
-      "tags": ["Flood frequency", "Design floods", "Bulletin 17C"]
+      "features": [
+        "11 distributions: GEV, LP3, P3, Gumbel, GLO, LN2/LN3, Gamma, Weibull, GPA, Normal",
+        "L-moments, ML (censored/historic), moments, PWM, Bulletin 17C EMA, Gumbel's method",
+        "Mann-Kendall (Hamed-Rao), Pettitt, independence and Multiple Grubbs-Beck checks",
+        "Bootstrap GOF p-values, AIC/AICc/BIC, L-moment ratio diagram",
+        "Intervals: parametric/non-parametric bootstrap (BC, BCa), delta, profile likelihood",
+        "Peaks over threshold (gap-aware, annual-maximum T) and non-stationary GEV",
+        "Report with methods paragraph, Excel and project file"
+      ],
+      "tags": [
+        "Flood frequency",
+        "Design floods",
+        "Bulletin 17C"
+      ]
     },
     {
       "name": "Brishti IDF",
@@ -166,8 +335,20 @@
       "accent": "teal",
       "status": "live",
       "updated": "2026-11-03",
-      "features": ["Gumbel, GEV, LP3, LN2/LN3, Gamma, P3, GLO; L-moments, moments or ML", "GEV with a fixed (e.g. regional) shape; rank by AICc, BIC, A², PPCC or KS", "Peaks over threshold with a threshold-stability table", "Koutsoyiannis general IDF plus Talbot, Sherman, Bernard, Kimijima and more", "Daily to sub-daily: IMD, calibrated power law, scaling, ratio transfer", "Bootstrap confidence intervals, trend and outlier screening", "Design storms for SWMM and HEC-HMS; report, Excel and methods paragraph"],
-      "tags": ["IDF curves", "Rainfall", "Design storms"]
+      "features": [
+        "Gumbel, GEV, LP3, LN2/LN3, Gamma, P3, GLO; L-moments, moments or ML",
+        "GEV with a fixed (e.g. regional) shape; rank by AICc, BIC, A², PPCC or KS",
+        "Peaks over threshold with a threshold-stability table",
+        "Koutsoyiannis general IDF plus Talbot, Sherman, Bernard, Kimijima and more",
+        "Daily to sub-daily: IMD, calibrated power law, scaling, ratio transfer",
+        "Bootstrap confidence intervals, trend and outlier screening",
+        "Design storms for SWMM and HEC-HMS; report, Excel and methods paragraph"
+      ],
+      "tags": [
+        "IDF curves",
+        "Rainfall",
+        "Design storms"
+      ]
     },
     {
       "name": "Ababahika",
@@ -179,8 +360,20 @@
       "accent": "earth",
       "status": "beta",
       "updated": "2026-11-04",
-      "features": ["Slope per catchment: mean, median, P10–P90, classes (Horn, as ArcGIS)", "Land cover and soil (raster or polygons): area and % per catchment", "Drainage units by D8 with embankments as walls, sluices as outlets, khals burned in", "Flow direction, accumulation and filled DEM as GeoTIFF; validated against pysheds", "Streams GeoTIFFs of any size; geographic DEMs handled exactly", "Project, clip, merge, dissolve, slope raster with real GDAL (WebAssembly)", "Export shapefile, GeoPackage, GeoJSON, KML in any CRS; Excel and methods text"],
-      "tags": ["GIS", "Drainage units", "Land cover"]
+      "features": [
+        "Slope per catchment: mean, median, P10–P90, classes (Horn, as ArcGIS)",
+        "Land cover and soil (raster or polygons): area and % per catchment",
+        "Drainage units by D8 with embankments as walls, sluices as outlets, khals burned in",
+        "Flow direction, accumulation and filled DEM as GeoTIFF; validated against pysheds",
+        "Streams GeoTIFFs of any size; geographic DEMs handled exactly",
+        "Project, clip, merge, dissolve, slope raster with real GDAL (WebAssembly)",
+        "Export shapefile, GeoPackage, GeoJSON, KML in any CRS; Excel and methods text"
+      ],
+      "tags": [
+        "GIS",
+        "Drainage units",
+        "Land cover"
+      ]
     },
     {
       "name": "Composite CN Calculator",
@@ -192,8 +385,44 @@
       "accent": "rose",
       "status": "live",
       "updated": "2026-11-03",
-      "features": ["Paste blocks from Excel; columns matched by header in any order", "Area-weighted CN for AMC I, II and III", "S, Ia (any λ), runoff Q, C = Q/P and volume per sub-catchment", "Soil texture or group A–D; Bangladesh land-cover classes built in", "Open water at CN 100 or excluded as storage", "Editable CN lookup; results copy straight back to Excel"],
-      "tags": ["Curve number", "Runoff", "TR-55"]
+      "features": [
+        "Paste blocks from Excel; columns matched by header in any order",
+        "Area-weighted CN for AMC I, II and III",
+        "S, Ia (any λ), runoff Q, C = Q/P and volume per sub-catchment",
+        "Soil texture or group A–D; Bangladesh land-cover classes built in",
+        "Open water at CN 100 or excluded as storage",
+        "Editable CN lookup; results copy straight back to Excel"
+      ],
+      "tags": [
+        "Curve number",
+        "Runoff",
+        "TR-55"
+      ]
+    },
+    {
+      "name": "River Profile Studio",
+      "group": "Modelling",
+      "tagline": "River cross-sections, SOBEK Y-Z profiles & thalweg analysis",
+      "description": "Convert surveyed river cross-section points (Excel / CSV) into SOBEK 2.1x Y-Z definitions (PROFILE.DEF). Interactively inspect and edit elevations and distances, add or delete specific survey points, select custom left and right bank codes for orientation, add vertical boundary walls, apply datum shifts (MSL to PWD), and merge into existing model files.",
+      "url": "tools/river-profile/",
+      "icon": "profile",
+      "accent": "teal",
+      "status": "live",
+      "updated": "2026-11-08",
+      "features": [
+        "Interactive cross-section inspector: edit elevations (Z), distances (Y), add or delete points",
+        "Configurable bank code selection: assign left and right codes to enforce correct flow orientation",
+        "Vertical boundary walls: add custom wall height or extend to fixed flood level at beginning & end",
+        "SOBEK 2.1x integration: generate clean PROFILE.DEF or merge into existing case files in-place",
+        "Datum shift (e.g. +0.46 m MSL → PWD in Bangladesh) & optional bank crest trimming",
+        "Audit report: export comprehensive CSV summaries with widths, bed levels, and orientation status",
+        "Ready for thalweg line tracking, chainage profiling & survey coordinate mapping"
+      ],
+      "tags": [
+        "Cross-sections",
+        "SOBEK",
+        "River profiling"
+      ]
     },
     {
       "name": "Hydro ML Studio",
@@ -205,8 +434,21 @@
       "accent": "amber",
       "status": "live",
       "updated": "2026-10-17",
-      "features": ["SVR, random forest, extra trees, gradient boosting, neural network, KNN, tree, Lasso", "Save & reload trained models", "One-click zip of all results & plots", "n-fold time-series cross-validation", "Grid, random & Bayesian hyper-parameter tuning", "Importance, partial dependence, duration curves", "Recursive gap filling & prediction on new files", "Methods paragraph + full Excel report"],
-      "tags": ["Machine learning", "Forecasting", "Gap filling"]
+      "features": [
+        "SVR, random forest, extra trees, gradient boosting, neural network, KNN, tree, Lasso",
+        "Save & reload trained models",
+        "One-click zip of all results & plots",
+        "n-fold time-series cross-validation",
+        "Grid, random & Bayesian hyper-parameter tuning",
+        "Importance, partial dependence, duration curves",
+        "Recursive gap filling & prediction on new files",
+        "Methods paragraph + full Excel report"
+      ],
+      "tags": [
+        "Machine learning",
+        "Forecasting",
+        "Gap filling"
+      ]
     },
     {
       "name": "DSBC Studio",
@@ -218,8 +460,19 @@
       "accent": "blue",
       "status": "live",
       "updated": "2026-10-25",
-      "features": ["Predictor screening: correlation, mutual information, stepwise PIC", "11 downscaling models with grid, random or Bayesian tuning", "Blocked-year cross-validation, scored against the seasonal cycle", "QM, QDM, SDM, CDF-t, NBC and more, calibrated on the past only", "Multivariate: MRNBC, MBCp, MBCr, MBCn, R2D2", "Checks that the projected climate change is kept"],
-      "tags": ["Climate change", "Downscaling", "Bias correction"]
+      "features": [
+        "Predictor screening: correlation, mutual information, stepwise PIC",
+        "11 downscaling models with grid, random or Bayesian tuning",
+        "Blocked-year cross-validation, scored against the seasonal cycle",
+        "QM, QDM, SDM, CDF-t, NBC and more, calibrated on the past only",
+        "Multivariate: MRNBC, MBCp, MBCr, MBCn, R2D2",
+        "Checks that the projected climate change is kept"
+      ],
+      "tags": [
+        "Climate change",
+        "Downscaling",
+        "Bias correction"
+      ]
     }
   ],
   "focusAreas": [
@@ -261,7 +514,12 @@
         "Developing, calibrating and validating 1D & 2D hydrologic and hydrodynamic mathematical models.",
         "Preparing technical maps and feasibility reports."
       ],
-      "tools": ["SOBEK", "Delft3D", "ArcGIS Pro", "GEE"]
+      "tools": [
+        "SOBEK",
+        "Delft3D",
+        "ArcGIS Pro",
+        "GEE"
+      ]
     },
     {
       "role": "Jr. Design Engineer",
@@ -278,7 +536,11 @@
         "Designed sewer networks and hydraulic alignments.",
         "CAD operations, engineering maps and project reports."
       ],
-      "tools": ["AutoCAD", "ArcGIS", "MS Office"]
+      "tools": [
+        "AutoCAD",
+        "ArcGIS",
+        "MS Office"
+      ]
     },
     {
       "role": "GIS and Environmental Officer",
@@ -296,7 +558,12 @@
         "Trained and tested RF, SVM, LSTM and CNN models for flood analysis.",
         "Map generation and reporting."
       ],
-      "tools": ["ArcGIS Pro", "GEE", "Google Colab", "Python"]
+      "tools": [
+        "ArcGIS Pro",
+        "GEE",
+        "Google Colab",
+        "Python"
+      ]
     },
     {
       "role": "RS & GIS Analyst",
@@ -314,7 +581,12 @@
         "Trained ML classifiers on ground sample points (KNN, RF, SVR, MD, NB).",
         "Crop damage maps, reports and a journal manuscript."
       ],
-      "tools": ["ArcGIS Pro", "GEE", "Python", "Excel"]
+      "tools": [
+        "ArcGIS Pro",
+        "GEE",
+        "Python",
+        "Excel"
+      ]
     },
     {
       "role": "Research Assistant",
@@ -332,7 +604,13 @@
         "Planform analysis, trend analysis and uni/bi/multivariate copulas.",
         "Predictive modeling with machine and deep learning; reporting and journal publication."
       ],
-      "tools": ["Python", "JavaScript", "QGIS", "SWMM", "GEE"]
+      "tools": [
+        "Python",
+        "JavaScript",
+        "QGIS",
+        "SWMM",
+        "GEE"
+      ]
     }
   ],
   "education": [
@@ -380,11 +658,24 @@
       "featured": false,
       "year": 2026,
       "title": "Climate Change Impacts on Soil Moisture and SERDI-Based Drought Assessment Using the ML-NBC Framework",
-      "authors": ["Ahmad Hasan Nury", "Mahfujur Rahman Joy", "Rounak Afroz", "Abu Sadat Md. Saim"],
+      "authors": [
+        "Ahmad Hasan Nury",
+        "Mahfujur Rahman Joy",
+        "Rounak Afroz",
+        "Abu Sadat Md. Saim"
+      ],
       "venue": "Journal of Hydrologic Engineering (ASCE)",
-      "volume": "", "issue": "", "pages": "",
-      "doi": "", "url": "",
-      "tags": ["Soil moisture", "Drought", "Bias correction", "Machine learning"]
+      "volume": "",
+      "issue": "",
+      "pages": "",
+      "doi": "",
+      "url": "",
+      "tags": [
+        "Soil moisture",
+        "Drought",
+        "Bias correction",
+        "Machine learning"
+      ]
     },
     {
       "type": "journal",
@@ -392,11 +683,25 @@
       "featured": true,
       "year": 2026,
       "title": "Understanding Extreme Floods and Their Impacts in the Northeastern Region in Bangladesh: Utilizing Remote Sensing Data and Deep Learning Models",
-      "authors": ["Khalidur Rahman", "Saiful Alam", "Md Sabbir Hossain", "Mahfujur Rahman Joy", "Nazmul Haque", "Md. Shihab Mostafa"],
+      "authors": [
+        "Khalidur Rahman",
+        "Saiful Alam",
+        "Md Sabbir Hossain",
+        "Mahfujur Rahman Joy",
+        "Nazmul Haque",
+        "Md. Shihab Mostafa"
+      ],
       "venue": "Heliyon",
-      "volume": "", "issue": "", "pages": "",
-      "doi": "", "url": "",
-      "tags": ["Floods", "Deep learning", "Remote sensing"]
+      "volume": "",
+      "issue": "",
+      "pages": "",
+      "doi": "",
+      "url": "",
+      "tags": [
+        "Floods",
+        "Deep learning",
+        "Remote sensing"
+      ]
     },
     {
       "type": "journal",
@@ -404,11 +709,23 @@
       "featured": true,
       "year": 2026,
       "title": "Assessing the Reliability of Global Circulation Models in Predicting Monthly Precipitation Patterns in Bangladesh",
-      "authors": ["Ahmad Hasan Nury", "Abu Sadat Md. Saim", "Khairul Hasan", "Mahfujur Rahman Joy"],
+      "authors": [
+        "Ahmad Hasan Nury",
+        "Abu Sadat Md. Saim",
+        "Khairul Hasan",
+        "Mahfujur Rahman Joy"
+      ],
       "venue": "H2Open Journal",
-      "volume": "", "issue": "", "pages": "100021",
-      "doi": "10.1016/j.htopen.2026.100021", "url": "",
-      "tags": ["GCM", "Precipitation", "CMIP6"]
+      "volume": "",
+      "issue": "",
+      "pages": "100021",
+      "doi": "10.1016/j.htopen.2026.100021",
+      "url": "",
+      "tags": [
+        "GCM",
+        "Precipitation",
+        "CMIP6"
+      ]
     },
     {
       "type": "journal",
@@ -416,11 +733,27 @@
       "featured": true,
       "year": 2025,
       "title": "Drought prediction in Bangladesh under changing climate: Integrating SDAT-SPI and SDSM-DCBC with CMIP6 data",
-      "authors": ["Ahmad Hasan Nury", "Saiful Alam", "Rounak Afroz", "Saurov Nandi Majumdar", "Shawly Deb Anti", "Mahfujur Rahman Joy", "Gulam Md. Munna"],
+      "authors": [
+        "Ahmad Hasan Nury",
+        "Saiful Alam",
+        "Rounak Afroz",
+        "Saurov Nandi Majumdar",
+        "Shawly Deb Anti",
+        "Mahfujur Rahman Joy",
+        "Gulam Md. Munna"
+      ],
       "venue": "Environmental and Sustainability Indicators",
-      "volume": "28", "issue": "", "pages": "100878",
-      "doi": "10.1016/j.indic.2025.100878", "url": "",
-      "tags": ["Drought", "CMIP6", "Downscaling", "SPI"]
+      "volume": "28",
+      "issue": "",
+      "pages": "100878",
+      "doi": "10.1016/j.indic.2025.100878",
+      "url": "",
+      "tags": [
+        "Drought",
+        "CMIP6",
+        "Downscaling",
+        "SPI"
+      ]
     },
     {
       "type": "journal",
@@ -428,11 +761,21 @@
       "featured": false,
       "year": 2025,
       "title": "Investigating the Trends of Rainfall and Discharge along the Brahmaputra-Jamuna River System",
-      "authors": ["Raied Ahmed Nishat", "Mahfujur Rahman Joy"],
+      "authors": [
+        "Raied Ahmed Nishat",
+        "Mahfujur Rahman Joy"
+      ],
       "venue": "Technical Journal, River Research Institute",
-      "volume": "17", "issue": "1", "pages": "",
-      "doi": "", "url": "https://www.researchgate.net/publication/392507278_Investigating_the_Trends_of_Rainfall_and_Discharge_along_the_Brahmaputra-Jamuna_River_System",
-      "tags": ["Trend analysis", "Rainfall", "Discharge"]
+      "volume": "17",
+      "issue": "1",
+      "pages": "",
+      "doi": "",
+      "url": "https://www.researchgate.net/publication/392507278_Investigating_the_Trends_of_Rainfall_and_Discharge_along_the_Brahmaputra-Jamuna_River_System",
+      "tags": [
+        "Trend analysis",
+        "Rainfall",
+        "Discharge"
+      ]
     },
     {
       "type": "journal",
@@ -440,11 +783,21 @@
       "featured": false,
       "year": 2025,
       "title": "Hydroclimatic Trend Analysis and Machine Learning-Based Water Level Prediction for The Ganges (Padma) River Basin",
-      "authors": ["Mahfujur Rahman Joy", "Raied Ahmed Nishat"],
+      "authors": [
+        "Mahfujur Rahman Joy",
+        "Raied Ahmed Nishat"
+      ],
       "venue": "Hydrological Processes (Wiley) — preprint",
-      "volume": "", "issue": "", "pages": "",
-      "doi": "10.22541/au.175741407.71397410/v1", "url": "https://www.authorea.com/doi/pdf/10.22541/au.175741407.71397410",
-      "tags": ["Machine learning", "Water level", "Ganges"]
+      "volume": "",
+      "issue": "",
+      "pages": "",
+      "doi": "10.22541/au.175741407.71397410/v1",
+      "url": "https://www.authorea.com/doi/pdf/10.22541/au.175741407.71397410",
+      "tags": [
+        "Machine learning",
+        "Water level",
+        "Ganges"
+      ]
     },
     {
       "type": "conference",
@@ -452,11 +805,21 @@
       "featured": false,
       "year": 2025,
       "title": "Evaluation of Machine Learning Classifiers for LULC Classification Using Sentinel-2 Imagery on Google Earth Engine",
-      "authors": ["Mahfujur Rahman Joy", "Saifullah Mansur Akil"],
+      "authors": [
+        "Mahfujur Rahman Joy",
+        "Saifullah Mansur Akil"
+      ],
       "venue": "Proc. International Conference on Civil Engineering Research & Innovations (ICCEI), RUET, Rajshahi — Paper 514",
-      "volume": "", "issue": "", "pages": "",
-      "doi": "", "url": "https://www.researchgate.net/publication/400757159_Evaluation_of_Machine_Learning_Classifiers_for_LULC_Classification_Using_Sentinel-2_Imagery_on_Google_Earth_Engine",
-      "tags": ["LULC", "Sentinel-2", "GEE"]
+      "volume": "",
+      "issue": "",
+      "pages": "",
+      "doi": "",
+      "url": "https://www.researchgate.net/publication/400757159_Evaluation_of_Machine_Learning_Classifiers_for_LULC_Classification_Using_Sentinel-2_Imagery_on_Google_Earth_Engine",
+      "tags": [
+        "LULC",
+        "Sentinel-2",
+        "GEE"
+      ]
     },
     {
       "type": "conference",
@@ -464,11 +827,21 @@
       "featured": false,
       "year": 2025,
       "title": "Multi-Decadal Planform Dynamics of the Transboundary Ganges River Using Landsat Imagery and GIS",
-      "authors": ["Mahfujur Rahman Joy", "Saifullah Mansur Akil"],
+      "authors": [
+        "Mahfujur Rahman Joy",
+        "Saifullah Mansur Akil"
+      ],
       "venue": "Proc. International Conference on Civil Engineering Research & Innovations (ICCEI), RUET, Rajshahi — Paper 518",
-      "volume": "", "issue": "", "pages": "",
-      "doi": "", "url": "https://www.researchgate.net/publication/400756811_Multi-Decadal_Planform_Dynamics_of_the_Transboundary_Ganges_River_Using_Landsat_Imagery_and_GIS",
-      "tags": ["River planform", "Landsat", "GIS"]
+      "volume": "",
+      "issue": "",
+      "pages": "",
+      "doi": "",
+      "url": "https://www.researchgate.net/publication/400756811_Multi-Decadal_Planform_Dynamics_of_the_Transboundary_Ganges_River_Using_Landsat_Imagery_and_GIS",
+      "tags": [
+        "River planform",
+        "Landsat",
+        "GIS"
+      ]
     },
     {
       "type": "conference",
@@ -476,11 +849,22 @@
       "featured": false,
       "year": 2025,
       "title": "Integrating Geospatial Techniques and the MCDA Approach for Landfill Site Suitability Mapping in Rajshahi District, Bangladesh",
-      "authors": ["Saifullah Mansur Akil", "Mahfujur Rahman Joy", "Gulam Md. Munna"],
+      "authors": [
+        "Saifullah Mansur Akil",
+        "Mahfujur Rahman Joy",
+        "Gulam Md. Munna"
+      ],
       "venue": "Proc. International Conference on Civil Engineering Research & Innovations (ICCEI), RUET, Rajshahi — Paper 1011",
-      "volume": "", "issue": "", "pages": "",
-      "doi": "", "url": "https://www.researchgate.net/publication/401255010_Integrating_Geospatial_Techniques_and_the_MCDA_Approach_for_Landfill_Site_Suitability_Mapping_in_Rajshahi_District_Bangladesh",
-      "tags": ["MCDA", "Site suitability", "GIS"]
+      "volume": "",
+      "issue": "",
+      "pages": "",
+      "doi": "",
+      "url": "https://www.researchgate.net/publication/401255010_Integrating_Geospatial_Techniques_and_the_MCDA_Approach_for_Landfill_Site_Suitability_Mapping_in_Rajshahi_District_Bangladesh",
+      "tags": [
+        "MCDA",
+        "Site suitability",
+        "GIS"
+      ]
     },
     {
       "type": "conference",
@@ -488,11 +872,19 @@
       "featured": false,
       "year": 2025,
       "title": "Clustering Earthquake Activity in South Asia Using Advanced Techniques",
-      "authors": ["Mahfujur Rahman Joy"],
+      "authors": [
+        "Mahfujur Rahman Joy"
+      ],
       "venue": "Proc. International Conference on Civil Engineering Research & Innovations (ICCEI), RUET, Rajshahi — Paper 266",
-      "volume": "", "issue": "", "pages": "",
-      "doi": "", "url": "https://www.researchgate.net/publication/400756205_Clustering_Earthquake_Activity_in_South_Asia_Using_Advanced_Techniques",
-      "tags": ["Earthquakes", "Clustering"]
+      "volume": "",
+      "issue": "",
+      "pages": "",
+      "doi": "",
+      "url": "https://www.researchgate.net/publication/400756205_Clustering_Earthquake_Activity_in_South_Asia_Using_Advanced_Techniques",
+      "tags": [
+        "Earthquakes",
+        "Clustering"
+      ]
     },
     {
       "type": "conference",
@@ -500,11 +892,20 @@
       "featured": false,
       "year": 2025,
       "title": "Bivariate GIS-Based Risk Mapping of Earthquake Hazard and Population Vulnerability in Bangladesh",
-      "authors": ["Mahfujur Rahman Joy"],
+      "authors": [
+        "Mahfujur Rahman Joy"
+      ],
       "venue": "Proc. International Conference on Civil Engineering Research & Innovations (ICCEI), RUET, Rajshahi — Paper 268",
-      "volume": "", "issue": "", "pages": "",
-      "doi": "", "url": "https://www.researchgate.net/publication/400756808_Bivariate_GIS-Based_Risk_Mapping_of_Earthquake_Hazard_and_Population_Vulnerability_in_Bangladesh",
-      "tags": ["Earthquakes", "Risk mapping", "GIS"]
+      "volume": "",
+      "issue": "",
+      "pages": "",
+      "doi": "",
+      "url": "https://www.researchgate.net/publication/400756808_Bivariate_GIS-Based_Risk_Mapping_of_Earthquake_Hazard_and_Population_Vulnerability_in_Bangladesh",
+      "tags": [
+        "Earthquakes",
+        "Risk mapping",
+        "GIS"
+      ]
     },
     {
       "type": "conference",
@@ -512,42 +913,196 @@
       "featured": false,
       "year": 2025,
       "title": "Spatio-Temporal Dynamics of Erosion and Accretion in the Jamuna River System Using Satellite Imagery and GEE",
-      "authors": ["Saifullah Mansur Akil", "Mahfujur Rahman Joy", "Gulam Md. Munna"],
+      "authors": [
+        "Saifullah Mansur Akil",
+        "Mahfujur Rahman Joy",
+        "Gulam Md. Munna"
+      ],
       "venue": "Proc. International Conference on Civil Engineering Research & Innovations (ICCEI), RUET, Rajshahi — Paper 1014",
-      "volume": "", "issue": "", "pages": "",
-      "doi": "", "url": "https://www.researchgate.net/publication/400757077_Spatio-Temporal_Dynamics_of_Erosion_and_Accretion_in_the_Jamuna_River_System_Using_Satellite_Imagery_and_GEE",
-      "tags": ["Erosion", "Accretion", "GEE"]
+      "volume": "",
+      "issue": "",
+      "pages": "",
+      "doi": "",
+      "url": "https://www.researchgate.net/publication/400757077_Spatio-Temporal_Dynamics_of_Erosion_and_Accretion_in_the_Jamuna_River_System_Using_Satellite_Imagery_and_GEE",
+      "tags": [
+        "Erosion",
+        "Accretion",
+        "GEE"
+      ]
     }
   ],
   "skills": [
-    { "group": "GIS & Remote Sensing", "items": ["ArcGIS Pro", "QGIS", "Google Earth Engine", "Sentinel-2 & Landsat imagery", "Flood inundation mapping", "Land-cover classification", "River planform & erosion analysis", "MCDA site suitability"] },
-    { "group": "Hydrodynamic Modeling", "items": ["SOBEK 1D/2D", "Delft3D", "EPA SWMM", "Calibration & validation"] },
-    { "group": "Climate & Hydro-Statistics", "items": ["CMIP6 statistical downscaling", "Bias correction (NBC, MBC, QBC)", "Flood & rainfall frequency analysis", "Copula drought analysis", "Trend tests (Mann–Kendall, Sen's slope)"] },
-    { "group": "Machine Learning & Coding", "items": ["Python", "JavaScript", "Random forest, SVM, KNN", "LSTM & CNN deep learning", "Browser-based analysis tools"] },
-    { "group": "Engineering Design", "items": ["AutoCAD", "ETABS", "Sewer network design"] }
+    {
+      "group": "GIS & Remote Sensing",
+      "items": [
+        "ArcGIS Pro",
+        "QGIS",
+        "Google Earth Engine",
+        "Sentinel-2 & Landsat imagery",
+        "Flood inundation mapping",
+        "Land-cover classification",
+        "River planform & erosion analysis",
+        "MCDA site suitability"
+      ]
+    },
+    {
+      "group": "Hydrodynamic Modeling",
+      "items": [
+        "SOBEK 1D/2D",
+        "Delft3D",
+        "EPA SWMM",
+        "Calibration & validation"
+      ]
+    },
+    {
+      "group": "Climate & Hydro-Statistics",
+      "items": [
+        "CMIP6 statistical downscaling",
+        "Bias correction (NBC, MBC, QBC)",
+        "Flood & rainfall frequency analysis",
+        "Copula drought analysis",
+        "Trend tests (Mann–Kendall, Sen's slope)"
+      ]
+    },
+    {
+      "group": "Machine Learning & Coding",
+      "items": [
+        "Python",
+        "JavaScript",
+        "Random forest, SVM, KNN",
+        "LSTM & CNN deep learning",
+        "Browser-based analysis tools"
+      ]
+    },
+    {
+      "group": "Engineering Design",
+      "items": [
+        "AutoCAD",
+        "ETABS",
+        "Sewer network design"
+      ]
+    }
   ],
   "certifications": [
-    { "title": "Geospatial Data Analysis and Management (Intermediate)", "issuer": "Esri & EDGE", "date": "Apr – May 2026", "credentialId": "", "url": "" },
-    { "title": "Big Data Analysis for Water Related Applications", "issuer": "UNU-INWEH", "date": "Mar 2026", "credentialId": "eda202eb1db04a99b01c6b6c66801e5a", "url": "" },
-    { "title": "Remote Sensing and GIS in Climate and Water Management", "issuer": "BUET", "date": "May 2025", "credentialId": "", "url": "" },
-    { "title": "Getting Started with Imagery and Remote Sensing", "issuer": "Esri", "date": "Apr – May 2025", "credentialId": "6834612eb653abf18e3a67b5", "url": "" },
-    { "title": "Python Programming and Basic Data Science", "issuer": "ICT Division, Bangladesh", "date": "Dec 2024 – May 2025", "credentialId": "EDGE-DSTS-126-8826-00016", "url": "" },
-    { "title": "Going Places with Spatial Analysis", "issuer": "Esri", "date": "Jan – Mar 2025", "credentialId": "6754afca58d5e000133f6ef3", "url": "" },
-    { "title": "Data Analysis with Python", "issuer": "freeCodeCamp", "date": "May – Jun 2024", "credentialId": "mahfujurrahmanjoy-dawp", "url": "" },
-    { "title": "Geospatial Data Analysis with ChatGPT and Google Earth Engine", "issuer": "UNU-INWEH", "date": "Apr – May 2024", "credentialId": "ce28690d389c48a6ba3845560d75d44c", "url": "" }
+    {
+      "title": "Geospatial Data Analysis and Management (Intermediate)",
+      "issuer": "Esri & EDGE",
+      "date": "Apr – May 2026",
+      "credentialId": "",
+      "url": ""
+    },
+    {
+      "title": "Big Data Analysis for Water Related Applications",
+      "issuer": "UNU-INWEH",
+      "date": "Mar 2026",
+      "credentialId": "eda202eb1db04a99b01c6b6c66801e5a",
+      "url": ""
+    },
+    {
+      "title": "Remote Sensing and GIS in Climate and Water Management",
+      "issuer": "BUET",
+      "date": "May 2025",
+      "credentialId": "",
+      "url": ""
+    },
+    {
+      "title": "Getting Started with Imagery and Remote Sensing",
+      "issuer": "Esri",
+      "date": "Apr – May 2025",
+      "credentialId": "6834612eb653abf18e3a67b5",
+      "url": ""
+    },
+    {
+      "title": "Python Programming and Basic Data Science",
+      "issuer": "ICT Division, Bangladesh",
+      "date": "Dec 2024 – May 2025",
+      "credentialId": "EDGE-DSTS-126-8826-00016",
+      "url": ""
+    },
+    {
+      "title": "Going Places with Spatial Analysis",
+      "issuer": "Esri",
+      "date": "Jan – Mar 2025",
+      "credentialId": "6754afca58d5e000133f6ef3",
+      "url": ""
+    },
+    {
+      "title": "Data Analysis with Python",
+      "issuer": "freeCodeCamp",
+      "date": "May – Jun 2024",
+      "credentialId": "mahfujurrahmanjoy-dawp",
+      "url": ""
+    },
+    {
+      "title": "Geospatial Data Analysis with ChatGPT and Google Earth Engine",
+      "issuer": "UNU-INWEH",
+      "date": "Apr – May 2024",
+      "credentialId": "ce28690d389c48a6ba3845560d75d44c",
+      "url": ""
+    }
   ],
   "leadership": [
-    { "role": "IT Secretary", "org": "Association of Civil & Environmental Engineering (ACEE), SUST", "location": "Sylhet", "period": "Mar 2024 – Jul 2025" },
-    { "role": "Assistant IT Secretary", "org": "ACEE, SUST", "location": "Sylhet", "period": "Apr 2023 – Mar 2024" },
-    { "role": "Campus Leader", "org": "BongoDev", "location": "Remote", "period": "Jan 2023 – Jun 2024" },
-    { "role": "Campus Ambassador", "org": "Construct Carnival 1.0, KUET", "location": "Remote", "period": "May 2024" },
-    { "role": "Publication & IT Management", "org": "ExCEEd 2.0", "location": "Sylhet", "period": "Mar 2023" },
-    { "role": "Management", "org": "CEE SUST Silver Jubilee Celebration & Reunion", "location": "Sylhet", "period": "Mar 2023" },
-    { "role": "Vice President", "org": "HPC Science Club, Hamdard Public College", "location": "Dhaka", "period": "Mar 2018 – Mar 2019" }
+    {
+      "role": "IT Secretary",
+      "org": "Association of Civil & Environmental Engineering (ACEE), SUST",
+      "location": "Sylhet",
+      "period": "Mar 2024 – Jul 2025"
+    },
+    {
+      "role": "Assistant IT Secretary",
+      "org": "ACEE, SUST",
+      "location": "Sylhet",
+      "period": "Apr 2023 – Mar 2024"
+    },
+    {
+      "role": "Campus Leader",
+      "org": "BongoDev",
+      "location": "Remote",
+      "period": "Jan 2023 – Jun 2024"
+    },
+    {
+      "role": "Campus Ambassador",
+      "org": "Construct Carnival 1.0, KUET",
+      "location": "Remote",
+      "period": "May 2024"
+    },
+    {
+      "role": "Publication & IT Management",
+      "org": "ExCEEd 2.0",
+      "location": "Sylhet",
+      "period": "Mar 2023"
+    },
+    {
+      "role": "Management",
+      "org": "CEE SUST Silver Jubilee Celebration & Reunion",
+      "location": "Sylhet",
+      "period": "Mar 2023"
+    },
+    {
+      "role": "Vice President",
+      "org": "HPC Science Club, Hamdard Public College",
+      "location": "Dhaka",
+      "period": "Mar 2018 – Mar 2019"
+    }
   ],
   "references": [
-    { "name": "Dr. Ahmad Hasan Nury", "title": "Professor, Dept. of Civil & Environmental Engineering", "org": "Shahjalal University of Science and Technology", "email": "hasan-cee@sust.edu" },
-    { "name": "Dr. Khalidur Rahman", "title": "Professor, Dept. of Statistics", "org": "Shahjalal University of Science and Technology", "email": "khalid-sta@sust.edu" },
-    { "name": "Dr. Niaz Md. Farhat Rahman", "title": "Principal Scientific Officer, Agromet Lab", "org": "Bangladesh Rice Research Institute", "email": "niaz.sust@gmail.com" }
+    {
+      "name": "Dr. Ahmad Hasan Nury",
+      "title": "Professor, Dept. of Civil & Environmental Engineering",
+      "org": "Shahjalal University of Science and Technology",
+      "email": "hasan-cee@sust.edu"
+    },
+    {
+      "name": "Dr. Khalidur Rahman",
+      "title": "Professor, Dept. of Statistics",
+      "org": "Shahjalal University of Science and Technology",
+      "email": "khalid-sta@sust.edu"
+    },
+    {
+      "name": "Dr. Niaz Md. Farhat Rahman",
+      "title": "Principal Scientific Officer, Agromet Lab",
+      "org": "Bangladesh Rice Research Institute",
+      "email": "niaz.sust@gmail.com"
+    }
   ]
 }

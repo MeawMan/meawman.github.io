@@ -1,0 +1,1152 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>River Profile Studio &mdash; Cross-sections, SOBEK Y-Z &amp; profiling &middot; Mahfujur Rahman Joy</title>
+<meta name="description" content="Turn surveyed river cross-section points (Excel / CSV) into SOBEK 2.1x Y-Z definitions (PROFILE.DEF). Interactively inspect and edit elevations and distances, add or delete points, select bank codes for orientation, add vertical boundary walls, and export. Runs 100% in your browser.">
+<meta property="og:title" content="River Profile Studio &middot; Mahfujur Rahman Joy">
+<meta property="og:description" content="River cross-section inspector, interactive point editor, and SOBEK 2.1x Y-Z PROFILE.DEF builder. Runs 100% in your browser.">
+<meta property="og:image" content="https://meawman.github.io/assets/og-image.png">
+<link rel="canonical" href="https://meawman.github.io/tools/river-profile/">
+<link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../../assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Silkscreen&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/css/tool-shell.css">
+<script>
+  (function () {
+    var t = null; try { t = localStorage.getItem('mrj_theme'); } catch (e) {}
+    if (t !== 'light' && t !== 'dark') t = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', t);
+  })();
+</script>
+<style>
+:root{
+  --bg:#f2f4f9; --panel:#ffffff; --panel2:#eef2f8; --ink:#14262e; --muted:#5b6b72; --line:#dbe2ee; --soft:#eef2f8;
+  --water:#0786ad; --water-2:#2f8fb1; --sediment:#b7792b; --ok:#2c8a22; --warn:#b86200; --bad:#c0264d;
+  --cut:rgba(183,121,43,.13); --gridc:#dfe6e8;
+  --f-display:"Space Grotesk",system-ui,-apple-system,sans-serif;
+  --f-body:"Space Grotesk",system-ui,-apple-system,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+  --r:8px;
+}
+html[data-theme="dark"]{
+  --bg:#06080f; --panel:#0d1322; --panel2:#121b2f; --ink:#c9d3e6; --muted:#8592ab; --line:#1d2a44; --soft:#121b2f;
+  --water:#5be7ff; --water-2:#7fcae4; --sediment:#ffc857; --ok:#9dff6b; --warn:#ffc857; --bad:#ff6b8b;
+  --cut:rgba(255,200,87,.14); --gridc:#1d2a44; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.5;margin:0}
+.wrap{max-width:1380px;margin:0 auto;padding-block:20px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.header-intro{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px;padding-bottom:18px;margin-bottom:20px;border-bottom:1px solid var(--line)}
+h1{font-family:var(--f-display);font-weight:700;font-size:clamp(22px,3vw,30px);letter-spacing:-.01em;margin:0;line-height:1.15}
+h1 small{display:block;font-family:var(--f-mono);font-weight:400;font-size:12px;letter-spacing:.06em;color:var(--water);text-transform:uppercase;margin-bottom:4px}
+.lede{max-width:68ch;color:var(--muted);margin:6px 0 0;font-size:13.5px}
+.grid{display:grid;grid-template-columns:minmax(320px,380px) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:960px){.grid{grid-template-columns:minmax(0,1fr)}}
+.rail{display:flex;flex-direction:column;gap:16px}
+.step{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.step h2{margin:0;font-family:var(--f-display);font-weight:700;font-size:15px;letter-spacing:.02em;display:flex;align-items:baseline;gap:8px}
+.step h2 .n{font-family:var(--f-mono);font-size:12px;color:var(--sediment);font-weight:600}
+.hint{color:var(--muted);font-size:12px;margin:0}
+label{font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:4px;min-width:0;font-weight:500}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink);font-size:13px;font-weight:400;cursor:pointer}
+input[type=text],input[type=number],select,textarea{font:inherit;font-size:13px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:6px 8px;width:100%;min-width:0}
+input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible,.sec:focus-visible{outline:2px solid var(--water);outline-offset:1px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.drop{border:1.5px dashed var(--water);border-radius:var(--r);padding:14px;text-align:center;cursor:pointer;background:color-mix(in srgb,var(--water) 6%,transparent);color:var(--ink)}
+.drop.over{background:color-mix(in srgb,var(--water) 16%,transparent)}
+.drop strong{display:block;font-family:var(--f-display);font-size:13.5px}
+.drop span{font-size:12px;color:var(--muted)}
+button{font:inherit;font-size:13px;font-weight:500;border-radius:6px;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:6px 12px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+button:hover{border-color:var(--water);background:var(--soft)}
+button.primary{background:var(--water);border-color:var(--water);color:#fff;font-weight:600}
+html[data-theme="dark"] button.primary{color:#04141a}
+button.primary:hover{background:var(--water-2)}
+button.danger{color:var(--bad);border-color:color-mix(in srgb,var(--bad) 35%,transparent)}
+button.danger:hover{background:color-mix(in srgb,var(--bad) 10%,transparent)}
+button:disabled{opacity:.5;cursor:not-allowed}
+.btns{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:4px;font-family:var(--f-mono);font-size:11px;padding:1px 7px;border-radius:999px;border:1px solid currentColor;white-space:nowrap}
+.chip.ok{color:var(--ok)} .chip.warn{color:var(--warn)} .chip.bad{color:var(--bad)} .chip.info{color:var(--water)} .chip.edit{color:var(--sediment)}
+details{border-top:1px solid var(--line);padding-top:8px}
+summary{cursor:pointer;font-size:13px;font-weight:500;color:var(--ink)}
+details[open] summary{margin-bottom:10px}
+.dg{display:flex;flex-direction:column;gap:10px}
+.main{display:flex;flex-direction:column;gap:16px;min-width:0}
+.summary{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:baseline;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:10px 16px}
+.summary b{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-size:17px;font-weight:600}
+.summary span{color:var(--muted);font-size:12px}
+.badge-sample{font-family:var(--f-mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--sediment);border:1px solid var(--sediment);padding:1px 6px;border-radius:3px}
+.work{display:grid;grid-template-columns:minmax(210px,270px) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:1100px){.work{grid-template-columns:minmax(0,1fr)}}
+.list{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);max-height:720px;overflow:auto;min-width:0}
+.list .flt{position:sticky;top:0;background:var(--panel);padding:8px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:6px;z-index:2}
+.sec{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 8px;padding:8px 10px;border-bottom:1px solid var(--line);cursor:pointer}
+.sec:hover{background:var(--soft)}
+.sec.on{background:color-mix(in srgb,var(--water) 14%,transparent);box-shadow:inset 3px 0 0 var(--water)}
+.sec.has-edit{border-left:3px solid var(--sediment)}
+.sec .nm{font-family:var(--f-mono);font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500}
+.sec .meta{grid-column:1/-1;font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.view{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.view-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px}
+.view-head h3{margin:0;font-family:var(--f-display);font-size:19px;font-weight:700;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.sec-actions{display:flex;flex-wrap:wrap;gap:8px}
+.plot{width:100%;overflow-x:auto;position:relative}
+.plot svg{display:block;width:100%;height:auto;min-width:540px}
+.plot circle.pt-dot{cursor:pointer;transition:r .15s}
+.plot circle.pt-dot:hover{r:6.5;fill:var(--water-2)}
+.plot circle.pt-dot.selected{r:7;fill:var(--sediment);stroke:var(--panel);stroke-width:2}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12px;color:var(--muted);align-items:center}
+.legend i{display:inline-block;width:16px;height:0;border-top:2px solid;vertical-align:middle;margin-right:5px}
+.editor-card{background:var(--soft);border:1px solid var(--line);border-radius:var(--r);padding:12px;display:flex;flex-direction:column;gap:10px}
+.add-bar{display:flex;flex-wrap:wrap;align-items:flex-end;gap:8px}
+.add-bar label{flex:1;min-width:90px}
+.tbl{overflow:auto;max-height:300px;border:1px solid var(--line);border-radius:6px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-family:var(--f-mono);font-size:12px;font-variant-numeric:tabular-nums}
+th,td{padding:5px 8px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap;vertical-align:middle}
+th{position:sticky;top:0;background:var(--soft);font-family:var(--f-body);font-weight:600;color:var(--muted);z-index:1}
+td.l,th.l{text-align:left}
+td.c,th.c{text-align:center}
+tr.selected{background:color-mix(in srgb,var(--water) 14%,transparent)}
+tr.edited-pt{background:color-mix(in srgb,var(--sediment) 12%,transparent)}
+tr.cut td{color:var(--muted);text-decoration:line-through;text-decoration-color:color-mix(in srgb,var(--sediment) 70%,transparent)}
+input.tbl-inp{font:inherit;font-family:var(--f-mono);font-size:12px;padding:3px 6px;border:1px solid var(--line);border-radius:4px;background:var(--bg);color:var(--ink);width:85px;text-align:right}
+input.tbl-inp:focus{outline:2px solid var(--water);background:var(--panel);color:var(--ink)}
+.del-btn{background:transparent;border:none;color:var(--bad);cursor:pointer;padding:2px 6px;font-size:14px;border-radius:3px;line-height:1}
+.del-btn:hover{background:color-mix(in srgb,var(--bad) 15%,transparent)}
+pre.out{margin:0;max-height:220px;overflow:auto;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:10px;font-family:var(--f-mono);font-size:11.5px;line-height:1.45}
+.status{font-size:12.5px;min-height:1.4em}
+.status.err{color:var(--bad)} .status.okk{color:var(--ok)}
+.bank-box{background:var(--soft);border-radius:var(--r);padding:10px;display:flex;flex-direction:column;gap:8px;border:1px solid var(--line)}
+.wall-box{background:var(--soft);border-radius:var(--r);padding:10px;display:flex;flex-direction:column;gap:8px;border:1px solid var(--line);margin-top:4px}
+.empty{color:var(--muted);padding:24px;text-align:center}
+footer.tool-foot{margin-top:32px;padding-top:14px;border-top:1px solid var(--line);color:var(--muted);font-size:12px;display:flex;flex-wrap:wrap;gap:6px 20px;justify-content:space-between}
+</style>
+</head>
+<body>
+
+<!-- Portfolio standard bar -->
+<header class="ts-bar">
+  <div class="ts-brand">
+    <a class="ts-logo" href="../../" title="Back to the portfolio"><img src="../../assets/favicon.svg" alt="Mahfujur Rahman Joy — portfolio" width="34" height="34"></a>
+    <span class="ts-crumb"><a href="../../"><b>Joy</b></a><span aria-hidden="true">/</span><a href="../../#tools">Tools</a><span aria-hidden="true">/</span><em>River Profile Studio</em></span>
+    <small class="tagline" style="font-size:12px;color:var(--dim);margin-left:4px">cross-sections &amp; profiling</small>
+  </div>
+  <div class="ts-actions">
+    <span class="ts-privacy">● files stay on your computer</span>
+    <a class="ts-btn" href="../../#tools">All tools</a>
+    <button class="ts-btn icon" type="button" id="themeBtn" aria-label="Toggle light or dark theme" title="Toggle theme">
+      <svg class="i-sun" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M11 1h2v3h-2zM11 20h2v3h-2zM1 11h3v2H1zM20 11h3v2h-3zM4.2 5.6l1.4-1.4 2.1 2.1-1.4 1.4zM16.3 17.7l1.4-1.4 2.1 2.1-1.4 1.4zM4.2 18.4l2.1-2.1 1.4 1.4-2.1 2.1zM16.3 6.3l2.1-2.1 1.4 1.4-2.1 2.1zM7 9h2V7h6v2h2v6h-2v2H9v-2H7z"/></svg>
+      <svg class="i-moon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M9 2h6v2h-4v2H9v4H7v4h2v4h2v2h4v-2h4v-2h2v-4h-2v2h-2v2h-6v-2H9v-4H7v-2h2V6h2V4H9z"/></svg>
+    </button>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="header-intro">
+    <div>
+      <h1><small>Excel / CSV → PROFILE.DEF · SOBEK 2.1x Flow</small>River Profile Studio</h1>
+      <p class="lede">Convert surveyed river cross-sections into SOBEK <code>CRDS ... lt yz</code> definitions. Check and edit points visually, orient left bank first, add vertical walls, and export a clean <code>PROFILE.DEF</code>. Runs 100% in your browser.</p>
+    </div>
+  </div>
+
+  <div class="grid">
+    <aside class="rail">
+      <!-- Step 1: Input Data -->
+      <section class="step" aria-labelledby="s1">
+        <h2 id="s1"><span class="n">1</span>Survey data</h2>
+        <div class="drop" id="drop" tabindex="0" role="button" aria-label="Choose an Excel or CSV file">
+          <strong>Drop an Excel or CSV file</strong>
+          <span>.xlsx · .xls · .csv · .txt</span>
+        </div>
+        <input type="file" id="file" accept=".xlsx,.xls,.csv,.txt" hidden>
+        <div class="btns"><button id="sampleBtn" type="button">Load sample survey</button></div>
+        <div class="status" id="loadStatus"></div>
+        <div id="mapBox" class="dg" hidden>
+          <label id="sheetWrap">Sheet<select id="sheet"></select></label>
+          <div class="row2">
+            <label>Cross-section ID *<select id="cId"></select></label>
+            <label>Distance Y (m) *<select id="cY"></select></label>
+          </div>
+          <div class="row2">
+            <label>Level Z (m) *<select id="cZ"></select></label>
+            <label>Bank / data code (optional)<select id="cCode"></select></label>
+          </div>
+          
+          <!-- Bank code mapping (visible when code column is selected) -->
+          <div id="bankCodeWrap" class="bank-box" hidden>
+            <div style="font-weight:600;font-size:12px;color:var(--ink)">Bank code selection:</div>
+            <div class="row2">
+              <label>Left bank code
+                <select id="lCodeSelect"></select>
+              </label>
+              <label>Right bank code
+                <select id="rCodeSelect"></select>
+              </label>
+            </div>
+            <p class="hint">Select which code represents the left bank and which represents the right bank.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Step 2: Settings & Options -->
+      <section class="step" aria-labelledby="s2">
+        <h2 id="s2"><span class="n">2</span>Rules &amp; options</h2>
+        <div class="row2">
+          <label>Datum shift to Z (m)<input type="number" id="shift" step="0.001" value="0"></label>
+          <label>Name prefix<input type="text" id="prefix" value="" placeholder="e.g. 35_1_"></label>
+        </div>
+        <p class="hint">MSL → PWD in Bangladesh is typically +0.46 m. Section names in SOBEK become Prefix + ID.</p>
+        
+        <label class="inline"><input type="checkbox" id="orient" checked> Orient left bank first (when bank codes are present)</label>
+
+        <!-- Vertical End Wall Option -->
+        <div class="wall-box">
+          <label>Vertical wall at beginning &amp; end
+            <select id="walls">
+              <option value="none">None (SOBEK standard extension)</option>
+              <option value="size">Add wall of size / height (+H m)</option>
+              <option value="level">Wall to fixed level (Z = … m)</option>
+            </select>
+          </label>
+          <div id="wallValWrap" hidden>
+            <label id="wallValLbl">Wall height / size (m)
+              <input type="number" id="wallVal" step="0.5" value="1.5">
+            </label>
+          </div>
+        </div>
+
+        <!-- Trimming is OFF by default -->
+        <details id="trimDetails">
+          <summary>Bank crest trimming (optional — off by default)</summary>
+          <div class="dg" style="margin-top:8px">
+            <label class="inline"><input type="checkbox" id="trim"> Trim ground behind bank crest</label>
+            <div class="row2">
+              <label>Trim drop (m)<input type="number" id="thr" step="0.05" min="0.05" value="0.5"></label>
+              <label>Ignore spikes (m)<input type="number" id="spike" step="0.1" min="0" value="1.0"></label>
+            </div>
+            <p class="hint">Keeps only the main channel between the natural bank crests.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>Advanced SOBEK settings &amp; checks</summary>
+          <div class="dg" style="margin-top:8px">
+            <label class="inline"><input type="checkbox" id="dedupe" checked> Drop repeated points (same Y and Z)</label>
+            <label class="inline"><input type="checkbox" id="zeroY"> Shift each section to start at Y = 0</label>
+            <label class="inline"><input type="checkbox" id="checkWidth"> Warn if channel width exceeds threshold</label>
+            <div id="widthWrap" class="row2" hidden>
+              <label>Width threshold (m)
+                <input type="number" id="maxW" step="50" min="50" value="500">
+              </label>
+            </div>
+            <label>Definition header<input type="text" id="hdr" value="ty 10 lu 0 st 0 lt sw 0 0 gl 0 gu 0 lt yz"></label>
+            <label>First numeric ID for definitions<input type="number" id="startId" step="1" min="1" value="1"></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- Step 3: Export & Merge -->
+      <section class="step" aria-labelledby="s3">
+        <h2 id="s3"><span class="n">3</span>Output</h2>
+        <label>Merge into existing PROFILE.DEF (optional)<input type="file" id="defFile" accept=".def,.DEF,.txt"></label>
+        <p class="hint" id="mergeInfo">Without a file, a clean new PROFILE.DEF is written. With an existing file, matching section names are updated in place.</p>
+        <div class="btns">
+          <button class="primary" id="dlDef" type="button" disabled>Save PROFILE.DEF</button>
+          <button id="cpDef" type="button" disabled>Copy text</button>
+          <button id="dlRep" type="button" disabled>Save report (CSV)</button>
+        </div>
+        <div class="status" id="outStatus"></div>
+        <pre class="out" id="defPreview" aria-label="PROFILE.DEF preview">Load survey points to see the output.</pre>
+      </section>
+    </aside>
+
+    <main class="main">
+      <div class="summary" id="summary"><span>No survey loaded yet.</span></div>
+      
+      <div class="work">
+        <!-- Section Picker List -->
+        <div class="list" id="listBox">
+          <div class="flt">
+            <input type="search" id="searchSec" placeholder="Filter by ID…" style="font-size:12px;padding:4px 7px">
+            <select id="filter" aria-label="Filter sections">
+              <option value="all">All sections</option>
+              <option value="edit">Manually edited</option>
+              <option value="flip">Reversed</option>
+              <option value="check">Needs check / warnings</option>
+            </select>
+          </div>
+          <div id="list"><div class="empty">Sections appear here.</div></div>
+        </div>
+
+        <!-- Interactive Visualizer & Point Editor -->
+        <div class="view" id="view">
+          <div class="empty">Select a cross-section to view and edit.</div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <footer class="tool-foot">
+    <span>Produces SOBEK 2.1x <code>CRDS … ty 10 … lt yz</code> blocks. Verify in SOBEK Data Edit before model execution.</span>
+    <span>Developed for Water Resources Engineering</span>
+  </footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+  if (typeof XLSX === 'undefined') {
+    document.write('<script src="../ababahika/vendor/xlsx.core.min.js"><\/script>');
+  }
+</script>
+
+<script id="core">
+/* ---------- Core Hydraulic & Geometric Functions ---------- */
+const Core = (() => {
+  const norm = s => String(s ?? "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+  const toks = s => String(s).split(/[,;\s]+/).map(norm).filter(Boolean);
+  const r2 = v => Math.round(v * 100) / 100, r3 = v => Math.round(v * 1000) / 1000;
+  const fmt = v => { const x = Object.is(v, -0) ? 0 : v; return String(x); };
+
+  function side(code, opt) {
+    const c = norm(code);
+    if (!c) return null;
+    if (opt.customL && c === norm(opt.customL)) return "L";
+    if (opt.customR && c === norm(opt.customR)) return "R";
+    if (opt.tok) {
+      if (opt.tok.x && opt.tok.x.some(t => c.startsWith(t))) return null;
+      const L = opt.tok.l && opt.tok.l.some(t => c === t || c.startsWith(t));
+      const R = opt.tok.r && opt.tok.r.some(t => c === t || c.startsWith(t));
+      return L && !R ? "L" : R && !L ? "R" : null;
+    }
+    return null;
+  }
+
+  function group(rows, m) {
+    const by = new Map();
+    let skipped = 0;
+    rows.forEach((row, i) => {
+      const id = String(row[m.id] ?? "").replace(/[\r\n]+/g, " ").trim();
+      const y = parseFloat(String(row[m.y] ?? "").replace(",", "."));
+      const z = parseFloat(String(row[m.z] ?? "").replace(",", "."));
+      if (!id || !isFinite(y) || !isFinite(z)) { skipped++; return; }
+      if (!by.has(id)) by.set(id, []);
+      by.get(id).push({ y, z, code: m.code != null && m.code !== "" ? String(row[m.code] ?? "").trim() : "", src: i });
+    });
+    return { by, skipped };
+  }
+
+  function processSection(id, rawPoints, o, isManuallyFlipped = false) {
+    const flags = [];
+    let p = rawPoints.map(q => ({ ...q, z: r3(q.z + (q.custom ? 0 : o.shift)) }));
+    p.sort((a, b) => a.y - b.y);
+
+    if (o.dedupe) {
+      const seen = new Set();
+      const n0 = p.length;
+      p = p.filter(q => {
+        const k = q.y + "|" + q.z;
+        if (seen.has(k)) return false;
+        seen.add(k);
+        return true;
+      });
+      if (p.length < n0) flags.push(["info", `${n0 - p.length} repeated pts removed`]);
+    }
+
+    const n = p.length;
+    if (n < 2) flags.push(["bad", "fewer than 2 points"]);
+
+    const sd = p.map(q => side(q.code, o));
+    const Li = sd.flatMap((s, i) => s === "L" ? [i] : []);
+    const Ri = sd.flatMap((s, i) => s === "R" ? [i] : []);
+    const mean = a => a.reduce((s, i) => s + p[i].y, 0) / a.length;
+
+    let flipped = isManuallyFlipped;
+    let basis = isManuallyFlipped ? "manual flip" : "as surveyed";
+
+    if (!isManuallyFlipped && o.orient && n >= 2) {
+      if (Li.length && Ri.length) {
+        basis = "bank codes";
+        if (mean(Li) > mean(Ri)) flipped = true;
+      } else if (Li.length || Ri.length) {
+        let bedIdx = 0;
+        for (let i = 1; i < n; i++) if (p[i].z < p[bedIdx].z) bedIdx = i;
+        const bedY = p[bedIdx].y;
+        if (Li.length && mean(Li) > bedY) { flipped = true; basis = "left code on right of bed"; }
+        else if (Ri.length && mean(Ri) < bedY) { flipped = true; basis = "right code on left of bed"; }
+      }
+    }
+
+    if (flipped) {
+      const w = p[n - 1].y;
+      p = p.map(q => ({ ...q, y: r2(w - q.y) })).reverse();
+      flags.push(["info", "reversed"]);
+    }
+
+    let bedIdx = 0;
+    for (let i = 1; i < n; i++) if (p[i].z < p[bedIdx].z) bedIdx = i;
+
+    let lc = 0, rc = n - 1;
+    if (o.trim && n >= 3) {
+      const isSpike = k => o.spike > 0 && k > 0 && k < n - 1 && p[k].z - Math.max(p[k - 1].z, p[k + 1].z) > o.spike;
+      let li = sd.indexOf("L"); if (li < 0 || li > bedIdx) li = 0;
+      let ri = sd.lastIndexOf("R"); if (ri < 0 || ri < bedIdx) ri = n - 1;
+
+      let run = p[li].z;
+      for (let k = li - 1; k >= 0; k--) {
+        if (isSpike(k)) continue;
+        if (p[k].z > run) run = p[k].z;
+        else if (run - p[k].z > o.thr) { lc = k + 1; break; }
+      }
+      run = p[ri].z;
+      for (let k = ri + 1; k < n; k++) {
+        if (isSpike(k)) continue;
+        if (p[k].z > run) run = p[k].z;
+        else if (run - p[k].z > o.thr) { rc = k - 1; break; }
+      }
+      if (lc > 0 || rc < n - 1) flags.push(["info", "trimmed"]);
+    }
+
+    let out = p.slice(lc, rc + 1).map(q => ({ y: q.y, z: q.z, code: q.code, edited: q.edited, custom: q.custom }));
+    const y0 = out.length ? out[0].y : 0;
+    if (o.zeroY) {
+      out = out.map(q => ({ ...q, y: r2(q.y - y0) }));
+    }
+
+    if (out.length >= 2) {
+      const firstY = out[0].y;
+      const lastY = out[out.length - 1].y;
+      if (o.walls === "size" && o.wallVal > 0) {
+        const H = o.wallVal;
+        out = [
+          { y: firstY, z: r3(out[0].z + H), wall: true },
+          ...out,
+          { y: lastY, z: r3(out[out.length - 1].z + H), wall: true }
+        ];
+      } else if (o.walls === "level") {
+        const targetZ = o.wallVal;
+        const topExisting = Math.max(...out.map(q => q.z));
+        if (targetZ < topExisting) flags.push(["warn", "wall level below crest"]);
+        out = [
+          { y: firstY, z: targetZ, wall: true },
+          ...out,
+          { y: lastY, z: targetZ, wall: true }
+        ];
+      }
+    }
+
+    const wet = out.filter(q => !q.wall);
+    const width = wet.length >= 2 ? wet[wet.length - 1].y - wet[0].y : 0;
+    if (o.checkWidth && width > o.maxW) {
+      flags.push(["warn", `wide channel (${Math.round(width)} m)`]);
+    }
+
+    return {
+      id, all: p, lc, rc, bedIdx, flipped, basis, out, width,
+      bedZ: wet.length ? Math.min(...wet.map(q => q.z)) : NaN,
+      flags, check: flags.some(f => f[0] === "warn" || f[0] === "bad")
+    };
+  }
+
+  function block(id, name, hdr, pts, eol) {
+    return [`CRDS id '${id}' nm '${name}' ${hdr}`, "TBLE", ...pts.map(q => `${fmt(q.y)} ${fmt(q.z)} <`), "tble", " crds"].join(eol);
+  }
+
+  function writeNew(secs, o) {
+    let id = o.startId;
+    const eol = "\r\n";
+    return { text: secs.map(s => block(id++, o.prefix + s.id, o.hdr, s.out, eol)).join(eol) + eol, replaced: 0, appended: secs.length };
+  }
+
+  function merge(defText, secs, o) {
+    const eol = defText.includes("\r\n") ? "\r\n" : "\n";
+    const L = defText.split(/\r?\n/);
+    const trailing = L.length && L[L.length - 1] === "" ? L.pop() : null;
+    const want = new Map(secs.map(s => [o.prefix + s.id, s]));
+    const ids = new Set();
+    let maxId = 0;
+    const out = [];
+    const done = new Set();
+    for (let i = 0; i < L.length; i++) {
+      const m = /^CRDS id '([^']*)' nm '([^']*)'/.exec(L[i]);
+      if (m) { ids.add(m[1]); if (/^\d+$/.test(m[1])) maxId = Math.max(maxId, +m[1]); }
+      if (m && want.has(m[2]) && !done.has(m[2]) && L[i + 1] === "TBLE") {
+        let j = i + 2; while (j < L.length && L[j] !== "tble") j++;
+        if (j < L.length) {
+          out.push(L[i], "TBLE", ...want.get(m[2]).out.map(q => `${fmt(q.y)} ${fmt(q.z)} <`));
+          done.add(m[2]); i = j - 1; continue;
+        }
+      }
+      out.push(L[i]);
+    }
+    let next = Math.max(maxId + 1, o.startId);
+    const added = [];
+    for (const [nm, s] of want) {
+      if (!done.has(nm)) {
+        while (ids.has(String(next))) next++;
+        added.push(block(next, nm, o.hdr, s.out, eol));
+        ids.add(String(next));
+        next++;
+      }
+    }
+    let text = out.join(eol);
+    if (added.length) text += (text.length ? eol : "") + added.join(eol);
+    text += eol;
+    if (trailing === null && !added.length) text = text.slice(0, -eol.length);
+    return { text, replaced: done.size, appended: added.length };
+  }
+
+  function report(secs, o) {
+    const q = v => /[",\n]/.test(String(v)) ? `"${String(v).replace(/"/g, '""')}"` : v;
+    const head = "name,points_in,points_out,orientation,reversed,width_m,bed_z,flags";
+    return [head, ...secs.map(s => [
+      o.prefix + s.id, s.all.length, s.out.filter(p => !p.wall).length, s.basis, s.flipped ? "yes" : "no",
+      r2(s.width), isFinite(s.bedZ) ? s.bedZ : "", s.flags.map(f => f[1]).join("; ")
+    ].map(q).join(","))].join("\r\n") + "\r\n";
+  }
+
+  return { norm, toks, side, group, processSection, writeNew, merge, report, r2, r3 };
+})();
+</script>
+
+<script>
+/* ---------- Application State & Data Management ---------- */
+const $ = id => document.getElementById(id);
+const st = {
+  wb: null,
+  rows: [],
+  cols: [],
+  rawGroups: new Map(),
+  editedPoints: new Map(),
+  manualFlips: new Set(),
+  secs: [],
+  sel: null,
+  selPtIdx: null,
+  def: null,
+  defName: "",
+  out: null,
+  rep: "",
+  sample: false
+};
+
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+function setStatus(el, msg, cls) { el.textContent = msg; el.className = "status" + (cls ? " " + cls : ""); }
+
+function fillSelect(sel, cols, val, optional) {
+  sel.innerHTML = (optional ? '<option value="">— none —</option>' : "") + cols.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join("");
+  sel.value = val !== undefined ? val : (optional ? "" : cols[0] || "");
+}
+
+function guess(cols, res, avoid) {
+  for (const re of res) {
+    const c = cols.find(c => re.test(c) && !(avoid && avoid.test(c)));
+    if (c) return c;
+  }
+  return "";
+}
+
+function opts() {
+  return {
+    shift: parseFloat($("shift").value) || 0,
+    prefix: $("prefix").value.trim(),
+    orient: $("orient").checked,
+    trim: $("trim").checked,
+    thr: Math.max(0.01, parseFloat($("thr").value) || 0.5),
+    spike: Math.max(0, parseFloat($("spike").value) || 0),
+    dedupe: $("dedupe").checked,
+    zeroY: $("zeroY").checked,
+    walls: $("walls").value,
+    wallVal: parseFloat($("wallVal").value) || 0,
+    checkWidth: $("checkWidth").checked,
+    maxW: Math.max(10, parseFloat($("maxW").value) || 500),
+    hdr: $("hdr").value.trim() || "ty 10 lu 0 st 0 lt sw 0 0 gl 0 gu 0 lt yz",
+    startId: Math.max(1, parseInt($("startId").value, 10) || 1),
+    customL: $("lCodeSelect").value || null,
+    customR: $("rCodeSelect").value || null,
+    tok: {
+      l: ["LB", "LS", "BLLS", "BLL", "BLNLS", "BLSL", "KHALNLS", "LEFT"],
+      r: ["RB", "RS", "BLRS", "BLR", "BLNRS", "BLSR", "KHALNRS", "RIGHT"],
+      x: ["EMB", "TOE", "SLOPE", "KR", "PR", "HBB", "CL"]
+    }
+  };
+}
+
+/* ---------- Data Loading & Column Mapping ---------- */
+function loadRows(rows, label) {
+  st.rows = rows;
+  st.editedPoints.clear();
+  st.manualFlips.clear();
+  st.cols = rows.length ? Object.keys(rows.reduce((a, r) => Object.assign(a, r), {})) : [];
+  const c = st.cols;
+  fillSelect($("cId"), c, guess(c, [/^cs.?id$/i, /cs.?id/i, /cegis/i, /section/i, /^id$/i]));
+  fillSelect($("cY"), c, guess(c, [/distance/i, /chainage/i, /offset/i, /^y$/i, /station/i]));
+  fillSelect($("cZ"), c, guess(c, [/pwd/i, /^rl\b/i, /level/i, /elev/i, /^z$/i], /msl/i) || guess(c, [/rl|level|elev|^z$/i]));
+  fillSelect($("cCode"), c, guess(c, [/data.?code/i, /bank.?code/i, /code/i, /desc/i, /remark/i]), true);
+  
+  $("mapBox").hidden = false;
+  setStatus($("loadStatus"), label, "okk");
+  updateBankCodeSelectors();
+  run();
+}
+
+function updateBankCodeSelectors() {
+  const codeCol = $("cCode").value;
+  const wrap = $("bankCodeWrap");
+  if (!codeCol) {
+    wrap.hidden = true;
+    fillSelect($("lCodeSelect"), [], "", true);
+    fillSelect($("rCodeSelect"), [], "", true);
+    return;
+  }
+
+  const uniqueCodes = Array.from(new Set(
+    st.rows.map(r => String(r[codeCol] ?? "").trim()).filter(Boolean)
+  )).sort();
+
+  wrap.hidden = false;
+  const guessL = uniqueCodes.find(c => /^(lb|ls|bll|left)/i.test(c)) || "";
+  const guessR = uniqueCodes.find(c => /^(rb|rs|blr|right)/i.test(c)) || "";
+
+  fillSelect($("lCodeSelect"), uniqueCodes, guessL, true);
+  fillSelect($("rCodeSelect"), uniqueCodes, guessR, true);
+}
+
+function readWorkbook(buf, name) {
+  if (typeof XLSX === "undefined") {
+    setStatus($("loadStatus"), "Spreadsheet reader (XLSX) unavailable. Check your connection.", "err");
+    return;
+  }
+  try {
+    const wb = XLSX.read(buf, { type: "array" });
+    st.wb = wb;
+    st.sample = false;
+    const s = $("sheet");
+    s.innerHTML = wb.SheetNames.map(n => `<option value="${esc(n)}">${esc(n)}</option>`).join("");
+    s.value = wb.SheetNames.find(n => /cs.?data/i.test(n)) || wb.SheetNames[0];
+    $("sheetWrap").hidden = wb.SheetNames.length <= 1;
+    useSheet(name);
+  } catch (e) {
+    setStatus($("loadStatus"), `Error reading ${name}: ${e.message}`, "err");
+  }
+}
+
+function useSheet(name) {
+  const rows = XLSX.utils.sheet_to_json(st.wb.Sheets[$("sheet").value], { defval: "", raw: true });
+  loadRows(rows, `${name || "Workbook"} · ${$("sheet").value} · ${rows.length.toLocaleString()} rows`);
+}
+
+/* ---------- Calculation & Execution Pipeline ---------- */
+function run() {
+  if (!st.rows.length) return;
+  const o = opts();
+  const m = { id: $("cId").value, y: $("cY").value, z: $("cZ").value, code: $("cCode").value || null };
+  if (!m.id || !m.y || !m.z) return;
+
+  const { by, skipped } = Core.group(st.rows, m);
+  st.rawGroups = by;
+  const ids = [...by.keys()].sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+
+  st.secs = ids.map(id => {
+    const activePts = st.editedPoints.has(id) ? st.editedPoints.get(id) : by.get(id);
+    const isFlipped = st.manualFlips.has(id);
+    return Core.processSection(id, activePts, o, isFlipped);
+  });
+
+  st.out = st.def ? Core.merge(st.def, st.secs, o) : Core.writeNew(st.secs, o);
+  st.rep = Core.report(st.secs, o);
+
+  renderSummary(skipped);
+  renderList();
+  if (!st.sel || !st.secs.find(s => s.id === st.sel)) {
+    st.sel = st.secs[0]?.id;
+    st.selPtIdx = null;
+  }
+  renderView();
+
+  const pv = st.out.text.split(/\r?\n/);
+  $("defPreview").textContent = pv.slice(0, 70).join("\n") + (pv.length > 70 ? `\n… ${(pv.length - 70).toLocaleString()} more lines` : "");
+  ["dlDef", "cpDef", "dlRep"].forEach(b => $(b).disabled = !st.secs.length);
+  $("mergeInfo").textContent = st.def
+    ? `Merging into ${st.defName}: ${st.out.replaced} definition(s) updated, ${st.out.appended} appended. Other definitions preserved.`
+    : `Ready: a new file with ${st.secs.length} SOBEK definitions will be written.`;
+}
+
+function renderSummary(skipped) {
+  const s = st.secs, n = s.length;
+  const totalPts = s.reduce((a, x) => a + x.all.length, 0);
+  const totalWritten = s.reduce((a, x) => a + x.out.length, 0);
+  const editedCount = st.editedPoints.size;
+  const flipCount = s.filter(x => x.flipped).length;
+  const trimCount = s.filter(x => x.flags.some(f => f[1] === "trimmed")).length;
+  const chkCount = s.filter(x => x.check).length;
+
+  $("summary").innerHTML = `${st.sample ? '<span class="badge-sample">Sample survey</span>' : ""}
+    <div><b>${n}</b> <span>sections</span></div>
+    <div><b>${totalPts.toLocaleString()}</b> <span>points loaded</span></div>
+    <div><b>${totalWritten.toLocaleString()}</b> <span>points output</span></div>
+    ${editedCount ? `<div><b style="color:var(--sediment)">${editedCount}</b> <span>edited</span></div>` : ""}
+    <div><b>${flipCount}</b> <span>reversed</span></div>
+    ${$("trim").checked ? `<div><b>${trimCount}</b> <span>trimmed</span></div>` : ""}
+    <div><b style="color:${chkCount ? 'var(--warn)' : 'var(--ok)'}">${chkCount}</b> <span>warnings</span></div>
+    ${skipped ? `<div><b>${skipped}</b> <span>skipped rows</span></div>` : ""}`;
+}
+
+function renderList() {
+  const f = $("filter").value;
+  const q = $("searchSec").value.trim().toLowerCase();
+  const s = st.secs.filter(x => {
+    if (q && !x.id.toLowerCase().includes(q)) return false;
+    if (f === "edit") return st.editedPoints.has(x.id);
+    if (f === "flip") return x.flipped;
+    if (f === "check") return x.check;
+    return true;
+  });
+
+  $("list").innerHTML = s.length ? s.map(x => {
+    const isEd = st.editedPoints.has(x.id);
+    return `<div class="sec${x.id === st.sel ? " on" : ""}${isEd ? " has-edit" : ""}" tabindex="0" data-id="${esc(x.id)}">
+      <span class="nm">${esc($("prefix").value.trim() + x.id)}</span>
+      <span class="chip ${isEd ? "edit" : x.flags.some(g => g[0] === "bad") ? "bad" : x.check ? "warn" : "ok"}">${isEd ? "edited" : x.flags.some(g => g[0] === "bad") ? "error" : x.check ? "warn" : "ok"}</span>
+      <span class="meta">${x.out.length} pts · W ${x.width.toFixed(1)}m · bed ${isFinite(x.bedZ) ? x.bedZ.toFixed(2) : "–"}</span>
+    </div>`;
+  }).join("") : '<div class="empty">No sections match.</div>';
+}
+
+function niceTicks(lo, hi, n) {
+  const span = hi - lo || 1;
+  const step0 = span / n;
+  const mag = Math.pow(10, Math.floor(Math.log10(step0)));
+  const step = [1, 2, 2.5, 5, 10].map(k => k * mag).find(k => span / k <= n) || mag * 10;
+  const a = Math.floor(lo / step) * step;
+  const t = [];
+  for (let v = a; v <= hi + 1e-9; v += step) if (v >= lo - 1e-9) t.push(+v.toFixed(6));
+  return t;
+}
+
+/* ---------- Interactive SVG Cross-Section Plot ---------- */
+function renderPlot(s) {
+  const W = 780, H = 340, m = { l: 56, r: 24, t: 24, b: 42 };
+  const all = s.all;
+  const out = s.out;
+  if (!all.length) return '<div class="empty">No cross-section points available.</div>';
+
+  const zs = all.map(p => p.z).concat(out.map(p => p.z));
+  const xs = all.map(p => p.y);
+  let x0 = Math.min(...xs), x1 = Math.max(...xs);
+  if (x1 - x0 < 0.5) x1 = x0 + 1;
+  let z0 = Math.min(...zs), z1 = Math.max(...zs);
+  const pad = (z1 - z0) * 0.12 || 0.6;
+  z0 -= pad; z1 += pad;
+
+  const X = v => m.l + (v - x0) / (x1 - x0) * (W - m.l - m.r);
+  const Y = v => m.t + (z1 - v) / (z1 - z0) * (H - m.t - m.b);
+
+  const xt = niceTicks(x0, x1, 8);
+  const zt = niceTicks(z0, z1, 6);
+
+  const allPath = all.map((p, i) => `${i ? "L" : "M"}${X(p.y).toFixed(1)},${Y(p.z).toFixed(1)}`).join("");
+  const outPath = out.map((p, i) => `${i ? "L" : "M"}${X(p.y).toFixed(1)},${Y(p.z).toFixed(1)}`).join("");
+
+  const wallsSvg = out.filter(p => p.wall).map(p => {
+    return `<line x1="${X(p.y)}" x2="${X(p.y)}" y1="${Y(p.z)}" y2="${Y(p.z)}" stroke="var(--water)" stroke-width="3" stroke-linecap="round"/>
+            <text x="${X(p.y)}" y="${Y(p.z) - 8}" text-anchor="middle" font-size="10.5" font-family="var(--f-mono)" fill="var(--water)">wall ${p.z.toFixed(2)}m</text>`;
+  }).join("");
+
+  const opt = opts();
+  const marks = all.map(p => {
+    const sd = Core.side(p.code, opt);
+    if (!sd) return "";
+    const col = sd === "L" ? "var(--ok)" : "var(--bad)";
+    return `<g>
+      <circle cx="${X(p.y)}" cy="${Y(p.z)}" r="5.5" fill="${col}"/>
+      <text x="${X(p.y)}" y="${Y(p.z) - 10}" text-anchor="middle" font-size="11" font-weight="700" fill="${col}" font-family="var(--f-mono)">${sd}</text>
+    </g>`;
+  }).join("");
+
+  const dots = all.map((p, i) => {
+    const isSel = i === st.selPtIdx;
+    const isEd = p.edited || p.custom;
+    const col = isEd ? "var(--sediment)" : "var(--water)";
+    return `<circle class="pt-dot${isSel ? ' selected' : ''}" cx="${X(p.y)}" cy="${Y(p.z)}" r="${isSel ? 6 : 4}" fill="${col}" data-idx="${i}">
+      <title>Pt #${i + 1}: Y = ${p.y} m, Z = ${p.z} m ${p.code ? '(' + p.code + ')' : ''}</title>
+    </circle>`;
+  }).join("");
+
+  const bedPt = all.reduce((a, b) => b.z < a.z ? b : a, all[0]);
+
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" id="plotSvg">
+    <!-- Grid -->
+    ${zt.map(v => `<line x1="${m.l}" x2="${W - m.r}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--gridc)"/><text x="${m.l - 8}" y="${Y(v) + 4}" text-anchor="end" font-size="11" fill="var(--muted)" font-family="var(--f-mono)">${+v.toFixed(2)}</text>`).join("")}
+    ${xt.map(v => `<line x1="${X(v)}" x2="${X(v)}" y1="${m.t}" y2="${H - m.b}" stroke="var(--gridc)"/><text x="${X(v)}" y="${H - m.b + 16}" text-anchor="middle" font-size="11" fill="var(--muted)" font-family="var(--f-mono)">${+v.toFixed(1)}</text>`).join("")}
+    <line x1="${m.l}" x2="${W - m.r}" y1="${H - m.b}" y2="${H - m.b}" stroke="var(--muted)"/>
+    
+    <!-- Paths -->
+    ${allPath ? `<path d="${allPath}" fill="none" stroke="var(--muted)" stroke-width="1.2" stroke-dasharray="3 3"/>` : ""}
+    <path d="${outPath}" fill="none" stroke="var(--water)" stroke-width="2.5" stroke-linejoin="round"/>
+    
+    <!-- Wall additions -->
+    ${wallsSvg}
+
+    <!-- Points and markers -->
+    ${dots}
+    ${marks}
+
+    <!-- Bed marker -->
+    ${bedPt ? `<text x="${X(bedPt.y)}" y="${Y(bedPt.z) + 18}" text-anchor="middle" font-size="11" fill="var(--sediment)" font-family="var(--f-mono)">bed ${bedPt.z.toFixed(2)}</text>` : ""}
+    
+    <!-- Axis Labels -->
+    <text x="${(m.l + W - m.r) / 2}" y="${H - 6}" text-anchor="middle" font-size="11.5" fill="var(--muted)">Distance Y (m) — Left to Right Bank</text>
+    <text x="16" y="${(m.t + H - m.b) / 2}" text-anchor="middle" font-size="11.5" fill="var(--muted)" transform="rotate(-90 16 ${(m.t + H - m.b) / 2})">Elevation Z (m)</text>
+  </svg>`;
+}
+
+/* ---------- Interactive View & Table Editing ---------- */
+function renderView() {
+  const s = st.secs.find(x => x.id === st.sel);
+  if (!s) {
+    $("view").innerHTML = '<div class="empty">Select a cross-section to view and edit.</div>';
+    return;
+  }
+
+  const name = $("prefix").value.trim() + s.id;
+  const isEdited = st.editedPoints.has(s.id);
+
+  const rows = s.all.map((p, i) => {
+    const isSel = i === st.selPtIdx;
+    const isEd = p.edited || p.custom;
+    const isCut = $("trim").checked && (i < s.lc || i > s.rc);
+    return `<tr class="${isSel ? 'selected' : ''} ${isEd ? 'edited-pt' : ''} ${isCut ? 'cut' : ''}" data-idx="${i}">
+      <td class="c">${i + 1}</td>
+      <td>
+        <input type="number" step="0.01" class="tbl-inp pt-edit-y" value="${p.y}" data-idx="${i}" title="Edit distance Y">
+      </td>
+      <td>
+        <input type="number" step="0.001" class="tbl-inp pt-edit-z" value="${p.z}" data-idx="${i}" title="Edit elevation Z">
+      </td>
+      <td class="l">${esc(p.code || "")}</td>
+      <td class="c">${p.custom ? '<span class="chip edit">new</span>' : isEd ? '<span class="chip edit">mod</span>' : isCut ? 'cut' : 'raw'}</td>
+      <td class="c">
+        <button type="button" class="del-btn" data-idx="${i}" title="Delete point #${i + 1}">✕</button>
+      </td>
+    </tr>`;
+  }).join("");
+
+  $("view").innerHTML = `
+    <div class="view-head">
+      <h3>
+        <span style="font-family:var(--f-mono)">${esc(name)}</span>
+        ${s.flags.map(f => `<span class="chip ${f[0]}">${esc(f[1])}</span>`).join("")}
+        ${isEdited ? '<span class="chip edit">customized</span>' : ''}
+      </h3>
+      <div class="sec-actions">
+        <button type="button" id="flipSecBtn" title="Reverse left-to-right orientation">⇄ Reverse direction</button>
+        ${isEdited ? '<button type="button" id="resetSecBtn" class="danger">↺ Reset to survey</button>' : ''}
+      </div>
+    </div>
+
+    <div class="legend">
+      <span><i style="border-color:var(--water)"></i>Output line</span>
+      <span><i style="border-color:var(--muted);border-top-style:dashed"></i>Surveyed</span>
+      ${$("walls").value !== "none" ? '<span><i style="border-color:var(--water);border-top-width:4px"></i>End walls</span>' : ''}
+      <span>Orientation: ${esc(s.basis)}${s.flipped ? ' · reversed' : ''}</span>
+      <span>Click any point or row to highlight</span>
+    </div>
+
+    <div class="plot" id="plotWrap">${renderPlot(s)}</div>
+
+    <!-- Quick Add Point Bar -->
+    <div class="editor-card">
+      <div style="font-weight:600;font-size:12.5px;color:var(--ink)">Add a specific data point to this section:</div>
+      <div class="add-bar">
+        <label>Distance Y (m)
+          <input type="number" id="newPtY" step="0.01" placeholder="e.g. 25.5">
+        </label>
+        <label>Elevation Z (m)
+          <input type="number" id="newPtZ" step="0.001" placeholder="e.g. 1.25">
+        </label>
+        <label>Bank code
+          <input type="text" id="newPtCode" placeholder="optional">
+        </label>
+        <button type="button" class="primary" id="addPtBtn">+ Add Point</button>
+      </div>
+    </div>
+
+    <!-- Points Table -->
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <span class="hint"><b>${s.all.length} points</b> in section · edit elevation directly in the table or delete points below</span>
+      <button type="button" id="cpTblBtn">Copy Y-Z table</button>
+    </div>
+    
+    <div class="tbl" id="ptsTbl">
+      <table>
+        <thead>
+          <tr>
+            <th class="c">#</th>
+            <th>Distance Y (m)</th>
+            <th>Level Z (m)</th>
+            <th class="l">Code</th>
+            <th class="c">Status</th>
+            <th class="c">Delete</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+
+  bindViewEvents(s);
+}
+
+function bindViewEvents(s) {
+  const flipBtn = $("flipSecBtn");
+  if (flipBtn) {
+    flipBtn.onclick = () => {
+      if (st.manualFlips.has(s.id)) st.manualFlips.delete(s.id);
+      else st.manualFlips.add(s.id);
+      run();
+    };
+  }
+
+  const resetBtn = $("resetSecBtn");
+  if (resetBtn) {
+    resetBtn.onclick = () => {
+      st.editedPoints.delete(s.id);
+      st.manualFlips.delete(s.id);
+      st.selPtIdx = null;
+      run();
+    };
+  }
+
+  $("cpTblBtn").onclick = () => copy(s.out.map(p => `${p.y}\t${p.z}`).join("\n"), $("cpTblBtn"));
+
+  $("addPtBtn").onclick = () => {
+    const yVal = parseFloat($("newPtY").value);
+    const zVal = parseFloat($("newPtZ").value);
+    const codeVal = $("newPtCode").value.trim();
+    if (!isFinite(yVal) || !isFinite(zVal)) {
+      alert("Please provide valid numeric Distance Y and Level Z values.");
+      return;
+    }
+    const current = getOrCreateActivePoints(s.id);
+    current.push({ y: yVal, z: zVal, code: codeVal, custom: true });
+    current.sort((a, b) => a.y - b.y);
+    st.editedPoints.set(s.id, current);
+    $("newPtY").value = "";
+    $("newPtZ").value = "";
+    $("newPtCode").value = "";
+    run();
+  };
+
+  document.querySelectorAll(".del-btn").forEach(btn => {
+    btn.onclick = e => {
+      e.stopPropagation();
+      const idx = parseInt(btn.dataset.idx, 10);
+      const current = getOrCreateActivePoints(s.id);
+      if (current.length <= 2) {
+        alert("A SOBEK cross-section requires at least 2 points.");
+        return;
+      }
+      current.splice(idx, 1);
+      st.editedPoints.set(s.id, current);
+      st.selPtIdx = null;
+      run();
+    };
+  });
+
+  document.querySelectorAll(".pt-edit-z").forEach(inp => {
+    inp.onchange = () => {
+      const idx = parseInt(inp.dataset.idx, 10);
+      const val = parseFloat(inp.value);
+      if (!isFinite(val)) return;
+      const current = getOrCreateActivePoints(s.id);
+      current[idx].z = val;
+      current[idx].edited = true;
+      st.editedPoints.set(s.id, current);
+      run();
+    };
+  });
+
+  document.querySelectorAll(".pt-edit-y").forEach(inp => {
+    inp.onchange = () => {
+      const idx = parseInt(inp.dataset.idx, 10);
+      const val = parseFloat(inp.value);
+      if (!isFinite(val)) return;
+      const current = getOrCreateActivePoints(s.id);
+      current[idx].y = val;
+      current[idx].edited = true;
+      current.sort((a, b) => a.y - b.y);
+      st.editedPoints.set(s.id, current);
+      run();
+    };
+  });
+
+  document.querySelectorAll(".pt-dot").forEach(dot => {
+    dot.onclick = () => {
+      const idx = parseInt(dot.dataset.idx, 10);
+      st.selPtIdx = idx;
+      renderView();
+      const row = document.querySelector(`tr[data-idx="${idx}"]`);
+      if (row) {
+        row.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        row.querySelector(".pt-edit-z")?.focus();
+      }
+    };
+  });
+}
+
+function getOrCreateActivePoints(secId) {
+  if (st.editedPoints.has(secId)) {
+    return st.editedPoints.get(secId);
+  }
+  const raw = st.rawGroups.get(secId) || [];
+  const cloned = raw.map(p => ({ ...p }));
+  st.editedPoints.set(secId, cloned);
+  return cloned;
+}
+
+/* ---------- Clipboard & File Saving ---------- */
+async function copy(text, btn) {
+  const old = btn.textContent;
+  try {
+    await navigator.clipboard.writeText(text);
+    btn.textContent = "Copied!";
+  } catch {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand("copy"); } catch {}
+    ta.remove();
+    btn.textContent = "Copied!";
+  }
+  setTimeout(() => btn.textContent = old, 1600);
+}
+
+function save(filename, text) {
+  const msg = $("outStatus");
+  try {
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([text], { type: "text/plain" }));
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+    setStatus(msg, `Saved ${filename}`, "okk");
+  } catch (e) {
+    setStatus(msg, "Direct file saving blocked. Use 'Copy text' instead.", "err");
+  }
+}
+
+/* ---------- Event Listeners & Wiring ---------- */
+const drop = $("drop");
+drop.onclick = () => $("file").click();
+drop.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); $("file").click(); } };
+["dragenter", "dragover"].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add("over"); }));
+["dragleave", "drop"].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove("over"); }));
+drop.addEventListener("drop", e => { const f = e.dataTransfer.files[0]; if (f) readFile(f); });
+$("file").onchange = e => { const f = e.target.files[0]; if (f) readFile(f); };
+
+function readFile(f) {
+  const r = new FileReader();
+  r.onload = () => readWorkbook(new Uint8Array(r.result), f.name);
+  r.onerror = () => setStatus($("loadStatus"), "Could not read file.", "err");
+  r.readAsArrayBuffer(f);
+}
+
+$("sheet").onchange = () => useSheet();
+$("cCode").onchange = () => { updateBankCodeSelectors(); run(); };
+$("lCodeSelect").onchange = () => run();
+$("rCodeSelect").onchange = () => run();
+
+$("walls").onchange = () => {
+  const mode = $("walls").value;
+  const wrap = $("wallValWrap");
+  if (mode === "none") {
+    wrap.hidden = true;
+  } else {
+    wrap.hidden = false;
+    $("wallValLbl").firstChild.textContent = mode === "size" ? "Wall height size (m)" : "Target wall elevation (m)";
+    if (mode === "size" && $("wallVal").value > 15) $("wallVal").value = "1.5";
+    if (mode === "level" && $("wallVal").value < 5) $("wallVal").value = "7.0";
+  }
+  run();
+};
+
+$("checkWidth").onchange = () => {
+  $("widthWrap").hidden = !$("checkWidth").checked;
+  run();
+};
+
+["cId", "cY", "cZ", "filter"].forEach(id => $(id).addEventListener("change", () => id === "filter" ? renderList() : run()));
+["shift", "prefix", "thr", "spike", "wallVal", "hdr", "startId", "maxW"].forEach(id => {
+  $(id).addEventListener("input", () => {
+    clearTimeout(run.timer);
+    run.timer = setTimeout(run, 200);
+  });
+});
+["orient", "trim", "dedupe", "zeroY"].forEach(id => $(id).addEventListener("change", run));
+
+$("searchSec").addEventListener("input", renderList);
+
+$("list").addEventListener("click", e => {
+  const d = e.target.closest(".sec");
+  if (d) {
+    st.sel = d.dataset.id;
+    st.selPtIdx = null;
+    renderList();
+    renderView();
+  }
+});
+
+$("defFile").onchange = e => {
+  const f = e.target.files[0];
+  if (!f) { st.def = null; run(); return; }
+  const r = new FileReader();
+  r.onload = () => {
+    st.def = String(r.result);
+    st.defName = f.name;
+    const n = (st.def.match(/^CRDS /gm) || []).length;
+    setStatus($("outStatus"), `${f.name}: ${n.toLocaleString()} definitions read.`, "okk");
+    run();
+  };
+  r.readAsText(f);
+};
+
+$("dlDef").onclick = () => st.out && save("PROFILE.DEF", st.out.text);
+$("cpDef").onclick = () => st.out && copy(st.out.text, $("cpDef"));
+$("dlRep").onclick = () => st.rep && save("profile_report.csv", st.rep);
+
+$("themeBtn").onclick = () => {
+  const cur = document.documentElement.getAttribute("data-theme");
+  const next = cur === "dark" ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", next);
+  try { localStorage.setItem("mrj_theme", next); } catch (e) {}
+};
+
+/* ---------- Sample Survey Data ---------- */
+function sampleRows() {
+  const S = [];
+  const add = (id, pts) => pts.forEach(([y, z, c]) => S.push({ "CS ID": id, "Distance Y (m)": y, "Level Z (m PWD)": z, "Bank Code": c || "" }));
+  add("KH-01", [[0,1.10],[7,1.06],[15.5,1.19],[29.9,1.08],[39.2,1.22],[45.6,2.12],[47.9,2.70],[51.1,3.00],[52.4,2.91],[53.1,2.69,"BLN_LS"],[55.9,0.11],[58.1,-0.40],[60.0,-0.48],[63.1,-0.13],[64.8,0.26],[66.8,2.13,"BLN_RS"],[69.2,2.21],[73.4,1.99],[78.2,2.01],[87.5,1.92],[92.8,1.86],[100.8,0.98],[108.8,1.03],[118.2,1.01]]);
+  add("KH-02", [[0,2.05],[6.2,2.10],[12.8,2.12],[18.4,2.20,"BLN_RS"],[21.0,1.30],[24.2,0.10],[27.3,-0.62],[30.1,-0.70],[33.4,-0.21],[35.9,0.90],[38.0,1.72,"BLN_LS"],[42.6,1.78],[49.0,1.70],[55.3,1.74]]);
+  add("KH-03", [[0,1.62],[5.1,1.60],[11.2,1.65],[16.3,1.63],[20.8,1.56],[25.5,1.72],[27.1,0.26],[28.7,-0.18],[30.1,-0.22],[32.2,0.05],[33.7,0.38],[34.3,1.34],[39.8,1.49],[46.7,1.59],[55.8,1.53],[64.9,1.94]]);
+  add("KH-04", [[0,1.07],[8.0,1.09],[15.7,1.11],[24.1,1.19],[33.0,1.20],[40.4,1.22],[48.9,1.26],[55.9,1.07],[56.4,1.56],[57.3,1.44,"BLN_LS"],[58.0,0.49],[60.0,0.05],[61.3,-0.21],[63.3,-0.27],[65.6,-0.26],[67.5,0.50],[68.5,0.88],[69.5,1.38],[71.1,2.21,"BLN_RS"],[75.7,2.13],[80.1,2.06],[83.2,2.06],[85.0,1.14],[86.2,0.58],[88.3,1.59],[90.2,1.84],[93.2,1.81],[99.2,-0.52],[106.3,1.44],[112.7,2.29]]);
+  add("KH-05", [[0,1.80],[6.9,1.55],[11.9,1.69],[17.5,1.74],[24.0,1.58],[32.0,1.24],[32.7,0.53],[34.5,0.03],[35.3,-0.26],[37.7,0.00],[39.9,6.10],[42.6,-0.03],[45.8,0.10],[48.6,0.59],[49.9,1.61,"BLN_RS"],[54.8,1.93],[60.0,1.93],[64.5,1.82]]);
+  return S;
+}
+
+$("sampleBtn").onclick = () => {
+  st.wb = null;
+  st.sample = true;
+  $("sheetWrap").hidden = true;
+  $("prefix").value = "KH_";
+  loadRows(sampleRows(), "Sample survey loaded (5 sections)");
+};
+
+/* Start with sample data loaded */
+$("sampleBtn").click();
+</script>
+</body>
+</html>
