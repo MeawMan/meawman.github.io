@@ -755,7 +755,7 @@ function loadRows(rows, label) {
   st.thExcluded.clear();
   st.cols = rows.length ? Object.keys(rows.reduce((a, r) => Object.assign(a, r), {})) : [];
   const c = st.cols;
-  fillSelect($("cId"), c, guess(c, [/^cs.?id$/i, /cs.?id/i, /cegis/i, /section/i, /^id$/i]));
+  fillSelect($("cId"), c, guess(c, [/cs.?id.?\(khal/i, /khal.?label/i, /^cs.?id$/i, /cs.?id/i, /cegis/i, /section/i, /^id$/i]));
   fillSelect($("cY"), c, guess(c, [/distance/i, /chainage/i, /offset/i, /^y$/i, /station/i]));
   fillSelect($("cZ"), c, guess(c, [/pwd/i, /^rl\b/i, /level/i, /elev/i, /^z$/i], /msl/i) || guess(c, [/rl|level|elev|^z$/i]));
   fillSelect($("cCode"), c, guess(c, [/data.?code/i, /bank.?code/i, /code/i, /desc/i, /remark/i]), true);
@@ -1309,6 +1309,50 @@ function linearRegression(pts) {
   return { slope, intercept };
 }
 
+function sortAlongRiverPath(sections) {
+  const valid = sections.filter(s => s.thalwegPt && isFinite(s.thalwegPt.east) && isFinite(s.thalwegPt.north));
+  if (valid.length <= 2) return sections.slice();
+
+  // Find two endpoints with maximum distance between them
+  let maxD = -1, endA = 0, endB = 0;
+  for (let i = 0; i < valid.length; i++) {
+    for (let j = i + 1; j < valid.length; j++) {
+      const d = calcStepDist(valid[i].thalwegPt, valid[j].thalwegPt);
+      if (d > maxD) { maxD = d; endA = i; endB = j; }
+    }
+  }
+
+  // Pick start endpoint: prefer upstream (higher Northing or Easting)
+  let startIdx = endA;
+  const pA = valid[endA].thalwegPt, pB = valid[endB].thalwegPt;
+  if (pB.north > pA.north || (pB.north === pA.north && pB.east > pA.east)) {
+    startIdx = endB;
+  }
+
+  const ordered = [];
+  const visited = new Set();
+  let cur = startIdx;
+  ordered.push(valid[cur]);
+  visited.add(cur);
+
+  while (ordered.length < valid.length) {
+    let bestIdx = -1, bestDist = Infinity;
+    for (let i = 0; i < valid.length; i++) {
+      if (visited.has(i)) continue;
+      const d = calcStepDist(valid[cur].thalwegPt, valid[i].thalwegPt);
+      if (d < bestDist) { bestDist = d; bestIdx = i; }
+    }
+    if (bestIdx !== -1) {
+      ordered.push(valid[bestIdx]);
+      visited.add(bestIdx);
+      cur = bestIdx;
+    }
+  }
+
+  const invalid = sections.filter(s => !s.thalwegPt || !isFinite(s.thalwegPt.east) || !isFinite(s.thalwegPt.north));
+  return ordered.concat(invalid);
+}
+
 function setMode(mode) {
   st.mode = mode;
   $("btnModeCS").setAttribute("aria-selected", mode === "cs");
@@ -1343,8 +1387,13 @@ function renderThalweg() {
     const cnt = allSecs.filter(s => s.reach === r).length;
     reachOptions += `<option value="${esc(r)}">${esc(r)} (${cnt} cross-sections)</option>`;
   });
+  const unassignedCnt = allSecs.filter(s => !s.reach).length;
+  if (unassignedCnt > 0 && reaches.length > 0) {
+    reachOptions += `<option value="(Unassigned)">(Unassigned / No Khal) (${unassignedCnt} cross-sections)</option>`;
+  }
+
   reachSel.innerHTML = reachOptions;
-  if (curReachVal && (curReachVal === "all" || reaches.includes(curReachVal))) {
+  if (curReachVal && (curReachVal === "all" || curReachVal === "(Unassigned)" || reaches.includes(curReachVal))) {
     reachSel.value = curReachVal;
     st.thReach = curReachVal;
   } else if (reaches.length > 0) {
@@ -1356,7 +1405,18 @@ function renderThalweg() {
   }
 
   // Filter cross-sections by reach
-  let reachSecs = allSecs.filter(s => st.thReach === "all" || !s.reach || s.reach === st.thReach);
+  let reachSecs;
+  if (st.thReach === "all") {
+    reachSecs = allSecs.slice();
+  } else if (st.thReach === "(Unassigned)") {
+    reachSecs = allSecs.filter(s => !s.reach);
+  } else {
+    reachSecs = allSecs.filter(s => s.reach === st.thReach);
+  }
+
+  // Auto-sequence sections along natural river centerline
+  reachSecs = sortAlongRiverPath(reachSecs);
+
   if (st.thReversed) {
     reachSecs = reachSecs.slice().reverse();
   }
