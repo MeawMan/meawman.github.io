@@ -8,6 +8,9 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "serve": "node scripts/serve.mjs --port 4173",
+    "shots": "node scripts/shots.mjs",
+    "brand": "node scripts/brand.mjs",
+    "test": "playwright test",
     "audit:lighthouse": "node scripts/audit/lighthouse.mjs --out docs/audit/after --paths / --form both --runs 3",
     "audit:axe": "node scripts/audit/axe.mjs --out docs/audit/after --paths /",
     "audit:shots": "node scripts/audit/screenshots.mjs --out docs/audit/after --paths / --themes light,dark",

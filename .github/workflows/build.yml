@@ -1,0 +1,48 @@
+name: Build static pages
+
+# Rebuilds the prerendered HTML when content, templates, build scripts or assets change on main
+# (for example after the admin editor commits data/content.json) and commits the result back.
+# GitHub Pages keeps serving from the branch. Commits made with GITHUB_TOKEN do not start
+# another workflow run, so this cannot loop.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'data/**'
+      - 'src/**'
+      - 'scripts/**'
+      - 'assets/**'
+      - 'tools/*/about.json'
+      - '.github/workflows/build.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # full history: "last updated" and sitemap dates come from git
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Build (no dependencies to install)
+        run: node scripts/build.mjs
+      - name: Commit regenerated files
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add -A
+            git commit -m "build: regenerate static pages"
+            git push
+          else
+            echo "Nothing to commit."
+          fi
