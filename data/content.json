@@ -52,6 +52,21 @@
   },
   "links": [
     {
+      "label": "Google Scholar",
+      "url": "https://scholar.google.com/citations?user=kWzC3RUAAAAJ&hl=en",
+      "icon": "scholar"
+    },
+    {
+      "label": "ORCID",
+      "url": "https://orcid.org/0009-0003-4202-9776",
+      "icon": "orcid"
+    },
+    {
+      "label": "ResearchGate",
+      "url": "https://www.researchgate.net/profile/Mahfujur-Rahman-Joy",
+      "icon": "researchgate"
+    },
+    {
       "label": "GitHub",
       "url": "https://github.com/meawman",
       "icon": "github"
@@ -60,21 +75,6 @@
       "label": "LinkedIn",
       "url": "https://www.linkedin.com/in/mahfujur-rahman-joy",
       "icon": "linkedin"
-    },
-    {
-      "label": "Google Scholar",
-      "url": "https://scholar.google.com/citations?user=kWzC3RUAAAAJ&hl=en",
-      "icon": "scholar"
-    },
-    {
-      "label": "ResearchGate",
-      "url": "https://www.researchgate.net/profile/Mahfujur-Rahman-Joy",
-      "icon": "researchgate"
-    },
-    {
-      "label": "ORCID",
-      "url": "https://orcid.org/0009-0003-4202-9776",
-      "icon": "orcid"
     }
   ],
   "studyAreas": [

@@ -50,12 +50,11 @@ export function sitesMap(data, geo) {
   if (!geo) return '';
   const { pt, width, height } = projector(geo);
   const sites = data.studyAreas || [];
-  // nudge labels of markers that sit close together so the numbers stay readable
   const pins = sites.map((s, i) => {
     const [x, y] = pt(s.lon, s.lat);
     return '<a class="map-pin' + (s.current ? ' now' : '') + '" href="#site-' + (i + 1) + '" tabindex="-1" data-site="' + (i + 1) + '">' +
-      '<circle class="hit" cx="' + f(x) + '" cy="' + f(y) + '" r="11"/><circle class="ring" cx="' + f(x) + '" cy="' + f(y) + '" r="7.5"/>' +
-      '<text x="' + f(x) + '" y="' + f(y + 3) + '">' + (i + 1) + '</text><title>' + esc(s.name) + '</title></a>';
+      '<circle class="hit" cx="' + f(x) + '" cy="' + f(y) + '" r="11"/><circle class="ring" cx="' + f(x) + '" cy="' + f(y) + '" r="9"/>' +
+      '<text x="' + f(x) + '" y="' + f(y + 4.2) + '">' + (i + 1) + '</text><title>' + esc(s.name) + '</title></a>';
   }).join('');
   return '<svg viewBox="0 0 ' + width + ' ' + height + '" width="' + width + '" height="' + height + '" aria-hidden="true" focusable="false"><use href="#bd-base"/>' + pins + '</svg>';
 }
