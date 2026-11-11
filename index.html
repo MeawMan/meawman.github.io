@@ -23,7 +23,7 @@
   <link rel="preload" href="assets/fonts/space-grotesk-var.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="assets/fonts/jetbrains-mono-var.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="data/content.json" as="fetch" crossorigin />
-  <link rel="stylesheet" href="assets/css/style.css" />
+  <link rel="stylesheet" href="assets/css/style.css?v=20261112" />
   <script>
     // Apply theme before paint to avoid a flash
     (function () {
@@ -32,6 +32,9 @@
       if (!t) t = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', t);
       document.documentElement.classList.add('js'); // lets the CSS show the script-driven parts only when scripts run
+      // safety net: never leave the page hidden if the main script is slow, cached from an older version, or fails
+      setTimeout(function () { document.documentElement.classList.add('ready'); }, 3500);
+      addEventListener('error', function () { document.documentElement.classList.add('ready'); });
     })();
   </script>
 </head>
@@ -281,8 +284,8 @@
 
   <div class="toast mono" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="assets/js/avatar.js"></script>
-  <script src="assets/js/flow.js"></script>
-  <script src="assets/js/app.js"></script>
+  <script src="assets/js/avatar.js?v=20261112"></script>
+  <script src="assets/js/flow.js?v=20261112"></script>
+  <script src="assets/js/app.js?v=20261112"></script>
 </body>
 </html>
