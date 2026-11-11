@@ -1,0 +1,386 @@
+{
+  "generatedAt": "2026-11-11T14:05:01.824Z",
+  "base": "http://127.0.0.1:4173",
+  "theme": "light",
+  "settleMs": 4500,
+  "note": "JS-on runs use a fresh browser context (first visit, no storage). smallText counts visible text nodes with computed font-size < 12px. targets.under24 = interactive elements smaller than 24 CSS px in either dimension; failingSpacingException additionally applies the WCAG 2.5.8 inline and spacing exceptions (approximation).",
+  "results": [
+    {
+      "path": "/",
+      "url": "http://127.0.0.1:4173/",
+      "js": {
+        "375x812": {
+          "viewport": "375x812",
+          "viewportName": "mobile",
+          "loadMs": 102,
+          "scrollYAfter3s": 0,
+          "autoScrolled": false,
+          "networkIdle": true,
+          "innerWidth": 375,
+          "scrollWidth": 375,
+          "bodyScrollWidth": 375,
+          "horizontalOverflowPx": 0,
+          "overflowingElements": [],
+          "rootOverflowX": {
+            "html": "visible",
+            "body": "visible"
+          },
+          "pageHeight": 18521,
+          "domElements": 821,
+          "appliedTheme": null,
+          "h1Count": 1,
+          "h1Visible": 1,
+          "h1Texts": [
+            "Mahfujur Rahman Joy"
+          ],
+          "headingCount": 62,
+          "headingSkips": [],
+          "headingOrder": [
+            "h1: Mahfujur Rahman Joy",
+            "h2: Research",
+            "h3: Hydrodynamic Modeling",
+            "h3: GIS & Remote Sensing",
+            "h3: Climate Projection",
+            "h3: Machine & Deep Learning",
+            "h2: Publications",
+            "h3: JOURNAL ARTICLES",
+            "h4: Assessing the Reliability of Global Circulation Models in Predicting M",
+            "h4: Drought prediction in Bangladesh under changing climate: Integrating S",
+            "h4: Investigating the Trends of Rainfall and Discharge along the Brahmaput",
+            "h3: PREPRINTS",
+            "h4: Climate associated groundwater table changes and drought risk in Bangl",
+            "h4: Hydroclimatic Trend Analysis and Machine Learning-Based Water Level Pr",
+            "h3: CONFERENCE PAPERS — ICCEI 2025",
+            "h4: Evaluation of Machine Learning Classifiers for LULC Classification Usi",
+            "h4: Multi-Decadal Planform Dynamics of the Transboundary Ganges River Usin",
+            "h4: Spatio-Temporal Dynamics of Erosion and Accretion in the Jamuna River ",
+            "h4: Integrating Geospatial Techniques and the MCDA Approach for Landfill S",
+            "h4: Clustering Earthquake Activity in South Asia Using Advanced Techniques",
+            "h4: Bivariate GIS-Based Risk Mapping of Earthquake Hazard and Population V",
+            "h2: Tools",
+            "h3: DATA PREPARATION",
+            "h4: GapLens",
+            "h4: Hydro-Series Toolkit",
+            "h3: ANALYSIS",
+            "h4: OpenFFA",
+            "h4: Brishti IDF",
+            "h4: Dependability Analyzer",
+            "h4: Composite CN Calculator",
+            "h3: MODELLING & SPATIAL",
+            "h4: River Profile Studio",
+            "h4: Ababahika",
+            "h4: Hydro ML Studio",
+            "h4: DSBC Studio",
+            "h2: Study sites",
+            "h3: Sandhya-Baleshwar River Basin CURRENT",
+            "h3: Burishwar-Payra River Basin",
+            "h3: Khulna Coastal Polders (5 polders)",
+            "h3: North Rajshahi Irrigation Project (NRIP)",
+            "h3: Cox's Bazar Watersheds",
+            "h3: Sylhet Region",
+            "h3: Feni & Southeast Floodplain",
+            "h3: Jamuna River (Sirajganj reach)",
+            "h3: Brahmaputra-Jamuna System",
+            "h3: Ganges (Padma) River",
+            "h3: Rajshahi District",
+            "h3: Dhaka (Zones W3 & W4)",
+            "h2: Experience",
+            "h3: Research Consultant",
+            "h3: Jr. Design Engineer",
+            "h3: GIS and Environmental Officer",
+            "h3: RS & GIS Analyst",
+            "h3: Research Assistant",
+            "h2: Education",
+            "h3: M.Sc. in Water Resource Development",
+            "h3: B.Sc. (Engg.) in Civil & Environmental Engineering",
+            "h3: CERTIFICATIONS AND TRAINING",
+            "h2: Skills",
+            "h2: Leadership and service",
+            "h2: References",
+            "h2: Contact"
+          ],
+          "visibleTextNodes": 447,
+          "smallText": {
+            "count": 0,
+            "chars": 0,
+            "insideAriaHidden": 0,
+            "minFontSizePx": null,
+            "top": []
+          },
+          "targets": {
+            "total": 110,
+            "under24": 0,
+            "under24ExcludingInlineLinks": 0,
+            "failingSpacingException": 0,
+            "examples": []
+          },
+          "fixedCoveringViewport": [],
+          "opaqueFixedOverlay": false,
+          "renderBlockingStylesheets": [
+            {
+              "href": "http://127.0.0.1:4173/assets/dist/site.3e2eb641d4.css",
+              "external": false,
+              "inHead": true
+            }
+          ],
+          "renderBlockingHeadScripts": [],
+          "bodyTextLength": 16164,
+          "bodyTextSample": "Jamuna Padma Meghna Bay of Bengal Skip to content Mahfujur Rahman Joy Menu WATER RESOURCES ENGINEER · DHAKA, BANGLADESH Mahfujur Rahman Joy Civil & Environmenta",
+          "hasVisibleH1WithText": true,
+          "linkCount": 114,
+          "consoleErrors": [],
+          "pageErrors": [],
+          "failedRequests": [],
+          "requestCount": 8,
+          "transferredBytes": 128882,
+          "externalHosts": {},
+          "fontHosts": [
+            "127.0.0.1:4173"
+          ],
+          "fontRequests": 4,
+          "largestRequests": [
+            {
+              "url": "/assets/fonts/plex-sans-var.woff2",
+              "bytes": 46003,
+              "type": "font"
+            },
+            {
+              "url": "/assets/fonts/plex-sans-italic-400.woff2",
+              "bytes": 24647,
+              "type": "font"
+            },
+            {
+              "url": "/assets/fonts/newsreader-500.woff2",
+              "bytes": 23915,
+              "type": "font"
+            },
+            {
+              "url": "/",
+              "bytes": 21687,
+              "type": "document"
+            },
+            {
+              "url": "/assets/fonts/noto-bengali-subset.woff2",
+              "bytes": 5998,
+              "type": "font"
+            }
+          ]
+        },
+        "1366x900": {
+          "viewport": "1366x900",
+          "viewportName": "desktop",
+          "loadMs": 36,
+          "scrollYAfter3s": 0,
+          "autoScrolled": false,
+          "networkIdle": true,
+          "innerWidth": 1366,
+          "scrollWidth": 1366,
+          "bodyScrollWidth": 1366,
+          "horizontalOverflowPx": 0,
+          "overflowingElements": [],
+          "rootOverflowX": {
+            "html": "visible",
+            "body": "visible"
+          },
+          "pageHeight": 11244,
+          "domElements": 821,
+          "appliedTheme": null,
+          "h1Count": 1,
+          "h1Visible": 1,
+          "h1Texts": [
+            "Mahfujur Rahman Joy"
+          ],
+          "headingCount": 62,
+          "headingSkips": [],
+          "headingOrder": [
+            "h1: Mahfujur Rahman Joy",
+            "h2: Research",
+            "h3: Hydrodynamic Modeling",
+            "h3: GIS & Remote Sensing",
+            "h3: Climate Projection",
+            "h3: Machine & Deep Learning",
+            "h2: Publications",
+            "h3: JOURNAL ARTICLES",
+            "h4: Assessing the Reliability of Global Circulation Models in Predicting M",
+            "h4: Drought prediction in Bangladesh under changing climate: Integrating S",
+            "h4: Investigating the Trends of Rainfall and Discharge along the Brahmaput",
+            "h3: PREPRINTS",
+            "h4: Climate associated groundwater table changes and drought risk in Bangl",
+            "h4: Hydroclimatic Trend Analysis and Machine Learning-Based Water Level Pr",
+            "h3: CONFERENCE PAPERS — ICCEI 2025",
+            "h4: Evaluation of Machine Learning Classifiers for LULC Classification Usi",
+            "h4: Multi-Decadal Planform Dynamics of the Transboundary Ganges River Usin",
+            "h4: Spatio-Temporal Dynamics of Erosion and Accretion in the Jamuna River ",
+            "h4: Integrating Geospatial Techniques and the MCDA Approach for Landfill S",
+            "h4: Clustering Earthquake Activity in South Asia Using Advanced Techniques",
+            "h4: Bivariate GIS-Based Risk Mapping of Earthquake Hazard and Population V",
+            "h2: Tools",
+            "h3: DATA PREPARATION",
+            "h4: GapLens",
+            "h4: Hydro-Series Toolkit",
+            "h3: ANALYSIS",
+            "h4: OpenFFA",
+            "h4: Brishti IDF",
+            "h4: Dependability Analyzer",
+            "h4: Composite CN Calculator",
+            "h3: MODELLING & SPATIAL",
+            "h4: River Profile Studio",
+            "h4: Ababahika",
+            "h4: Hydro ML Studio",
+            "h4: DSBC Studio",
+            "h2: Study sites",
+            "h3: Sandhya-Baleshwar River Basin CURRENT",
+            "h3: Burishwar-Payra River Basin",
+            "h3: Khulna Coastal Polders (5 polders)",
+            "h3: North Rajshahi Irrigation Project (NRIP)",
+            "h3: Cox's Bazar Watersheds",
+            "h3: Sylhet Region",
+            "h3: Feni & Southeast Floodplain",
+            "h3: Jamuna River (Sirajganj reach)",
+            "h3: Brahmaputra-Jamuna System",
+            "h3: Ganges (Padma) River",
+            "h3: Rajshahi District",
+            "h3: Dhaka (Zones W3 & W4)",
+            "h2: Experience",
+            "h3: Research Consultant",
+            "h3: Jr. Design Engineer",
+            "h3: GIS and Environmental Officer",
+            "h3: RS & GIS Analyst",
+            "h3: Research Assistant",
+            "h2: Education",
+            "h3: M.Sc. in Water Resource Development",
+            "h3: B.Sc. (Engg.) in Civil & Environmental Engineering",
+            "h3: CERTIFICATIONS AND TRAINING",
+            "h2: Skills",
+            "h2: Leadership and service",
+            "h2: References",
+            "h2: Contact"
+          ],
+          "visibleTextNodes": 453,
+          "smallText": {
+            "count": 0,
+            "chars": 0,
+            "insideAriaHidden": 0,
+            "minFontSizePx": null,
+            "top": []
+          },
+          "targets": {
+            "total": 116,
+            "under24": 3,
+            "under24ExcludingInlineLinks": 3,
+            "failingSpacingException": 0,
+            "examples": [
+              {
+                "selector": "figcaption > a",
+                "size": "450x22.4",
+                "text": "See the list",
+                "inlineLink": false
+              },
+              {
+                "selector": "h4 > a",
+                "size": "788.6x19",
+                "text": "Investigating the Trends of Rainfall and",
+                "inlineLink": false
+              },
+              {
+                "selector": "h4 > a",
+                "size": "607x19",
+                "text": "Clustering Earthquake Activity in South ",
+                "inlineLink": false
+              }
+            ]
+          },
+          "fixedCoveringViewport": [],
+          "opaqueFixedOverlay": false,
+          "renderBlockingStylesheets": [
+            {
+              "href": "http://127.0.0.1:4173/assets/dist/site.3e2eb641d4.css",
+              "external": false,
+              "inHead": true
+            }
+          ],
+          "renderBlockingHeadScripts": [],
+          "bodyTextLength": 16302,
+          "bodyTextSample": "Jamuna Padma Meghna Bay of Bengal Skip to content Mahfujur Rahman Joy Publications Tools Experience Education Contact WATER RESOURCES ENGINEER · DHAKA, BANGLADE",
+          "hasVisibleH1WithText": true,
+          "linkCount": 114,
+          "consoleErrors": [],
+          "pageErrors": [],
+          "failedRequests": [],
+          "requestCount": 8,
+          "transferredBytes": 128882,
+          "externalHosts": {},
+          "fontHosts": [
+            "127.0.0.1:4173"
+          ],
+          "fontRequests": 4,
+          "largestRequests": [
+            {
+              "url": "/assets/fonts/plex-sans-var.woff2",
+              "bytes": 46003,
+              "type": "font"
+            },
+            {
+              "url": "/assets/fonts/plex-sans-italic-400.woff2",
+              "bytes": 24647,
+              "type": "font"
+            },
+            {
+              "url": "/assets/fonts/newsreader-500.woff2",
+              "bytes": 23915,
+              "type": "font"
+            },
+            {
+              "url": "/",
+              "bytes": 21687,
+              "type": "document"
+            },
+            {
+              "url": "/assets/fonts/noto-bengali-subset.woff2",
+              "bytes": 5998,
+              "type": "font"
+            }
+          ]
+        }
+      },
+      "nojs": {
+        "375x812": {
+          "viewport": "375x812",
+          "viewportName": "mobile",
+          "bodyTextLength": 16188,
+          "bodyTextSample": "Jamuna Padma Meghna Bay of Bengal Skip to content Mahfujur Rahman Joy Publications Tools Experience Education Contact WATER RESOURCES ENGINEER · DHAKA, BANGLADE",
+          "hasVisibleH1WithText": true,
+          "h1Count": 1,
+          "h1Visible": 1,
+          "h1Texts": [
+            "Mahfujur Rahman Joy"
+          ],
+          "headingCount": 62,
+          "linkCount": 114,
+          "fixedCoveringViewport": [],
+          "opaqueFixedOverlay": false,
+          "pageHeight": 18565,
+          "horizontalOverflowPx": 0
+        },
+        "1366x900": {
+          "viewport": "1366x900",
+          "viewportName": "desktop",
+          "bodyTextLength": 16283,
+          "bodyTextSample": "Jamuna Padma Meghna Bay of Bengal Skip to content Mahfujur Rahman Joy Publications Tools Experience Education Contact WATER RESOURCES ENGINEER · DHAKA, BANGLADE",
+          "hasVisibleH1WithText": true,
+          "h1Count": 1,
+          "h1Visible": 1,
+          "h1Texts": [
+            "Mahfujur Rahman Joy"
+          ],
+          "headingCount": 62,
+          "linkCount": 114,
+          "fixedCoveringViewport": [],
+          "opaqueFixedOverlay": false,
+          "pageHeight": 11244,
+          "horizontalOverflowPx": 0
+        }
+      }
+    }
+  ]
+}

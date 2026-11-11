@@ -1,0 +1,522 @@
+{
+  "generatedAt": "2026-11-11T14:00:49.067Z",
+  "root": ".",
+  "site": "https://meawman.github.io",
+  "pagesChecked": [
+    "index.html",
+    "404.html",
+    "publications/2025-bivariate-gis-based-risk-mapping-of-earthquake/index.html",
+    "publications/2025-clustering-earthquake-activity-in-south-asia-using/index.html",
+    "publications/2025-drought-prediction-in-bangladesh-under-changing-climate/index.html",
+    "publications/2025-evaluation-of-machine-learning-classifiers-for-lulc/index.html",
+    "publications/2025-hydroclimatic-trend-analysis-and-machine-learning-based/index.html",
+    "publications/2025-integrating-geospatial-techniques-and-the-mcda-approach/index.html",
+    "publications/2025-investigating-the-trends-of-rainfall-and-discharge/index.html",
+    "publications/2025-multi-decadal-planform-dynamics-of-the-transboundary/index.html",
+    "publications/2025-spatio-temporal-dynamics-of-erosion-and-accretion/index.html",
+    "publications/2026-assessing-the-reliability-of-global-circulation-models/index.html",
+    "publications/2026-climate-associated-groundwater-table-changes-and-drought/index.html",
+    "publications/index.html",
+    "tools/ababahika/about/index.html",
+    "tools/brishti-idf/about/index.html",
+    "tools/cn-calculator/about/index.html",
+    "tools/dependability/about/index.html",
+    "tools/dsbc/about/index.html",
+    "tools/gaplens/about/index.html",
+    "tools/hydro-ml/about/index.html",
+    "tools/hydro-series/about/index.html",
+    "tools/openffa/about/index.html",
+    "tools/river-profile/about/index.html"
+  ],
+  "patternsWithoutMatch": [
+    "lab/index.html"
+  ],
+  "pages": [
+    {
+      "page": "index.html",
+      "links": 137,
+      "internal": 112,
+      "external": 22,
+      "skipped": 3,
+      "broken": []
+    },
+    {
+      "page": "404.html",
+      "links": 22,
+      "internal": 21,
+      "external": 1,
+      "skipped": 0,
+      "broken": []
+    },
+    {
+      "page": "publications/2025-bivariate-gis-based-risk-mapping-of-earthquake/index.html",
+      "links": 24,
+      "internal": 22,
+      "external": 2,
+      "skipped": 0,
+      "broken": []
+    },
+    {
+      "page": "publications/2025-clustering-earthquake-activity-in-south-asia-using/index.html",
+      "links": 24,
+      "internal": 22,
+      "external": 2,
+      "skipped": 0,
+      "broken": []
+    },
+    {
+      "page": "publications/2025-drought-prediction-in-bangladesh-under-changing-climate/index.html",
+      "links": 24,
+      "internal": 22,
+      "external": 2,
+      "skipped": 0,
+      "broken": []
+    },
+    {
+      "page": "publications/2025-evaluation-of-machine-learning-classifiers-for-lulc/index.html",
+      "links": 24,
+      "internal": 22,
+      "external": 2,
+      "skipped": 0,
+      "broken": []
+    },
+    {
+      "page": "publications/2025-hydroclimatic-trend-analysis-and-machine-learning-based/index.html",
+      "links": 26,
+      "internal": 23,
+      "external": 3,
+      "skipped": 0,
+      "broken": []
+    },
+    {
+      "page": "publications/2025-integrating-geospatial-techniques-and-the-mcda-approach/index.html",
+      "links": 25,
+      "internal": 23,
+      "external": 2,
+      "skipped": 0,
+      "broken": []
+    },
+    {
+      "page": "publications/2025-investigating-the-trends-of-rainfall-and-discharge/index.html",
+      "links": 25,
+      "internal": 23,
+      "external": 2,
+      "skipped": 0,
+      "broken": []
+    },
+    {
+      "page": "publications/2025-multi-decadal-planform-dynamics-of-the-transboundary/index.html",
+      "links": 25,
+      "internal": 23,
+      "external": 2,
+      "skipped": 0,
+      "broken": []
+    },
+    {
+      "page": "publications/2025-spatio-temporal-dynamics-of-erosion-and-accretion/index.html",
+      "links": 25,
+      "internal": 23,
+      "external": 2,
+      "skipped": 0,
+      "broken": []
+    },
+    {
+      "page": "publications/2026-assessing-the-reliability-of-global-circulation-models/index.html",
+      "links": 24,
+      "internal": 22,
+      "external": 2,
+      "skipped": 0,
+      "broken": []
+    },
+    {
+      "page": "publications/2026-climate-associated-groundwater-table-changes-and-drought/index.html",
+      "links": 24,
+      "internal": 22,
+      "external": 2,
+      "skipped": 0,
+      "broken": []
+    },
+    {
+      "page": "publications/index.html",
+      "links": 57,
+      "internal": 42,
+      "external": 15,
+      "skipped": 0,
+      "broken": []
+    },
+    {
+      "page": "tools/ababahika/about/index.html",
+      "links": 31,
+      "internal": 25,
+      "external": 6,
+      "skipped": 0,
+      "broken": []
+    },
+    {
+      "page": "tools/brishti-idf/about/index.html",
+      "links": 37,
+      "internal": 25,
+      "external": 12,
+      "skipped": 0,
+      "broken": []
+    },
+    {
+      "page": "tools/cn-calculator/about/index.html",
+      "links": 26,
+      "internal": 25,
+      "external": 1,
+      "skipped": 0,
+      "broken": []
+    },
+    {
+      "page": "tools/dependability/about/index.html",
+      "links": 26,
+      "internal": 25,
+      "external": 1,
+      "skipped": 0,
+      "broken": []
+    },
+    {
+      "page": "tools/dsbc/about/index.html",
+      "links": 26,
+      "internal": 25,
+      "external": 1,
+      "skipped": 0,
+      "broken": []
+    },
+    {
+      "page": "tools/gaplens/about/index.html",
+      "links": 26,
+      "internal": 25,
+      "external": 1,
+      "skipped": 0,
+      "broken": []
+    },
+    {
+      "page": "tools/hydro-ml/about/index.html",
+      "links": 26,
+      "internal": 25,
+      "external": 1,
+      "skipped": 0,
+      "broken": []
+    },
+    {
+      "page": "tools/hydro-series/about/index.html",
+      "links": 28,
+      "internal": 27,
+      "external": 1,
+      "skipped": 0,
+      "broken": []
+    },
+    {
+      "page": "tools/openffa/about/index.html",
+      "links": 36,
+      "internal": 25,
+      "external": 11,
+      "skipped": 0,
+      "broken": []
+    },
+    {
+      "page": "tools/river-profile/about/index.html",
+      "links": 26,
+      "internal": 25,
+      "external": 1,
+      "skipped": 0,
+      "broken": []
+    }
+  ],
+  "external": [
+    {
+      "url": "https://doi.org/10.1016/j.htopen.2026.100021",
+      "pages": [
+        "index.html",
+        "publications/2026-assessing-the-reliability-of-global-circulation-models/index.html",
+        "publications/index.html"
+      ]
+    },
+    {
+      "url": "https://doi.org/10.1016/j.indic.2025.100878",
+      "pages": [
+        "index.html",
+        "publications/2025-drought-prediction-in-bangladesh-under-changing-climate/index.html",
+        "publications/index.html"
+      ]
+    },
+    {
+      "url": "https://doi.org/10.2139/ssrn.7540708",
+      "pages": [
+        "index.html",
+        "publications/2026-climate-associated-groundwater-table-changes-and-drought/index.html",
+        "publications/index.html"
+      ]
+    },
+    {
+      "url": "https://doi.org/10.22541/au.175741407.71397410/v1",
+      "pages": [
+        "index.html",
+        "publications/2025-hydroclimatic-trend-analysis-and-machine-learning-based/index.html",
+        "publications/index.html"
+      ]
+    },
+    {
+      "url": "https://github.com/meawman",
+      "pages": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://github.com/MeawMan/meawman.github.io",
+      "pages": [
+        "index.html",
+        "404.html",
+        "publications/2025-bivariate-gis-based-risk-mapping-of-earthquake/index.html",
+        "publications/2025-clustering-earthquake-activity-in-south-asia-using/index.html",
+        "publications/2025-drought-prediction-in-bangladesh-under-changing-climate/index.html",
+        "publications/2025-evaluation-of-machine-learning-classifiers-for-lulc/index.html",
+        "publications/2025-hydroclimatic-trend-analysis-and-machine-learning-based/index.html",
+        "publications/2025-integrating-geospatial-techniques-and-the-mcda-approach/index.html",
+        "publications/2025-investigating-the-trends-of-rainfall-and-discharge/index.html",
+        "publications/2025-multi-decadal-planform-dynamics-of-the-transboundary/index.html",
+        "publications/2025-spatio-temporal-dynamics-of-erosion-and-accretion/index.html",
+        "publications/2026-assessing-the-reliability-of-global-circulation-models/index.html",
+        "publications/2026-climate-associated-groundwater-table-changes-and-drought/index.html",
+        "publications/index.html",
+        "tools/ababahika/about/index.html",
+        "tools/brishti-idf/about/index.html",
+        "tools/cn-calculator/about/index.html",
+        "tools/dependability/about/index.html",
+        "tools/dsbc/about/index.html",
+        "tools/gaplens/about/index.html",
+        "tools/hydro-ml/about/index.html",
+        "tools/hydro-series/about/index.html",
+        "tools/openffa/about/index.html",
+        "tools/river-profile/about/index.html"
+      ]
+    },
+    {
+      "url": "https://github.com/MeawMan/meawman.github.io/blob/main/tools/ababahika/CITATION.cff",
+      "pages": [
+        "tools/ababahika/about/index.html"
+      ]
+    },
+    {
+      "url": "https://github.com/MeawMan/meawman.github.io/blob/main/tools/ababahika/docs/VALIDATION.md",
+      "pages": [
+        "tools/ababahika/about/index.html"
+      ]
+    },
+    {
+      "url": "https://github.com/MeawMan/meawman.github.io/blob/main/tools/ababahika/LICENSE",
+      "pages": [
+        "tools/ababahika/about/index.html"
+      ]
+    },
+    {
+      "url": "https://github.com/MeawMan/meawman.github.io/blob/main/tools/ababahika/README.md",
+      "pages": [
+        "tools/ababahika/about/index.html"
+      ]
+    },
+    {
+      "url": "https://github.com/MeawMan/meawman.github.io/blob/main/tools/brishti-idf/CITATION.cff",
+      "pages": [
+        "tools/brishti-idf/about/index.html"
+      ]
+    },
+    {
+      "url": "https://github.com/MeawMan/meawman.github.io/blob/main/tools/brishti-idf/data/third-party/README.md",
+      "pages": [
+        "tools/brishti-idf/about/index.html"
+      ]
+    },
+    {
+      "url": "https://github.com/MeawMan/meawman.github.io/blob/main/tools/brishti-idf/DECISIONS.md",
+      "pages": [
+        "tools/brishti-idf/about/index.html"
+      ]
+    },
+    {
+      "url": "https://github.com/MeawMan/meawman.github.io/blob/main/tools/brishti-idf/docs/HOLDOUT.md",
+      "pages": [
+        "tools/brishti-idf/about/index.html"
+      ]
+    },
+    {
+      "url": "https://github.com/MeawMan/meawman.github.io/blob/main/tools/brishti-idf/docs/LIMITATIONS.md",
+      "pages": [
+        "tools/brishti-idf/about/index.html"
+      ]
+    },
+    {
+      "url": "https://github.com/MeawMan/meawman.github.io/blob/main/tools/brishti-idf/docs/VALIDATION.md",
+      "pages": [
+        "tools/brishti-idf/about/index.html"
+      ]
+    },
+    {
+      "url": "https://github.com/MeawMan/meawman.github.io/blob/main/tools/brishti-idf/LICENSE",
+      "pages": [
+        "tools/brishti-idf/about/index.html"
+      ]
+    },
+    {
+      "url": "https://github.com/MeawMan/meawman.github.io/blob/main/tools/brishti-idf/NOTICE",
+      "pages": [
+        "tools/brishti-idf/about/index.html"
+      ]
+    },
+    {
+      "url": "https://github.com/MeawMan/meawman.github.io/blob/main/tools/brishti-idf/README.md",
+      "pages": [
+        "tools/brishti-idf/about/index.html"
+      ]
+    },
+    {
+      "url": "https://github.com/MeawMan/meawman.github.io/blob/main/tools/openffa/CITATION.cff",
+      "pages": [
+        "tools/openffa/about/index.html"
+      ]
+    },
+    {
+      "url": "https://github.com/MeawMan/meawman.github.io/blob/main/tools/openffa/data/README.md",
+      "pages": [
+        "tools/openffa/about/index.html"
+      ]
+    },
+    {
+      "url": "https://github.com/MeawMan/meawman.github.io/blob/main/tools/openffa/docs/DECISIONS.md",
+      "pages": [
+        "tools/openffa/about/index.html"
+      ]
+    },
+    {
+      "url": "https://github.com/MeawMan/meawman.github.io/blob/main/tools/openffa/docs/LIMITATIONS.md",
+      "pages": [
+        "tools/openffa/about/index.html"
+      ]
+    },
+    {
+      "url": "https://github.com/MeawMan/meawman.github.io/blob/main/tools/openffa/docs/VALIDATION_NOTES.md",
+      "pages": [
+        "tools/openffa/about/index.html"
+      ]
+    },
+    {
+      "url": "https://github.com/MeawMan/meawman.github.io/blob/main/tools/openffa/docs/VALIDATION.md",
+      "pages": [
+        "tools/openffa/about/index.html"
+      ]
+    },
+    {
+      "url": "https://github.com/MeawMan/meawman.github.io/blob/main/tools/openffa/LICENSE",
+      "pages": [
+        "tools/openffa/about/index.html"
+      ]
+    },
+    {
+      "url": "https://github.com/MeawMan/meawman.github.io/blob/main/tools/openffa/README.md",
+      "pages": [
+        "tools/openffa/about/index.html"
+      ]
+    },
+    {
+      "url": "https://orcid.org/0009-0003-4202-9776",
+      "pages": [
+        "index.html",
+        "publications/index.html"
+      ]
+    },
+    {
+      "url": "https://scholar.google.com/citations?user=kWzC3RUAAAAJ&hl=en",
+      "pages": [
+        "index.html",
+        "publications/index.html"
+      ]
+    },
+    {
+      "url": "https://www.authorea.com/doi/pdf/10.22541/au.175741407.71397410",
+      "pages": [
+        "publications/2025-hydroclimatic-trend-analysis-and-machine-learning-based/index.html"
+      ]
+    },
+    {
+      "url": "https://www.linkedin.com/in/mahfujur-rahman-joy",
+      "pages": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://www.researchgate.net/profile/Mahfujur-Rahman-Joy",
+      "pages": [
+        "index.html",
+        "publications/index.html"
+      ]
+    },
+    {
+      "url": "https://www.researchgate.net/publication/392507278_Investigating_the_Trends_of_Rainfall_and_Discharge_along_the_Brahmaputra-Jamuna_River_System",
+      "pages": [
+        "index.html",
+        "publications/2025-investigating-the-trends-of-rainfall-and-discharge/index.html",
+        "publications/index.html"
+      ]
+    },
+    {
+      "url": "https://www.researchgate.net/publication/400756205_Clustering_Earthquake_Activity_in_South_Asia_Using_Advanced_Techniques",
+      "pages": [
+        "index.html",
+        "publications/2025-clustering-earthquake-activity-in-south-asia-using/index.html",
+        "publications/index.html"
+      ]
+    },
+    {
+      "url": "https://www.researchgate.net/publication/400756808_Bivariate_GIS-Based_Risk_Mapping_of_Earthquake_Hazard_and_Population_Vulnerability_in_Bangladesh",
+      "pages": [
+        "index.html",
+        "publications/2025-bivariate-gis-based-risk-mapping-of-earthquake/index.html",
+        "publications/index.html"
+      ]
+    },
+    {
+      "url": "https://www.researchgate.net/publication/400756811_Multi-Decadal_Planform_Dynamics_of_the_Transboundary_Ganges_River_Using_Landsat_Imagery_and_GIS",
+      "pages": [
+        "index.html",
+        "publications/2025-multi-decadal-planform-dynamics-of-the-transboundary/index.html",
+        "publications/index.html"
+      ]
+    },
+    {
+      "url": "https://www.researchgate.net/publication/400757077_Spatio-Temporal_Dynamics_of_Erosion_and_Accretion_in_the_Jamuna_River_System_Using_Satellite_Imagery_and_GEE",
+      "pages": [
+        "index.html",
+        "publications/2025-spatio-temporal-dynamics-of-erosion-and-accretion/index.html",
+        "publications/index.html"
+      ]
+    },
+    {
+      "url": "https://www.researchgate.net/publication/400757159_Evaluation_of_Machine_Learning_Classifiers_for_LULC_Classification_Using_Sentinel-2_Imagery_on_Google_Earth_Engine",
+      "pages": [
+        "index.html",
+        "publications/2025-evaluation-of-machine-learning-classifiers-for-lulc/index.html",
+        "publications/index.html"
+      ]
+    },
+    {
+      "url": "https://www.researchgate.net/publication/401255010_Integrating_Geospatial_Techniques_and_the_MCDA_Approach_for_Landfill_Site_Suitability_Mapping_in_Rajshahi_District_Bangladesh",
+      "pages": [
+        "index.html",
+        "publications/2025-integrating-geospatial-techniques-and-the-mcda-approach/index.html",
+        "publications/index.html"
+      ]
+    }
+  ],
+  "summary": {
+    "pages": 24,
+    "links": 774,
+    "internal": 674,
+    "externalUnique": 39,
+    "brokenInternal": 0,
+    "externalChecked": false,
+    "brokenExternal": null,
+    "blockedExternal": null
+  }
+}

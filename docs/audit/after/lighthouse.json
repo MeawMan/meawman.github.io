@@ -1,0 +1,411 @@
+{
+  "generatedAt": "2026-11-11T14:08:53.511Z",
+  "tool": "lighthouse",
+  "lighthouseVersion": "13.6.0",
+  "base": "http://127.0.0.1:4173",
+  "note": "Scores are 0-100. Metrics are the median of 3 run(s); times in ms, totalByteWeight in bytes. Mobile = Lighthouse default (Moto G Power emulation, simulated slow 4G, 4x CPU slowdown); desktop = Lighthouse desktop preset. failed[] lists audits with score < 0.9 (union over runs).",
+  "results": [
+    {
+      "path": "/",
+      "url": "http://127.0.0.1:4173/",
+      "formFactor": "mobile",
+      "runs": 3,
+      "scores": {
+        "performance": 100,
+        "accessibility": 100,
+        "best-practices": 100,
+        "seo": 100
+      },
+      "metrics": {
+        "fcpMs": 902,
+        "lcpMs": 902,
+        "cls": 0,
+        "tbtMs": 0,
+        "speedIndexMs": 902,
+        "domElements": 792,
+        "totalByteWeight": 128882
+      },
+      "failed": {
+        "performance": [
+          {
+            "id": "cache-insight",
+            "title": "Use efficient cache lifetimes",
+            "displayValue": "Est savings of 95 KiB",
+            "failedRuns": 3
+          },
+          {
+            "id": "network-dependency-tree-insight",
+            "title": "Network dependency tree",
+            "displayValue": null,
+            "failedRuns": 3
+          },
+          {
+            "id": "render-blocking-insight",
+            "title": "Render-blocking requests",
+            "displayValue": null,
+            "failedRuns": 3
+          }
+        ],
+        "accessibility": [],
+        "best-practices": [],
+        "seo": []
+      },
+      "perRun": [
+        {
+          "scores": {
+            "performance": 100,
+            "accessibility": 100,
+            "best-practices": 100,
+            "seo": 100
+          },
+          "metrics": {
+            "fcpMs": 934,
+            "lcpMs": 934,
+            "cls": 0,
+            "tbtMs": 91,
+            "speedIndexMs": 934,
+            "domElements": 792,
+            "totalByteWeight": 128882
+          }
+        },
+        {
+          "scores": {
+            "performance": 100,
+            "accessibility": 100,
+            "best-practices": 100,
+            "seo": 100
+          },
+          "metrics": {
+            "fcpMs": 901,
+            "lcpMs": 901,
+            "cls": 0,
+            "tbtMs": 0,
+            "speedIndexMs": 901,
+            "domElements": 792,
+            "totalByteWeight": 128882
+          }
+        },
+        {
+          "scores": {
+            "performance": 100,
+            "accessibility": 100,
+            "best-practices": 100,
+            "seo": 100
+          },
+          "metrics": {
+            "fcpMs": 902,
+            "lcpMs": 902,
+            "cls": 0,
+            "tbtMs": 0,
+            "speedIndexMs": 902,
+            "domElements": 792,
+            "totalByteWeight": 128882
+          }
+        }
+      ]
+    },
+    {
+      "path": "/",
+      "url": "http://127.0.0.1:4173/",
+      "formFactor": "desktop",
+      "runs": 3,
+      "scores": {
+        "performance": 100,
+        "accessibility": 100,
+        "best-practices": 100,
+        "seo": 100
+      },
+      "metrics": {
+        "fcpMs": 242,
+        "lcpMs": 242,
+        "cls": 0,
+        "tbtMs": 0,
+        "speedIndexMs": 242,
+        "domElements": 792,
+        "totalByteWeight": 240318
+      },
+      "failed": {
+        "performance": [
+          {
+            "id": "cache-insight",
+            "title": "Use efficient cache lifetimes",
+            "displayValue": "Est savings of 195 KiB",
+            "failedRuns": 3
+          },
+          {
+            "id": "image-delivery-insight",
+            "title": "Improve image delivery",
+            "displayValue": "Est savings of 78 KiB",
+            "failedRuns": 3
+          },
+          {
+            "id": "network-dependency-tree-insight",
+            "title": "Network dependency tree",
+            "displayValue": null,
+            "failedRuns": 3
+          },
+          {
+            "id": "render-blocking-insight",
+            "title": "Render-blocking requests",
+            "displayValue": null,
+            "failedRuns": 3
+          }
+        ],
+        "accessibility": [],
+        "best-practices": [],
+        "seo": []
+      },
+      "perRun": [
+        {
+          "scores": {
+            "performance": 100,
+            "accessibility": 100,
+            "best-practices": 100,
+            "seo": 100
+          },
+          "metrics": {
+            "fcpMs": 242,
+            "lcpMs": 242,
+            "cls": 0,
+            "tbtMs": 0,
+            "speedIndexMs": 242,
+            "domElements": 792,
+            "totalByteWeight": 240318
+          }
+        },
+        {
+          "scores": {
+            "performance": 100,
+            "accessibility": 100,
+            "best-practices": 100,
+            "seo": 100
+          },
+          "metrics": {
+            "fcpMs": 242,
+            "lcpMs": 242,
+            "cls": 0,
+            "tbtMs": 0,
+            "speedIndexMs": 242,
+            "domElements": 792,
+            "totalByteWeight": 240318
+          }
+        },
+        {
+          "scores": {
+            "performance": 100,
+            "accessibility": 100,
+            "best-practices": 100,
+            "seo": 100
+          },
+          "metrics": {
+            "fcpMs": 245,
+            "lcpMs": 245,
+            "cls": 0,
+            "tbtMs": 0,
+            "speedIndexMs": 245,
+            "domElements": 792,
+            "totalByteWeight": 240318
+          }
+        }
+      ]
+    },
+    {
+      "path": "/publications/2026-assessing-the-reliability-of-global-circulation-models/",
+      "url": "http://127.0.0.1:4173/publications/2026-assessing-the-reliability-of-global-circulation-models/",
+      "formFactor": "mobile",
+      "runs": 3,
+      "scores": {
+        "performance": 100,
+        "accessibility": 100,
+        "best-practices": 100,
+        "seo": 100
+      },
+      "metrics": {
+        "fcpMs": 752,
+        "lcpMs": 752,
+        "cls": 0,
+        "tbtMs": 0,
+        "speedIndexMs": 752,
+        "domElements": 62,
+        "totalByteWeight": 104362
+      },
+      "failed": {
+        "performance": [
+          {
+            "id": "cache-insight",
+            "title": "Use efficient cache lifetimes",
+            "displayValue": "Est savings of 90 KiB",
+            "failedRuns": 3
+          },
+          {
+            "id": "network-dependency-tree-insight",
+            "title": "Network dependency tree",
+            "displayValue": null,
+            "failedRuns": 3
+          },
+          {
+            "id": "render-blocking-insight",
+            "title": "Render-blocking requests",
+            "displayValue": "Est savings of 100 ms",
+            "failedRuns": 3
+          }
+        ],
+        "accessibility": [],
+        "best-practices": [],
+        "seo": []
+      },
+      "perRun": [
+        {
+          "scores": {
+            "performance": 100,
+            "accessibility": 100,
+            "best-practices": 100,
+            "seo": 100
+          },
+          "metrics": {
+            "fcpMs": 752,
+            "lcpMs": 752,
+            "cls": 0,
+            "tbtMs": 0,
+            "speedIndexMs": 752,
+            "domElements": 62,
+            "totalByteWeight": 104362
+          }
+        },
+        {
+          "scores": {
+            "performance": 100,
+            "accessibility": 100,
+            "best-practices": 100,
+            "seo": 100
+          },
+          "metrics": {
+            "fcpMs": 752,
+            "lcpMs": 752,
+            "cls": 0,
+            "tbtMs": 0,
+            "speedIndexMs": 752,
+            "domElements": 62,
+            "totalByteWeight": 104362
+          }
+        },
+        {
+          "scores": {
+            "performance": 100,
+            "accessibility": 100,
+            "best-practices": 100,
+            "seo": 100
+          },
+          "metrics": {
+            "fcpMs": 753,
+            "lcpMs": 753,
+            "cls": 0,
+            "tbtMs": 0,
+            "speedIndexMs": 753,
+            "domElements": 62,
+            "totalByteWeight": 104362
+          }
+        }
+      ]
+    },
+    {
+      "path": "/publications/2026-assessing-the-reliability-of-global-circulation-models/",
+      "url": "http://127.0.0.1:4173/publications/2026-assessing-the-reliability-of-global-circulation-models/",
+      "formFactor": "desktop",
+      "runs": 3,
+      "scores": {
+        "performance": 100,
+        "accessibility": 100,
+        "best-practices": 100,
+        "seo": 100
+      },
+      "metrics": {
+        "fcpMs": 202,
+        "lcpMs": 202,
+        "cls": 0,
+        "tbtMs": 0,
+        "speedIndexMs": 202,
+        "domElements": 62,
+        "totalByteWeight": 104362
+      },
+      "failed": {
+        "performance": [
+          {
+            "id": "cache-insight",
+            "title": "Use efficient cache lifetimes",
+            "displayValue": "Est savings of 90 KiB",
+            "failedRuns": 3
+          },
+          {
+            "id": "network-dependency-tree-insight",
+            "title": "Network dependency tree",
+            "displayValue": null,
+            "failedRuns": 3
+          },
+          {
+            "id": "render-blocking-insight",
+            "title": "Render-blocking requests",
+            "displayValue": null,
+            "failedRuns": 3
+          }
+        ],
+        "accessibility": [],
+        "best-practices": [],
+        "seo": []
+      },
+      "perRun": [
+        {
+          "scores": {
+            "performance": 100,
+            "accessibility": 100,
+            "best-practices": 100,
+            "seo": 100
+          },
+          "metrics": {
+            "fcpMs": 202,
+            "lcpMs": 202,
+            "cls": 0,
+            "tbtMs": 0,
+            "speedIndexMs": 202,
+            "domElements": 62,
+            "totalByteWeight": 104362
+          }
+        },
+        {
+          "scores": {
+            "performance": 100,
+            "accessibility": 100,
+            "best-practices": 100,
+            "seo": 100
+          },
+          "metrics": {
+            "fcpMs": 202,
+            "lcpMs": 202,
+            "cls": 0,
+            "tbtMs": 0,
+            "speedIndexMs": 202,
+            "domElements": 62,
+            "totalByteWeight": 104362
+          }
+        },
+        {
+          "scores": {
+            "performance": 100,
+            "accessibility": 100,
+            "best-practices": 100,
+            "seo": 100
+          },
+          "metrics": {
+            "fcpMs": 201,
+            "lcpMs": 201,
+            "cls": 0,
+            "tbtMs": 0,
+            "speedIndexMs": 201,
+            "domElements": 62,
+            "totalByteWeight": 104362
+          }
+        }
+      ]
+    }
+  ]
+}

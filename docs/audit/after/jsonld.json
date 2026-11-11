@@ -1,0 +1,518 @@
+{
+  "generatedAt": "2026-11-11T14:00:32.931Z",
+  "root": ".",
+  "pagesChecked": [
+    "index.html",
+    "publications/2025-bivariate-gis-based-risk-mapping-of-earthquake/index.html",
+    "publications/2025-clustering-earthquake-activity-in-south-asia-using/index.html",
+    "publications/2025-drought-prediction-in-bangladesh-under-changing-climate/index.html",
+    "publications/2025-evaluation-of-machine-learning-classifiers-for-lulc/index.html",
+    "publications/2025-hydroclimatic-trend-analysis-and-machine-learning-based/index.html",
+    "publications/2025-integrating-geospatial-techniques-and-the-mcda-approach/index.html",
+    "publications/2025-investigating-the-trends-of-rainfall-and-discharge/index.html",
+    "publications/2025-multi-decadal-planform-dynamics-of-the-transboundary/index.html",
+    "publications/2025-spatio-temporal-dynamics-of-erosion-and-accretion/index.html",
+    "publications/2026-assessing-the-reliability-of-global-circulation-models/index.html",
+    "publications/2026-climate-associated-groundwater-table-changes-and-drought/index.html",
+    "publications/index.html",
+    "tools/ababahika/about/index.html",
+    "tools/brishti-idf/about/index.html",
+    "tools/cn-calculator/about/index.html",
+    "tools/dependability/about/index.html",
+    "tools/dsbc/about/index.html",
+    "tools/gaplens/about/index.html",
+    "tools/hydro-ml/about/index.html",
+    "tools/hydro-series/about/index.html",
+    "tools/openffa/about/index.html",
+    "tools/river-profile/about/index.html"
+  ],
+  "patternsWithoutMatch": [
+    "lab/index.html"
+  ],
+  "pages": [
+    {
+      "page": "index.html",
+      "blocks": 1,
+      "nodes": 87,
+      "types": {
+        "Person": 34,
+        "Organization": 3,
+        "CollegeOrUniversity": 2,
+        "EducationalOrganization": 2,
+        "PostalAddress": 1,
+        "WebSite": 1,
+        "ScholarlyArticle": 11,
+        "Periodical": 3,
+        "PropertyValue": 4,
+        "CreativeWork": 6,
+        "SoftwareApplication": 10,
+        "Offer": 10
+      },
+      "errors": [],
+      "warnings": [
+        "block 1@graph[2].author[0]: nested Person \"Ahmad Hasan Nury\" has no url/@id",
+        "block 1@graph[2].author[1]: nested Person \"Abu Sadat Md. Saim\" has no url/@id",
+        "block 1@graph[2].author[2]: nested Person \"Khairul Hasan\" has no url/@id",
+        "block 1@graph[3].author[0]: nested Person \"Ahmad Hasan Nury\" has no url/@id",
+        "block 1@graph[3].author[1]: nested Person \"Saiful Alam\" has no url/@id",
+        "block 1@graph[3].author[2]: nested Person \"Rounak Afroz\" has no url/@id",
+        "block 1@graph[3].author[3]: nested Person \"Saurov Nandi Majumdar\" has no url/@id",
+        "block 1@graph[3].author[4]: nested Person \"Shawly Deb Anti\" has no url/@id",
+        "block 1@graph[3].author[6]: nested Person \"Gulam Md. Munna\" has no url/@id",
+        "block 1@graph[4].author[0]: nested Person \"Raied Ahmed Nishat\" has no url/@id",
+        "block 1@graph[5].author[0]: nested Person \"Ahmad Hasan Nury\" has no url/@id",
+        "block 1@graph[5].author[1]: nested Person \"Abu Sadat Md. Saim\" has no url/@id",
+        "block 1@graph[5].author[2]: nested Person \"Anika Tasnim Sadia\" has no url/@id",
+        "block 1@graph[5].author[3]: nested Person \"Shaswata Roy\" has no url/@id",
+        "block 1@graph[5].author[4]: nested Person \"Gulam Md. Munna\" has no url/@id",
+        "block 1@graph[6].author[1]: nested Person \"Raied Ahmed Nishat\" has no url/@id",
+        "block 1@graph[7].author[1]: nested Person \"Saifullah Mansur Akil\" has no url/@id",
+        "block 1@graph[8].author[1]: nested Person \"Saifullah Mansur Akil\" has no url/@id",
+        "block 1@graph[9].author[0]: nested Person \"Saifullah Mansur Akil\" has no url/@id",
+        "block 1@graph[9].author[2]: nested Person \"Gulam Md. Munna\" has no url/@id",
+        "block 1@graph[10].author[0]: nested Person \"Saifullah Mansur Akil\" has no url/@id",
+        "block 1@graph[10].author[2]: nested Person \"Gulam Md. Munna\" has no url/@id"
+      ],
+      "injectsJsonLdWithJs": false
+    },
+    {
+      "page": "publications/2025-bivariate-gis-based-risk-mapping-of-earthquake/index.html",
+      "blocks": 1,
+      "nodes": 10,
+      "types": {
+        "ScholarlyArticle": 1,
+        "Person": 2,
+        "CreativeWork": 1,
+        "Organization": 1,
+        "CollegeOrUniversity": 2,
+        "EducationalOrganization": 2,
+        "PostalAddress": 1
+      },
+      "errors": [],
+      "warnings": [],
+      "injectsJsonLdWithJs": false
+    },
+    {
+      "page": "publications/2025-clustering-earthquake-activity-in-south-asia-using/index.html",
+      "blocks": 1,
+      "nodes": 10,
+      "types": {
+        "ScholarlyArticle": 1,
+        "Person": 2,
+        "CreativeWork": 1,
+        "Organization": 1,
+        "CollegeOrUniversity": 2,
+        "EducationalOrganization": 2,
+        "PostalAddress": 1
+      },
+      "errors": [],
+      "warnings": [],
+      "injectsJsonLdWithJs": false
+    },
+    {
+      "page": "publications/2025-drought-prediction-in-bangladesh-under-changing-climate/index.html",
+      "blocks": 1,
+      "nodes": 17,
+      "types": {
+        "ScholarlyArticle": 1,
+        "Person": 8,
+        "Periodical": 1,
+        "PropertyValue": 1,
+        "Organization": 1,
+        "CollegeOrUniversity": 2,
+        "EducationalOrganization": 2,
+        "PostalAddress": 1
+      },
+      "errors": [],
+      "warnings": [
+        "block 1@graph[0].author[0]: nested Person \"Ahmad Hasan Nury\" has no url/@id",
+        "block 1@graph[0].author[1]: nested Person \"Saiful Alam\" has no url/@id",
+        "block 1@graph[0].author[2]: nested Person \"Rounak Afroz\" has no url/@id",
+        "block 1@graph[0].author[3]: nested Person \"Saurov Nandi Majumdar\" has no url/@id",
+        "block 1@graph[0].author[4]: nested Person \"Shawly Deb Anti\" has no url/@id",
+        "block 1@graph[0].author[6]: nested Person \"Gulam Md. Munna\" has no url/@id"
+      ],
+      "injectsJsonLdWithJs": false
+    },
+    {
+      "page": "publications/2025-evaluation-of-machine-learning-classifiers-for-lulc/index.html",
+      "blocks": 1,
+      "nodes": 11,
+      "types": {
+        "ScholarlyArticle": 1,
+        "Person": 3,
+        "CreativeWork": 1,
+        "Organization": 1,
+        "CollegeOrUniversity": 2,
+        "EducationalOrganization": 2,
+        "PostalAddress": 1
+      },
+      "errors": [],
+      "warnings": [
+        "block 1@graph[0].author[1]: nested Person \"Saifullah Mansur Akil\" has no url/@id"
+      ],
+      "injectsJsonLdWithJs": false
+    },
+    {
+      "page": "publications/2025-hydroclimatic-trend-analysis-and-machine-learning-based/index.html",
+      "blocks": 1,
+      "nodes": 12,
+      "types": {
+        "ScholarlyArticle": 1,
+        "Person": 3,
+        "Organization": 2,
+        "PropertyValue": 1,
+        "CollegeOrUniversity": 2,
+        "EducationalOrganization": 2,
+        "PostalAddress": 1
+      },
+      "errors": [],
+      "warnings": [
+        "block 1@graph[0].author[1]: nested Person \"Raied Ahmed Nishat\" has no url/@id"
+      ],
+      "injectsJsonLdWithJs": false
+    },
+    {
+      "page": "publications/2025-integrating-geospatial-techniques-and-the-mcda-approach/index.html",
+      "blocks": 1,
+      "nodes": 12,
+      "types": {
+        "ScholarlyArticle": 1,
+        "Person": 4,
+        "CreativeWork": 1,
+        "Organization": 1,
+        "CollegeOrUniversity": 2,
+        "EducationalOrganization": 2,
+        "PostalAddress": 1
+      },
+      "errors": [],
+      "warnings": [
+        "block 1@graph[0].author[0]: nested Person \"Saifullah Mansur Akil\" has no url/@id",
+        "block 1@graph[0].author[2]: nested Person \"Gulam Md. Munna\" has no url/@id"
+      ],
+      "injectsJsonLdWithJs": false
+    },
+    {
+      "page": "publications/2025-investigating-the-trends-of-rainfall-and-discharge/index.html",
+      "blocks": 1,
+      "nodes": 11,
+      "types": {
+        "ScholarlyArticle": 1,
+        "Person": 3,
+        "Periodical": 1,
+        "Organization": 1,
+        "CollegeOrUniversity": 2,
+        "EducationalOrganization": 2,
+        "PostalAddress": 1
+      },
+      "errors": [],
+      "warnings": [
+        "block 1@graph[0].author[0]: nested Person \"Raied Ahmed Nishat\" has no url/@id"
+      ],
+      "injectsJsonLdWithJs": false
+    },
+    {
+      "page": "publications/2025-multi-decadal-planform-dynamics-of-the-transboundary/index.html",
+      "blocks": 1,
+      "nodes": 11,
+      "types": {
+        "ScholarlyArticle": 1,
+        "Person": 3,
+        "CreativeWork": 1,
+        "Organization": 1,
+        "CollegeOrUniversity": 2,
+        "EducationalOrganization": 2,
+        "PostalAddress": 1
+      },
+      "errors": [],
+      "warnings": [
+        "block 1@graph[0].author[1]: nested Person \"Saifullah Mansur Akil\" has no url/@id"
+      ],
+      "injectsJsonLdWithJs": false
+    },
+    {
+      "page": "publications/2025-spatio-temporal-dynamics-of-erosion-and-accretion/index.html",
+      "blocks": 1,
+      "nodes": 12,
+      "types": {
+        "ScholarlyArticle": 1,
+        "Person": 4,
+        "CreativeWork": 1,
+        "Organization": 1,
+        "CollegeOrUniversity": 2,
+        "EducationalOrganization": 2,
+        "PostalAddress": 1
+      },
+      "errors": [],
+      "warnings": [
+        "block 1@graph[0].author[0]: nested Person \"Saifullah Mansur Akil\" has no url/@id",
+        "block 1@graph[0].author[2]: nested Person \"Gulam Md. Munna\" has no url/@id"
+      ],
+      "injectsJsonLdWithJs": false
+    },
+    {
+      "page": "publications/2026-assessing-the-reliability-of-global-circulation-models/index.html",
+      "blocks": 1,
+      "nodes": 14,
+      "types": {
+        "ScholarlyArticle": 1,
+        "Person": 5,
+        "Periodical": 1,
+        "PropertyValue": 1,
+        "Organization": 1,
+        "CollegeOrUniversity": 2,
+        "EducationalOrganization": 2,
+        "PostalAddress": 1
+      },
+      "errors": [],
+      "warnings": [
+        "block 1@graph[0].author[0]: nested Person \"Ahmad Hasan Nury\" has no url/@id",
+        "block 1@graph[0].author[1]: nested Person \"Abu Sadat Md. Saim\" has no url/@id",
+        "block 1@graph[0].author[2]: nested Person \"Khairul Hasan\" has no url/@id"
+      ],
+      "injectsJsonLdWithJs": false
+    },
+    {
+      "page": "publications/2026-climate-associated-groundwater-table-changes-and-drought/index.html",
+      "blocks": 1,
+      "nodes": 16,
+      "types": {
+        "ScholarlyArticle": 1,
+        "Person": 7,
+        "Organization": 2,
+        "PropertyValue": 1,
+        "CollegeOrUniversity": 2,
+        "EducationalOrganization": 2,
+        "PostalAddress": 1
+      },
+      "errors": [],
+      "warnings": [
+        "block 1@graph[0].author[0]: nested Person \"Ahmad Hasan Nury\" has no url/@id",
+        "block 1@graph[0].author[1]: nested Person \"Abu Sadat Md. Saim\" has no url/@id",
+        "block 1@graph[0].author[2]: nested Person \"Anika Tasnim Sadia\" has no url/@id",
+        "block 1@graph[0].author[3]: nested Person \"Shaswata Roy\" has no url/@id",
+        "block 1@graph[0].author[4]: nested Person \"Gulam Md. Munna\" has no url/@id"
+      ],
+      "injectsJsonLdWithJs": false
+    },
+    {
+      "page": "publications/index.html",
+      "blocks": 1,
+      "nodes": 66,
+      "types": {
+        "Person": 34,
+        "Organization": 3,
+        "CollegeOrUniversity": 2,
+        "EducationalOrganization": 2,
+        "PostalAddress": 1,
+        "ScholarlyArticle": 11,
+        "Periodical": 3,
+        "PropertyValue": 4,
+        "CreativeWork": 6
+      },
+      "errors": [],
+      "warnings": [
+        "block 1@graph[1].author[0]: nested Person \"Ahmad Hasan Nury\" has no url/@id",
+        "block 1@graph[1].author[1]: nested Person \"Abu Sadat Md. Saim\" has no url/@id",
+        "block 1@graph[1].author[2]: nested Person \"Khairul Hasan\" has no url/@id",
+        "block 1@graph[2].author[0]: nested Person \"Ahmad Hasan Nury\" has no url/@id",
+        "block 1@graph[2].author[1]: nested Person \"Saiful Alam\" has no url/@id",
+        "block 1@graph[2].author[2]: nested Person \"Rounak Afroz\" has no url/@id",
+        "block 1@graph[2].author[3]: nested Person \"Saurov Nandi Majumdar\" has no url/@id",
+        "block 1@graph[2].author[4]: nested Person \"Shawly Deb Anti\" has no url/@id",
+        "block 1@graph[2].author[6]: nested Person \"Gulam Md. Munna\" has no url/@id",
+        "block 1@graph[3].author[0]: nested Person \"Raied Ahmed Nishat\" has no url/@id",
+        "block 1@graph[4].author[0]: nested Person \"Ahmad Hasan Nury\" has no url/@id",
+        "block 1@graph[4].author[1]: nested Person \"Abu Sadat Md. Saim\" has no url/@id",
+        "block 1@graph[4].author[2]: nested Person \"Anika Tasnim Sadia\" has no url/@id",
+        "block 1@graph[4].author[3]: nested Person \"Shaswata Roy\" has no url/@id",
+        "block 1@graph[4].author[4]: nested Person \"Gulam Md. Munna\" has no url/@id",
+        "block 1@graph[5].author[1]: nested Person \"Raied Ahmed Nishat\" has no url/@id",
+        "block 1@graph[6].author[1]: nested Person \"Saifullah Mansur Akil\" has no url/@id",
+        "block 1@graph[7].author[1]: nested Person \"Saifullah Mansur Akil\" has no url/@id",
+        "block 1@graph[8].author[0]: nested Person \"Saifullah Mansur Akil\" has no url/@id",
+        "block 1@graph[8].author[2]: nested Person \"Gulam Md. Munna\" has no url/@id",
+        "block 1@graph[9].author[0]: nested Person \"Saifullah Mansur Akil\" has no url/@id",
+        "block 1@graph[9].author[2]: nested Person \"Gulam Md. Munna\" has no url/@id"
+      ],
+      "injectsJsonLdWithJs": false
+    },
+    {
+      "page": "tools/ababahika/about/index.html",
+      "blocks": 1,
+      "nodes": 9,
+      "types": {
+        "SoftwareApplication": 1,
+        "Offer": 1,
+        "Person": 1,
+        "Organization": 1,
+        "CollegeOrUniversity": 2,
+        "EducationalOrganization": 2,
+        "PostalAddress": 1
+      },
+      "errors": [],
+      "warnings": [],
+      "injectsJsonLdWithJs": false
+    },
+    {
+      "page": "tools/brishti-idf/about/index.html",
+      "blocks": 1,
+      "nodes": 9,
+      "types": {
+        "SoftwareApplication": 1,
+        "Offer": 1,
+        "Person": 1,
+        "Organization": 1,
+        "CollegeOrUniversity": 2,
+        "EducationalOrganization": 2,
+        "PostalAddress": 1
+      },
+      "errors": [],
+      "warnings": [],
+      "injectsJsonLdWithJs": false
+    },
+    {
+      "page": "tools/cn-calculator/about/index.html",
+      "blocks": 1,
+      "nodes": 9,
+      "types": {
+        "SoftwareApplication": 1,
+        "Offer": 1,
+        "Person": 1,
+        "Organization": 1,
+        "CollegeOrUniversity": 2,
+        "EducationalOrganization": 2,
+        "PostalAddress": 1
+      },
+      "errors": [],
+      "warnings": [],
+      "injectsJsonLdWithJs": false
+    },
+    {
+      "page": "tools/dependability/about/index.html",
+      "blocks": 1,
+      "nodes": 9,
+      "types": {
+        "SoftwareApplication": 1,
+        "Offer": 1,
+        "Person": 1,
+        "Organization": 1,
+        "CollegeOrUniversity": 2,
+        "EducationalOrganization": 2,
+        "PostalAddress": 1
+      },
+      "errors": [],
+      "warnings": [],
+      "injectsJsonLdWithJs": false
+    },
+    {
+      "page": "tools/dsbc/about/index.html",
+      "blocks": 1,
+      "nodes": 9,
+      "types": {
+        "SoftwareApplication": 1,
+        "Offer": 1,
+        "Person": 1,
+        "Organization": 1,
+        "CollegeOrUniversity": 2,
+        "EducationalOrganization": 2,
+        "PostalAddress": 1
+      },
+      "errors": [],
+      "warnings": [],
+      "injectsJsonLdWithJs": false
+    },
+    {
+      "page": "tools/gaplens/about/index.html",
+      "blocks": 1,
+      "nodes": 9,
+      "types": {
+        "SoftwareApplication": 1,
+        "Offer": 1,
+        "Person": 1,
+        "Organization": 1,
+        "CollegeOrUniversity": 2,
+        "EducationalOrganization": 2,
+        "PostalAddress": 1
+      },
+      "errors": [],
+      "warnings": [],
+      "injectsJsonLdWithJs": false
+    },
+    {
+      "page": "tools/hydro-ml/about/index.html",
+      "blocks": 1,
+      "nodes": 9,
+      "types": {
+        "SoftwareApplication": 1,
+        "Offer": 1,
+        "Person": 1,
+        "Organization": 1,
+        "CollegeOrUniversity": 2,
+        "EducationalOrganization": 2,
+        "PostalAddress": 1
+      },
+      "errors": [],
+      "warnings": [],
+      "injectsJsonLdWithJs": false
+    },
+    {
+      "page": "tools/hydro-series/about/index.html",
+      "blocks": 1,
+      "nodes": 9,
+      "types": {
+        "SoftwareApplication": 1,
+        "Offer": 1,
+        "Person": 1,
+        "Organization": 1,
+        "CollegeOrUniversity": 2,
+        "EducationalOrganization": 2,
+        "PostalAddress": 1
+      },
+      "errors": [],
+      "warnings": [],
+      "injectsJsonLdWithJs": false
+    },
+    {
+      "page": "tools/openffa/about/index.html",
+      "blocks": 1,
+      "nodes": 9,
+      "types": {
+        "SoftwareApplication": 1,
+        "Offer": 1,
+        "Person": 1,
+        "Organization": 1,
+        "CollegeOrUniversity": 2,
+        "EducationalOrganization": 2,
+        "PostalAddress": 1
+      },
+      "errors": [],
+      "warnings": [],
+      "injectsJsonLdWithJs": false
+    },
+    {
+      "page": "tools/river-profile/about/index.html",
+      "blocks": 1,
+      "nodes": 9,
+      "types": {
+        "SoftwareApplication": 1,
+        "Offer": 1,
+        "Person": 1,
+        "Organization": 1,
+        "CollegeOrUniversity": 2,
+        "EducationalOrganization": 2,
+        "PostalAddress": 1
+      },
+      "errors": [],
+      "warnings": [],
+      "injectsJsonLdWithJs": false
+    }
+  ],
+  "summary": {
+    "pages": 23,
+    "blocks": 23,
+    "pagesWithoutJsonLd": [],
+    "errors": 0,
+    "warnings": 66
+  }
+}
