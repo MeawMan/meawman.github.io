@@ -13,62 +13,59 @@
   const f = (key, label, type, opts) => ({ key, label: label || key, type: type || 'text', opts });
   const ICONS = ['github', 'linkedin', 'scholar', 'researchgate', 'orcid', 'link'];
   const SCHEMA = [
-    { key: 'profile', label: 'Profile', kind: 'object', help: 'Your name, headline and contact details shown in the hero and contact sections.',
-      fields: [f('name', 'Full name'), f('shortName', 'Short name'), f('initials', 'Logo initials'), f('status', 'Status badge (top of hero)'),
-        f('roles', 'Typed roles — one per line', 'list'), f('bio', 'Hero bio — wrap words in **double asterisks** to bold them', 'textarea'),
-        f('location', 'Location'), f('currentQuest', 'Current quest / main project'), f('availability', 'Availability line (contact section)'),
-        f('workEmail', 'Work email'), f('personalEmail', 'Personal email (used for the main Email buttons)'), f('phone', 'Phone'),
-        f('office', 'Office address'), f('cvUrl', 'CV / résumé link (upload a PDF in the GitHub tab to get one)')] },
+    { key: 'profile', label: 'Profile', kind: 'object', help: 'Your name, headline and contact details shown at the top of the homepage and in the contact section.',
+      fields: [f('name', 'Full name'), f('shortName', 'Short name'), f('initials', 'Initials'), f('headline', 'Headline above your name (e.g. Water resources engineer)'), f('status', 'Current position, one line'),
+        f('roles', 'Roles — one per line (shown beside the Research section)', 'list'), f('researchAreas', 'Research areas — one per line (shown under the bio)', 'list'),
+        f('bio', 'Bio — wrap words in **double asterisks** to bold them', 'textarea'),
+        f('location', 'Location (city, country)'), f('currentProject', 'Current project'), f('availability', 'Availability line (contact section)'),
+        f('personalEmail', 'Primary email (used everywhere)'), f('workEmail', 'Work email (shown once, in the contact section)'), f('phone', 'Phone'),
+        f('cvUrl', 'CV file (keep assets/cv.pdf and upload the PDF in the GitHub tab; the link appears once the file exists)')] },
     { key: 'links', label: 'Links', kind: 'array', title: (i) => i.label || 'New link', blank: { label: '', url: '', icon: 'link' },
       help: 'Profile links. Empty URLs are hidden on the site.',
-      fields: [f('label', 'Label'), f('url', 'URL'), f('icon', 'Icon', 'select', ICONS)] },
-    { key: 'avatar', label: 'Avatar', kind: 'object', help: 'What the pixel avatar in the hero says in its speech bubble.',
-      fields: [f('lines', 'Speech lines — one per line', 'list')] },
-    { key: 'buddy', label: 'Companion', kind: 'object', help: 'The mini avatar that docks in the corner while scrolling. It says one line the first time each section comes into view (leave a line empty to stay quiet).',
-      fields: [f('enabled', 'Show the companion', 'checkbox'), f('sections', 'Lines per section (JSON: {"about": "…", "research": "…"})', 'json')] },
+      fields: [f('label', 'Label'), f('url', 'URL'), f('icon', 'Kind', 'select', ICONS)] },
     { key: 'studyAreas', label: 'Study map', kind: 'array', title: (i) => (i.current ? '● ' : '') + (i.name || 'New site'),
-      blank: { name: '', lon: 90.4, lat: 23.7, current: false, what: '', org: '', year: '' },
-      help: 'Pins on the Bangladesh map. Longitude 88–92.7, latitude 20.6–26.6 (copy them from Google Maps: right-click → coordinates gives “lat, lon”).',
+      blank: { name: '', lon: 90.4, lat: 23.7, current: false, what: '', org: '', year: '', related: [] },
+      help: 'Numbered markers on the Bangladesh map. Longitude 88–92.7, latitude 20.6–26.6 (copy them from Google Maps: right-click → coordinates gives “lat, lon”).',
       fields: [f('name', 'Site name'), f('what', 'What you studied', 'textarea'), f('lat', 'Latitude', 'number'), f('lon', 'Longitude', 'number'),
-        f('org', 'Organisation / venue'), f('year', 'Year(s)'), f('current', 'Current project (green pin)', 'checkbox')] },
+        f('org', 'Organisation / venue'), f('year', 'Year(s)'), f('related', 'Related papers — exact publication titles, one per line (only public papers are linked)', 'list'), f('current', 'Current project (filled marker)', 'checkbox')] },
     { key: 'tools', label: 'Tools', kind: 'array', title: (i) => (i.status === 'soon' ? '◌ ' : '') + (i.name || 'New tool'),
-      blank: { name: '', group: '', tagline: '', description: '', url: '', icon: 'chart', accent: 'cyan', status: 'live', updated: '', features: [], tags: [] },
-      help: 'Tools shown in the homepage Toolbox. “Link” can be a page in this site (e.g. tools/my-tool/) or any web address. Status “soon” shows the card without a launch button. The homepage shows tools in this order (move them with ↑ ↓); change “Last updated” when you publish a new version of a tool.',
-      fields: [f('name', 'Tool name'), f('group', 'Group heading (tools next to each other with the same group sit under one heading)'), f('tagline', 'One-line tagline'), f('description', 'Description', 'textarea'), f('url', 'Link (e.g. tools/hydro-series/#minmax)'),
-        f('icon', 'Icon', 'select', ['band', 'extend', 'ml', 'depend', 'gap', 'dsbc', 'idf', 'ffa', 'catchment', 'cn', 'chart', 'map', 'wave', 'profile']), f('accent', 'Colour', 'select', ['cyan', 'violet', 'amber', 'lime', 'pink', 'blue', 'teal', 'orange', 'earth', 'rose']),
-        f('status', 'Status', 'select', ['live', 'beta', 'soon']), f('updated', 'Last updated (shown on the card)', 'date'), f('features', 'Key features — one per line', 'list'), f('tags', 'Tags — comma separated', 'csv')] },
+      blank: { name: '', gloss: '', group: '', tagline: '', description: '', url: '', status: 'stable', updated: '', features: [], tags: [] },
+      help: 'Tools shown on the homepage, in this order, under their group headings. “Link” is the tool folder in this site (e.g. tools/my-tool/). Use the same name as the tool page title. Status “soon” lists the tool without links. Screenshots are captured with “npm run shots”; the About page for each tool is built from tools/<name>/about.json.',
+      fields: [f('name', 'Tool name (same as the tool page)'), f('gloss', 'Name gloss (optional, e.g. what a Bangla name means)'), f('group', 'Group heading'), f('tagline', 'One-line problem statement'), f('description', 'Description', 'textarea'), f('url', 'Link (e.g. tools/openffa/)'),
+        f('status', 'Status', 'select', ['stable', 'beta', 'soon']), f('updated', 'Last updated', 'date'), f('features', 'Key features — one per line', 'list'), f('tags', 'Tags — comma separated', 'csv'),
+        f('parts', 'Parts of a combined tool (JSON list of {name, url, tagline, description, features}; leave empty otherwise)', 'json')] },
     { key: 'focusAreas', label: 'Focus areas', kind: 'array', title: (i) => i.title, blank: { icon: 'chip', title: '', text: '' },
-      fields: [f('title', 'Title'), f('icon', 'Icon', 'select', ['wave', 'satellite', 'cloud', 'chip']), f('text', 'Description', 'textarea')] },
+      fields: [f('title', 'Title'), f('text', 'Description', 'textarea')] },
     { key: 'experience', label: 'Experience', kind: 'array', title: (i) => (i.role || 'New role') + (i.org ? ' — ' + i.org : ''),
       blank: { role: '', org: '', orgNote: '', location: '', mode: 'On-site', start: '', end: '', project: '', people: '', bullets: [], tools: [] },
       help: 'Newest first. Leave “End” empty for your current role.',
       fields: [f('role', 'Role / designation'), f('org', 'Organization'), f('orgNote', 'Organization note'), f('location', 'Location'),
         f('mode', 'Mode', 'select', ['On-site', 'Hybrid', 'Remote']), f('start', 'Start', 'month'), f('end', 'End (empty = present)', 'month'),
         f('project', 'Project', 'textarea'), f('people', 'PI / supervisor'), f('bullets', 'Responsibilities — one per line', 'list'), f('tools', 'Tools — comma separated', 'csv')] },
-    { key: 'publications', label: 'Publications', kind: 'array', title: (i) => (i.year ? '[' + i.year + '] ' : '') + (i.title || 'New publication'),
-      blank: { type: 'journal', status: 'published', featured: false, year: new Date().getFullYear(), title: '', authors: [], venue: '', volume: '', issue: '', pages: '', doi: '', url: '', tags: [] },
-      help: 'APA and BibTeX citations are generated automatically from these fields. Write the DOI without https://doi.org/.',
-      fields: [f('title', 'Title', 'textarea'), f('authors', 'Authors — one per line, in order', 'list'), f('type', 'Type', 'select', ['journal', 'conference']),
-        f('status', 'Status', 'select', ['published', 'accepted', 'revision', 'review', 'preprint']), f('year', 'Year', 'number'), f('venue', 'Journal / conference'),
-        f('volume', 'Volume'), f('issue', 'Issue'), f('pages', 'Pages / article no.'), f('doi', 'DOI (e.g. 10.1016/j.indic.2025.100878)'), f('url', 'Other link'),
-        f('tags', 'Tags — comma separated', 'csv'), f('featured', 'Featured', 'checkbox')] },
-    { key: 'education', label: 'Education', kind: 'array', title: (i) => i.degree, blank: { degree: '', institution: '', location: '', period: '', status: 'completed', grade: '', note: '' },
+    { key: 'publications', label: 'Publications', kind: 'array', title: (i) => (['published', 'preprint'].includes(i.status) ? '' : '(hidden) ') + (i.year ? '[' + i.year + '] ' : '') + (i.title || 'New publication'),
+      blank: { type: 'journal', status: 'published', year: new Date().getFullYear(), title: '', authors: [], venue: '', volume: '', issue: '', pages: '', doi: '', url: '', tags: [], date: '', event: '', note: '', abstract: '' },
+      help: 'Only items with status “published” or “preprint” appear on the site (homepage, their own page, search-engine data and counts). Accepted, in-revision and under-review items stay hidden until you change the status. APA and BibTeX citations are generated from these fields. Write the DOI without https://doi.org/. Conference papers are listed in this order under their event.',
+      fields: [f('title', 'Title', 'textarea'), f('authors', 'Authors — one per line, in order', 'list'), f('type', 'Type', 'select', ['journal', 'preprint', 'conference']),
+        f('status', 'Status', 'select', ['published', 'preprint', 'accepted', 'revision', 'review']), f('year', 'Year', 'number'), f('date', 'Publication / posting date (YYYY-MM or YYYY-MM-DD, optional)'), f('venue', 'Journal / preprint server / conference'),
+        f('event', 'Conference group heading (e.g. ICCEI 2025)'), f('volume', 'Volume'), f('issue', 'Issue'), f('pages', 'Pages / article no.'), f('doi', 'DOI (e.g. 10.1016/j.indic.2025.100878)'), f('url', 'Other link (ResearchGate, full text)'),
+        f('note', 'Note shown on the publication page (optional)'), f('abstract', 'Abstract — paste the published abstract only; leave empty otherwise', 'textarea'), f('tags', 'Topics — comma separated', 'csv')] },
+    { key: 'education', label: 'Education', kind: 'array', title: (i) => i.degree, blank: { degree: '', institution: '', location: '', period: '', status: 'completed', grade: '', note: '', level: 'university' },
       fields: [f('degree', 'Degree'), f('institution', 'Institution'), f('location', 'Location'), f('period', 'Period'), f('status', 'Status', 'select', ['ongoing', 'completed']),
-        f('grade', 'Grade / CGPA'), f('note', 'Note', 'textarea')] },
+        f('level', 'Level (school entries are shown as one compact line)', 'select', ['university', 'school']), f('grade', 'Grade / CGPA'), f('note', 'Note', 'textarea')] },
     { key: 'skills', label: 'Skills', kind: 'array', title: (i) => i.group, blank: { group: '', items: [] },
       fields: [f('group', 'Group name'), f('items', 'Skills — comma separated', 'csv')] },
     { key: 'certifications', label: 'Certifications', kind: 'array', title: (i) => i.title, blank: { title: '', issuer: '', date: '', credentialId: '', url: '' },
       fields: [f('title', 'Title'), f('issuer', 'Issuer'), f('date', 'Date'), f('credentialId', 'Credential ID'), f('url', 'Verification URL')] },
     { key: 'leadership', label: 'Leadership', kind: 'array', title: (i) => i.role + (i.org ? ' — ' + i.org : ''), blank: { role: '', org: '', location: '', period: '' },
       fields: [f('role', 'Role'), f('org', 'Organization'), f('location', 'Location'), f('period', 'Period')] },
-    { key: 'references', label: 'References', kind: 'array', title: (i) => i.name, blank: { name: '', title: '', org: '', email: '' },
-      fields: [f('name', 'Name'), f('title', 'Title'), f('org', 'Organization'), f('email', 'Email')] },
-    { key: 'settings', label: 'Site settings', kind: 'object', help: 'Turn sections and effects on or off.',
-      fields: [f('showPhone', 'Show phone number publicly', 'checkbox'), f('showUnpublished', 'Show accepted / in-revision / preprint papers (off = published only)', 'checkbox'), f('bootScreen', 'Show boot animation on first visit', 'checkbox'),
-        f('flowBackground', 'Animated flow background', 'checkbox'),
-        f('sections', 'Visible sections', 'flags', ['about', 'tools', 'experience', 'map', 'research', 'skills', 'education', 'leadership', 'references', 'contact'])] },
-    { key: 'meta', label: 'SEO', kind: 'object', help: 'Browser tab title and search-engine description.',
-      fields: [f('title', 'Page title'), f('description', 'Meta description', 'textarea'), f('siteUrl', 'Public site URL'), f('updated', 'Last updated', 'date')] },
+    { key: 'references', label: 'References', kind: 'array', title: (i) => i.name, blank: { name: '', title: '', org: '' },
+      help: 'Name, title and affiliation only. This file is public, so do not add email addresses or phone numbers of referees; the site says “Contact details available on request.”',
+      fields: [f('name', 'Name'), f('title', 'Title'), f('org', 'Organization')] },
+    { key: 'settings', label: 'Site settings', kind: 'object', help: 'Turn sections on or off.',
+      fields: [f('showPhone', 'Show phone number publicly', 'checkbox'),
+        f('sections', 'Visible sections', 'flags', ['about', 'research', 'tools', 'map', 'experience', 'education', 'certifications', 'skills', 'leadership', 'references', 'contact'])] },
+    { key: 'meta', label: 'SEO', kind: 'object', help: 'Browser tab title and search-engine description of the homepage. “Last updated” in the footer comes from the date of the last content change automatically.',
+      fields: [f('title', 'Page title'), f('description', 'Meta description', 'textarea'), f('siteUrl', 'Public site URL')] },
     { key: '_github', label: 'GitHub & publish', kind: 'github' },
     { key: '_json', label: 'Raw JSON', kind: 'json' },
   ];
@@ -379,8 +376,8 @@
 
     const up = document.createElement('div');
     up.className = 'panel';
-    up.innerHTML = '<h2>Upload a file</h2><p class="muted small">Upload your CV (PDF) or an image to <code>assets/files/</code> in the repo. Uploading a PDF can also fill your CV link.</p>' +
-      '<div class="row"><input type="file" id="upFile" /><label class="check"><input type="checkbox" id="upCv" checked /> Use as CV link</label><button class="btn primary" id="upBtn">Upload</button><span class="muted small" id="upMsg"></span></div>';
+    up.innerHTML = '<h2>Upload a file</h2><p class="muted small">Upload your CV as a PDF: with “Use as CV” ticked it is saved as <code>assets/cv.pdf</code> and the “Download CV (PDF)” link appears after the next rebuild. Other files go to <code>assets/files/</code>.</p>' +
+      '<div class="row"><input type="file" id="upFile" /><label class="check"><input type="checkbox" id="upCv" checked /> Use as CV (assets/cv.pdf)</label><button class="btn primary" id="upBtn">Upload</button><span class="muted small" id="upMsg"></span></div>';
     ed.appendChild(up);
 
     const help = document.createElement('div');
@@ -389,7 +386,7 @@
       '<li>Create a <b>fine-grained token</b> at GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens.</li>' +
       '<li>Give it access to <b>only this repository</b>, with <b>Contents: Read and write</b>. Set an expiry date.</li>' +
       '<li>Paste it above and press <b>Save connection</b>, then <b>Test connection</b>.</li>' +
-      '<li>Edit any section, use <b>Preview</b> to check, then <b>Publish to GitHub</b>. GitHub Pages redeploys in about a minute, and the Google Sites embed shows the new version automatically.</li>' +
+      '<li>Edit any section, use <b>Preview</b> to check, then <b>Publish to GitHub</b>. This commits <code>data/content.json</code>; a GitHub Action then rebuilds the static pages and GitHub Pages redeploys, usually within two minutes.</li>' +
       '</ol><p class="muted small">The token stays in this browser only; it is never written into the site. Anyone without a token can open this page but cannot change anything.</p>';
     ed.appendChild(help);
 
@@ -456,9 +453,12 @@
       try {
         const name = file.name.replace(/[^\w.-]+/g, '-');
         const b64 = bytesToB64(new Uint8Array(await file.arrayBuffer()));
-        await putFile('assets/files/' + name, b64, 'Upload ' + name + ' via Control Room');
-        if ($('#upCv').checked) { DATA.profile.cvUrl = 'assets/files/' + name; changed(); }
-        $('#upMsg').textContent = '✓ Uploaded to assets/files/' + name + ($('#upCv').checked ? ' — CV link set (publish to apply)' : '');
+        const asCv = $('#upCv').checked;
+        if (asCv && !/\.pdf$/i.test(file.name)) { $('#upMsg').textContent = '✕ The CV must be a PDF file'; return; }
+        const path = asCv ? 'assets/cv.pdf' : 'assets/files/' + name;
+        await putFile(path, b64, 'Upload ' + (asCv ? 'CV' : name) + ' via Control Room');
+        if (asCv && DATA.profile.cvUrl !== path) { DATA.profile.cvUrl = path; changed(); }
+        $('#upMsg').textContent = '✓ Uploaded to ' + path + (asCv ? ' — the CV link appears after the pages rebuild' : '');
       } catch (e) { $('#upMsg').textContent = '✕ ' + e.message; }
     });
 
@@ -500,14 +500,12 @@
     const btn = $('#publishBtn');
     btn.disabled = true; btn.textContent = 'Publishing…';
     try {
-      DATA.meta = DATA.meta || {};
-      DATA.meta.updated = today();
       const text = JSON.stringify(DATA, null, 2) + '\n';
       const r = await putFile(c.path, b64encode(text), 'Update portfolio content (' + today() + ')');
       baseline = JSON.stringify(DATA);
       try { localStorage.removeItem(DRAFT_KEY); } catch (e) { /* ignore */ }
       setStatus();
-      toast('✓ Published — live in about a minute');
+      toast('✓ Published — pages rebuild in a minute or two');
       $('#status').innerHTML = '✓ Published · <a href="' + esc(r.json.commit.html_url) + '" target="_blank" rel="noopener">view commit</a>';
     } catch (e) {
       toast('Publish failed: ' + e.message, true);
