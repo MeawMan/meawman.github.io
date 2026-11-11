@@ -1,0 +1,30 @@
+{
+  "generatedAt": "2026-11-10T21:54:04.264Z",
+  "root": ".tmp/baseline-site",
+  "pagesChecked": [
+    "index.html"
+  ],
+  "patternsWithoutMatch": [],
+  "pages": [
+    {
+      "page": "index.html",
+      "blocks": 0,
+      "nodes": 0,
+      "types": {},
+      "errors": [],
+      "warnings": [
+        "no <script type=\"application/ld+json\"> in the static HTML"
+      ],
+      "injectsJsonLdWithJs": false
+    }
+  ],
+  "summary": {
+    "pages": 1,
+    "blocks": 0,
+    "pagesWithoutJsonLd": [
+      "index.html"
+    ],
+    "errors": 0,
+    "warnings": 1
+  }
+}

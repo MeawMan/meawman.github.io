@@ -1,0 +1,847 @@
+{
+  "generatedAt": "2026-11-10T21:54:26.026Z",
+  "base": "http://127.0.0.1:4173",
+  "theme": "light",
+  "settleMs": 4500,
+  "note": "JS-on runs use a fresh browser context (first visit, no storage). smallText counts visible text nodes with computed font-size < 12px. targets.under24 = interactive elements smaller than 24 CSS px in either dimension; failingSpacingException additionally applies the WCAG 2.5.8 inline and spacing exceptions (approximation).",
+  "results": [
+    {
+      "path": "/",
+      "url": "http://127.0.0.1:4173/",
+      "js": {
+        "375x812": {
+          "viewport": "375x812",
+          "viewportName": "mobile",
+          "loadMs": 372,
+          "scrollYAfter3s": 2985,
+          "autoScrolled": true,
+          "networkIdle": true,
+          "innerWidth": 375,
+          "scrollWidth": 407,
+          "bodyScrollWidth": 407,
+          "horizontalOverflowPx": 32,
+          "overflowingElements": [
+            {
+              "selector": "section#home > div.hero-text",
+              "reducesOverflowByPx": 32,
+              "boxRight": 359,
+              "boxWidth": 343
+            }
+          ],
+          "rootOverflowX": {
+            "html": "visible",
+            "body": "hidden"
+          },
+          "pageHeight": 17778,
+          "domElements": 2668,
+          "appliedTheme": "light",
+          "h1Count": 1,
+          "h1Visible": 1,
+          "h1Texts": [
+            "Mahfujur Rahman Joy"
+          ],
+          "headingCount": 30,
+          "headingSkips": [],
+          "headingOrder": [
+            "h1: Mahfujur Rahman Joy",
+            "h2: What I work on",
+            "h3: Hydrodynamic Modeling",
+            "h3: GIS & Remote Sensing",
+            "h3: Climate Projection",
+            "h3: Machine & Deep Learning",
+            "h2: Education",
+            "h3: M.Sc. in Water Resources Development (WRD)",
+            "h3: B.Sc. (Engg.) in Civil & Environmental Engineering",
+            "h3: Higher Secondary Certificate (Science)",
+            "h2: Experience",
+            "h2: Tools I’ve built",
+            "h2: Where my research flows",
+            "h3: Sandhya-Baleshwar River Basin",
+            "h2: Publications",
+            "h3: 2026 1 paper",
+            "h3: Assessing the Reliability of Global Circulation Models in Predicting M",
+            "h3: 2025 8 papers",
+            "h3: Drought prediction in Bangladesh under changing climate: Integrating S",
+            "h3: Investigating the Trends of Rainfall and Discharge along the Brahmaput",
+            "h3: Evaluation of Machine Learning Classifiers for LULC Classification Usi",
+            "h3: Multi-Decadal Planform Dynamics of the Transboundary Ganges River Usin",
+            "h3: Integrating Geospatial Techniques and the MCDA Approach for Landfill S",
+            "h3: Clustering Earthquake Activity in South Asia Using Advanced Techniques",
+            "h3: Bivariate GIS-Based Risk Mapping of Earthquake Hazard and Population V",
+            "h3: Spatio-Temporal Dynamics of Erosion and Accretion in the Jamuna River ",
+            "h2: Skills & tools",
+            "h3: ACHIEVEMENTS UNLOCKED 8 / 8",
+            "h2: Leadership & references",
+            "h2: Let’s build something that floats."
+          ],
+          "visibleTextNodes": 419,
+          "smallText": {
+            "count": 54,
+            "chars": 450,
+            "insideAriaHidden": 0,
+            "minFontSizePx": 10,
+            "top": [
+              {
+                "selector": "button.site-chip > span.num.mono",
+                "fontSizePx": 11,
+                "count": 11,
+                "sample": "02"
+              },
+              {
+                "selector": "div.pub-meta.mono > span.badge.ok",
+                "fontSizePx": 10.5,
+                "count": 9,
+                "sample": "Published"
+              },
+              {
+                "selector": "div.pub-meta.mono > span.badge.type",
+                "fontSizePx": 10.5,
+                "count": 9,
+                "sample": "Journal"
+              },
+              {
+                "selector": "div.map-legend.mono > span",
+                "fontSizePx": 11,
+                "count": 3,
+                "sample": "Major rivers"
+              },
+              {
+                "selector": "button > em",
+                "fontSizePx": 11,
+                "count": 3,
+                "sample": "9"
+              },
+              {
+                "selector": "div.edu-top.mono > span.badge.ok",
+                "fontSizePx": 10.5,
+                "count": 2,
+                "sample": "SAVED"
+              },
+              {
+                "selector": "div.site-index-head.mono > span",
+                "fontSizePx": 11,
+                "count": 2,
+                "sample": "All sites"
+              },
+              {
+                "selector": "h3.year-head.pixel > small.mono",
+                "fontSizePx": 11,
+                "count": 2,
+                "sample": "1 paper"
+              },
+              {
+                "selector": "div.pub-meta.mono > span.badge.star",
+                "fontSizePx": 10.5,
+                "count": 2,
+                "sample": "★ Featured"
+              },
+              {
+                "selector": "div.card-bar.mono > span",
+                "fontSizePx": 11,
+                "count": 1,
+                "sample": "JOY.EXE"
+              }
+            ]
+          },
+          "targets": {
+            "total": 113,
+            "under24": 31,
+            "under24ExcludingInlineLinks": 30,
+            "failingSpacingException": 0,
+            "examples": [
+              {
+                "selector": "div.tags > button.tag",
+                "size": "37.6x22",
+                "text": "GCM",
+                "inlineLink": false
+              },
+              {
+                "selector": "div.tags > button.tag",
+                "size": "109.6x22",
+                "text": "Precipitation",
+                "inlineLink": false
+              },
+              {
+                "selector": "div.tags > button.tag",
+                "size": "52x22",
+                "text": "CMIP6",
+                "inlineLink": false
+              },
+              {
+                "selector": "div.tags > button.tag",
+                "size": "66.4x22",
+                "text": "Drought",
+                "inlineLink": false
+              },
+              {
+                "selector": "div.tags > button.tag",
+                "size": "52x22",
+                "text": "CMIP6",
+                "inlineLink": false
+              },
+              {
+                "selector": "div.tags > button.tag",
+                "size": "95.2x22",
+                "text": "Downscaling",
+                "inlineLink": false
+              },
+              {
+                "selector": "div.tags > button.tag",
+                "size": "37.6x22",
+                "text": "SPI",
+                "inlineLink": false
+              },
+              {
+                "selector": "div.tags > button.tag",
+                "size": "116.8x22",
+                "text": "Trend analysis",
+                "inlineLink": false
+              },
+              {
+                "selector": "div.tags > button.tag",
+                "size": "73.6x22",
+                "text": "Rainfall",
+                "inlineLink": false
+              },
+              {
+                "selector": "div.tags > button.tag",
+                "size": "80.8x22",
+                "text": "Discharge",
+                "inlineLink": false
+              },
+              {
+                "selector": "div.tags > button.tag",
+                "size": "44.8x22",
+                "text": "LULC",
+                "inlineLink": false
+              },
+              {
+                "selector": "div.tags > button.tag",
+                "size": "88x22",
+                "text": "Sentinel-2",
+                "inlineLink": false
+              },
+              {
+                "selector": "div.tags > button.tag",
+                "size": "37.6x22",
+                "text": "GEE",
+                "inlineLink": false
+              },
+              {
+                "selector": "div.tags > button.tag",
+                "size": "116.8x22",
+                "text": "River planform",
+                "inlineLink": false
+              },
+              {
+                "selector": "div.tags > button.tag",
+                "size": "66.4x22",
+                "text": "Landsat",
+                "inlineLink": false
+              }
+            ]
+          },
+          "fixedCoveringViewport": [
+            {
+              "selector": "canvas#flow",
+              "coverage": 1,
+              "zIndex": "0",
+              "opacity": "0.5",
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "hasBackgroundImage": false,
+              "pointerEvents": "none",
+              "tag": "canvas",
+              "opaque": false
+            },
+            {
+              "selector": "div.grid-bg",
+              "coverage": 1,
+              "zIndex": "0",
+              "opacity": "1",
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "hasBackgroundImage": true,
+              "pointerEvents": "none",
+              "tag": "div",
+              "opaque": false
+            },
+            {
+              "selector": "div.aurora",
+              "coverage": 1,
+              "zIndex": "0",
+              "opacity": "1",
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "hasBackgroundImage": false,
+              "pointerEvents": "none",
+              "tag": "div",
+              "opaque": false
+            },
+            {
+              "selector": "div.grain",
+              "coverage": 1,
+              "zIndex": "1",
+              "opacity": "0.035",
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "hasBackgroundImage": true,
+              "pointerEvents": "none",
+              "tag": "div",
+              "opaque": false
+            }
+          ],
+          "opaqueFixedOverlay": false,
+          "renderBlockingStylesheets": [
+            {
+              "href": "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Silkscreen:wght@400;700&display=swap",
+              "external": true,
+              "inHead": true
+            },
+            {
+              "href": "http://127.0.0.1:4173/assets/css/style.css",
+              "external": false,
+              "inHead": true
+            }
+          ],
+          "renderBlockingHeadScripts": [],
+          "bodyTextLength": 12673,
+          "bodyTextSample": "Skip to content XP 18% Mahfujur R. Joy About Education Experience Tools Map Research Skills Leadership Contact Research Consultant @ CEGIS · M.Sc. (WRD) @ BUET ",
+          "hasVisibleH1WithText": true,
+          "linkCount": 56,
+          "consoleErrors": [],
+          "pageErrors": [],
+          "failedRequests": [],
+          "requestCount": 12,
+          "transferredBytes": 126885,
+          "externalHosts": {
+            "fonts.googleapis.com": {
+              "requests": 1,
+              "bytes": 1420
+            },
+            "fonts.gstatic.com": {
+              "requests": 3,
+              "bytes": 62209
+            }
+          },
+          "fontHosts": [
+            "fonts.gstatic.com"
+          ],
+          "fontRequests": 3,
+          "largestRequests": [
+            {
+              "url": "https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwg.woff2",
+              "bytes": 31461,
+              "type": "font"
+            },
+            {
+              "url": "/assets/js/app.js",
+              "bytes": 22856,
+              "type": "script"
+            },
+            {
+              "url": "https://fonts.gstatic.com/s/spacegrotesk/v22/V8mDoQDjQSkFtoMM3T6r8E7mPbF4Cw.woff2",
+              "bytes": 22317,
+              "type": "font"
+            },
+            {
+              "url": "/assets/css/style.css",
+              "bytes": 12097,
+              "type": "stylesheet"
+            },
+            {
+              "url": "/data/content.json?v=1794347652235",
+              "bytes": 11896,
+              "type": "fetch"
+            }
+          ]
+        },
+        "1366x900": {
+          "viewport": "1366x900",
+          "viewportName": "desktop",
+          "loadMs": 410,
+          "scrollYAfter3s": 1722,
+          "autoScrolled": true,
+          "networkIdle": true,
+          "innerWidth": 1366,
+          "scrollWidth": 1366,
+          "bodyScrollWidth": 1366,
+          "horizontalOverflowPx": 0,
+          "overflowingElements": [],
+          "rootOverflowX": {
+            "html": "visible",
+            "body": "hidden"
+          },
+          "pageHeight": 10435,
+          "domElements": 2668,
+          "appliedTheme": "light",
+          "h1Count": 1,
+          "h1Visible": 1,
+          "h1Texts": [
+            "Mahfujur Rahman Joy"
+          ],
+          "headingCount": 31,
+          "headingSkips": [],
+          "headingOrder": [
+            "h1: Mahfujur Rahman Joy",
+            "h2: What I work on",
+            "h3: Hydrodynamic Modeling",
+            "h3: GIS & Remote Sensing",
+            "h3: Climate Projection",
+            "h3: Machine & Deep Learning",
+            "h2: Education",
+            "h3: M.Sc. in Water Resources Development (WRD)",
+            "h3: B.Sc. (Engg.) in Civil & Environmental Engineering",
+            "h3: Higher Secondary Certificate (Science)",
+            "h3: Secondary School Certificate (Science)",
+            "h2: Experience",
+            "h2: Tools I’ve built",
+            "h2: Where my research flows",
+            "h3: Sandhya-Baleshwar River Basin",
+            "h2: Publications",
+            "h3: 2026 1 paper",
+            "h3: Assessing the Reliability of Global Circulation Models in Predicting M",
+            "h3: 2025 8 papers",
+            "h3: Drought prediction in Bangladesh under changing climate: Integrating S",
+            "h3: Investigating the Trends of Rainfall and Discharge along the Brahmaput",
+            "h3: Evaluation of Machine Learning Classifiers for LULC Classification Usi",
+            "h3: Multi-Decadal Planform Dynamics of the Transboundary Ganges River Usin",
+            "h3: Integrating Geospatial Techniques and the MCDA Approach for Landfill S",
+            "h3: Clustering Earthquake Activity in South Asia Using Advanced Techniques",
+            "h3: Bivariate GIS-Based Risk Mapping of Earthquake Hazard and Population V",
+            "h3: Spatio-Temporal Dynamics of Erosion and Accretion in the Jamuna River ",
+            "h2: Skills & tools",
+            "h3: ACHIEVEMENTS UNLOCKED 8 / 8",
+            "h2: Leadership & references",
+            "h2: Let’s build something that floats."
+          ],
+          "visibleTextNodes": 455,
+          "smallText": {
+            "count": 72,
+            "chars": 660,
+            "insideAriaHidden": 0,
+            "minFontSizePx": 10,
+            "top": [
+              {
+                "selector": "button.site-chip > span.num.mono",
+                "fontSizePx": 11,
+                "count": 11,
+                "sample": "02"
+              },
+              {
+                "selector": "div.pub-meta.mono > span.badge.ok",
+                "fontSizePx": 10.5,
+                "count": 9,
+                "sample": "Published"
+              },
+              {
+                "selector": "div.pub-meta.mono > span.badge.type",
+                "fontSizePx": 10.5,
+                "count": 9,
+                "sample": "Journal"
+              },
+              {
+                "selector": "span.g-label > small",
+                "fontSizePx": 11.5,
+                "count": 5,
+                "sample": "Dept. of Civil & Environmental Engineering"
+              },
+              {
+                "selector": "span.g-bar > em",
+                "fontSizePx": 10.5,
+                "count": 4,
+                "sample": "1 yr 4 mos"
+              },
+              {
+                "selector": "div.edu-top.mono > span.badge.ok",
+                "fontSizePx": 10.5,
+                "count": 3,
+                "sample": "SAVED"
+              },
+              {
+                "selector": "span.g-tick.year > b",
+                "fontSizePx": 10.5,
+                "count": 3,
+                "sample": "2025"
+              },
+              {
+                "selector": "div.map-legend.mono > span",
+                "fontSizePx": 11,
+                "count": 3,
+                "sample": "Major rivers"
+              },
+              {
+                "selector": "button > em",
+                "fontSizePx": 11,
+                "count": 3,
+                "sample": "9"
+              },
+              {
+                "selector": "div#ganttLegend > span",
+                "fontSizePx": 11,
+                "count": 2,
+                "sample": "current"
+              }
+            ]
+          },
+          "targets": {
+            "total": 121,
+            "under24": 40,
+            "under24ExcludingInlineLinks": 39,
+            "failingSpacingException": 0,
+            "examples": [
+              {
+                "selector": "h3 > a",
+                "size": "933.3x23",
+                "text": "Assessing the Reliability of Global Circ",
+                "inlineLink": false
+              },
+              {
+                "selector": "div.tags > button.tag",
+                "size": "37.6x22",
+                "text": "GCM",
+                "inlineLink": false
+              },
+              {
+                "selector": "div.tags > button.tag",
+                "size": "109.6x22",
+                "text": "Precipitation",
+                "inlineLink": false
+              },
+              {
+                "selector": "div.tags > button.tag",
+                "size": "52x22",
+                "text": "CMIP6",
+                "inlineLink": false
+              },
+              {
+                "selector": "h3 > a",
+                "size": "945.8x23",
+                "text": "Drought prediction in Bangladesh under c",
+                "inlineLink": false
+              },
+              {
+                "selector": "div.tags > button.tag",
+                "size": "66.4x22",
+                "text": "Drought",
+                "inlineLink": false
+              },
+              {
+                "selector": "div.tags > button.tag",
+                "size": "52x22",
+                "text": "CMIP6",
+                "inlineLink": false
+              },
+              {
+                "selector": "div.tags > button.tag",
+                "size": "95.2x22",
+                "text": "Downscaling",
+                "inlineLink": false
+              },
+              {
+                "selector": "div.tags > button.tag",
+                "size": "37.6x22",
+                "text": "SPI",
+                "inlineLink": false
+              },
+              {
+                "selector": "h3 > a",
+                "size": "799.5x23",
+                "text": "Investigating the Trends of Rainfall and",
+                "inlineLink": false
+              },
+              {
+                "selector": "div.tags > button.tag",
+                "size": "116.8x22",
+                "text": "Trend analysis",
+                "inlineLink": false
+              },
+              {
+                "selector": "div.tags > button.tag",
+                "size": "73.6x22",
+                "text": "Rainfall",
+                "inlineLink": false
+              },
+              {
+                "selector": "div.tags > button.tag",
+                "size": "80.8x22",
+                "text": "Discharge",
+                "inlineLink": false
+              },
+              {
+                "selector": "h3 > a",
+                "size": "954.3x23",
+                "text": "Evaluation of Machine Learning Classifie",
+                "inlineLink": false
+              },
+              {
+                "selector": "div.tags > button.tag",
+                "size": "44.8x22",
+                "text": "LULC",
+                "inlineLink": false
+              }
+            ]
+          },
+          "fixedCoveringViewport": [
+            {
+              "selector": "canvas#flow",
+              "coverage": 1,
+              "zIndex": "0",
+              "opacity": "0.5",
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "hasBackgroundImage": false,
+              "pointerEvents": "none",
+              "tag": "canvas",
+              "opaque": false
+            },
+            {
+              "selector": "div.grid-bg",
+              "coverage": 1,
+              "zIndex": "0",
+              "opacity": "1",
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "hasBackgroundImage": true,
+              "pointerEvents": "none",
+              "tag": "div",
+              "opaque": false
+            },
+            {
+              "selector": "div.aurora",
+              "coverage": 1,
+              "zIndex": "0",
+              "opacity": "1",
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "hasBackgroundImage": false,
+              "pointerEvents": "none",
+              "tag": "div",
+              "opaque": false
+            },
+            {
+              "selector": "div.grain",
+              "coverage": 1,
+              "zIndex": "1",
+              "opacity": "0.035",
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "hasBackgroundImage": true,
+              "pointerEvents": "none",
+              "tag": "div",
+              "opaque": false
+            }
+          ],
+          "opaqueFixedOverlay": false,
+          "renderBlockingStylesheets": [
+            {
+              "href": "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Silkscreen:wght@400;700&display=swap",
+              "external": true,
+              "inHead": true
+            },
+            {
+              "href": "http://127.0.0.1:4173/assets/css/style.css",
+              "external": false,
+              "inHead": true
+            }
+          ],
+          "renderBlockingHeadScripts": [],
+          "bodyTextLength": 13806,
+          "bodyTextSample": "Skip to content XP 18% Mahfujur Rahman Joy CEGIS · BUET · SUST About Education Experience Tools Map Research Skills Leadership Contact Ctrl K Research Consultan",
+          "hasVisibleH1WithText": true,
+          "linkCount": 56,
+          "consoleErrors": [],
+          "pageErrors": [],
+          "failedRequests": [],
+          "requestCount": 12,
+          "transferredBytes": 126885,
+          "externalHosts": {
+            "fonts.googleapis.com": {
+              "requests": 1,
+              "bytes": 1420
+            },
+            "fonts.gstatic.com": {
+              "requests": 3,
+              "bytes": 62209
+            }
+          },
+          "fontHosts": [
+            "fonts.gstatic.com"
+          ],
+          "fontRequests": 3,
+          "largestRequests": [
+            {
+              "url": "https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwg.woff2",
+              "bytes": 31461,
+              "type": "font"
+            },
+            {
+              "url": "/assets/js/app.js",
+              "bytes": 22856,
+              "type": "script"
+            },
+            {
+              "url": "https://fonts.gstatic.com/s/spacegrotesk/v22/V8mDoQDjQSkFtoMM3T6r8E7mPbF4Cw.woff2",
+              "bytes": 22317,
+              "type": "font"
+            },
+            {
+              "url": "/assets/css/style.css",
+              "bytes": 12097,
+              "type": "stylesheet"
+            },
+            {
+              "url": "/data/content.json?v=1794347659371",
+              "bytes": 11896,
+              "type": "fetch"
+            }
+          ]
+        }
+      },
+      "nojs": {
+        "375x812": {
+          "viewport": "375x812",
+          "viewportName": "mobile",
+          "bodyTextLength": 1321,
+          "bodyTextSample": "Skip to content click or press any key to skip XP 0% Mahfujur Rahman Joy Mahfujur Rahman Joy Water resources engineer and researcher: Research Consultant at CEG",
+          "hasVisibleH1WithText": true,
+          "h1Count": 2,
+          "h1Visible": 1,
+          "h1Texts": [
+            "Mahfujur Rahman Joy",
+            ""
+          ],
+          "headingCount": 11,
+          "linkCount": 23,
+          "fixedCoveringViewport": [
+            {
+              "selector": "div#boot",
+              "coverage": 1,
+              "zIndex": "200",
+              "opacity": "1",
+              "backgroundColor": "rgb(4, 6, 12)",
+              "hasBackgroundImage": false,
+              "pointerEvents": "auto",
+              "tag": "div",
+              "opaque": true
+            },
+            {
+              "selector": "canvas#flow",
+              "coverage": 1,
+              "zIndex": "0",
+              "opacity": "0.5",
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "hasBackgroundImage": false,
+              "pointerEvents": "none",
+              "tag": "canvas",
+              "opaque": false
+            },
+            {
+              "selector": "div.grid-bg",
+              "coverage": 1,
+              "zIndex": "0",
+              "opacity": "1",
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "hasBackgroundImage": true,
+              "pointerEvents": "none",
+              "tag": "div",
+              "opaque": false
+            },
+            {
+              "selector": "div.aurora",
+              "coverage": 1,
+              "zIndex": "0",
+              "opacity": "1",
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "hasBackgroundImage": false,
+              "pointerEvents": "none",
+              "tag": "div",
+              "opaque": false
+            },
+            {
+              "selector": "div.grain",
+              "coverage": 1,
+              "zIndex": "1",
+              "opacity": "0.035",
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "hasBackgroundImage": true,
+              "pointerEvents": "none",
+              "tag": "div",
+              "opaque": false
+            }
+          ],
+          "opaqueFixedOverlay": true,
+          "pageHeight": 4547,
+          "horizontalOverflowPx": 32
+        },
+        "1366x900": {
+          "viewport": "1366x900",
+          "viewportName": "desktop",
+          "bodyTextLength": 1348,
+          "bodyTextSample": "Skip to content click or press any key to skip XP 0% Mahfujur Rahman Joy CEGIS · BUET · SUST Ctrl K Mahfujur Rahman Joy Water resources engineer and researcher:",
+          "hasVisibleH1WithText": true,
+          "h1Count": 2,
+          "h1Visible": 1,
+          "h1Texts": [
+            "Mahfujur Rahman Joy",
+            ""
+          ],
+          "headingCount": 11,
+          "linkCount": 23,
+          "fixedCoveringViewport": [
+            {
+              "selector": "div#boot",
+              "coverage": 1,
+              "zIndex": "200",
+              "opacity": "1",
+              "backgroundColor": "rgb(4, 6, 12)",
+              "hasBackgroundImage": false,
+              "pointerEvents": "auto",
+              "tag": "div",
+              "opaque": true
+            },
+            {
+              "selector": "canvas#flow",
+              "coverage": 1,
+              "zIndex": "0",
+              "opacity": "0.5",
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "hasBackgroundImage": false,
+              "pointerEvents": "none",
+              "tag": "canvas",
+              "opaque": false
+            },
+            {
+              "selector": "div.grid-bg",
+              "coverage": 1,
+              "zIndex": "0",
+              "opacity": "1",
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "hasBackgroundImage": true,
+              "pointerEvents": "none",
+              "tag": "div",
+              "opaque": false
+            },
+            {
+              "selector": "div.aurora",
+              "coverage": 1,
+              "zIndex": "0",
+              "opacity": "1",
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "hasBackgroundImage": false,
+              "pointerEvents": "none",
+              "tag": "div",
+              "opaque": false
+            },
+            {
+              "selector": "div.grain",
+              "coverage": 1,
+              "zIndex": "1",
+              "opacity": "0.035",
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "hasBackgroundImage": true,
+              "pointerEvents": "none",
+              "tag": "div",
+              "opaque": false
+            }
+          ],
+          "opaqueFixedOverlay": true,
+          "pageHeight": 4592,
+          "horizontalOverflowPx": 0
+        }
+      }
+    }
+  ]
+}

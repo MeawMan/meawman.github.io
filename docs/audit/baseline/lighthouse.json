@@ -1,0 +1,317 @@
+{
+  "generatedAt": "2026-11-10T21:53:46.104Z",
+  "tool": "lighthouse",
+  "lighthouseVersion": "13.6.0",
+  "base": "http://127.0.0.1:4173",
+  "note": "Scores are 0-100. Metrics are the median of 3 run(s); times in ms, totalByteWeight in bytes. Mobile = Lighthouse default (Moto G Power emulation, simulated slow 4G, 4x CPU slowdown); desktop = Lighthouse desktop preset. failed[] lists audits with score < 0.9 (union over runs).",
+  "results": [
+    {
+      "path": "/",
+      "url": "http://127.0.0.1:4173/",
+      "formFactor": "mobile",
+      "runs": 3,
+      "scores": {
+        "performance": 75,
+        "accessibility": 92,
+        "best-practices": 100,
+        "seo": 100
+      },
+      "metrics": {
+        "fcpMs": 1499,
+        "lcpMs": 2587,
+        "cls": 0.523,
+        "tbtMs": 46,
+        "speedIndexMs": 3213,
+        "domElements": 2648,
+        "totalByteWeight": 121991
+      },
+      "failed": {
+        "performance": [
+          {
+            "id": "largest-contentful-paint",
+            "title": "Largest Contentful Paint",
+            "displayValue": "2.6 s",
+            "failedRuns": 3
+          },
+          {
+            "id": "speed-index",
+            "title": "Speed Index",
+            "displayValue": "3.5 s",
+            "failedRuns": 1
+          },
+          {
+            "id": "cache-insight",
+            "title": "Use efficient cache lifetimes",
+            "displayValue": "Est savings of 41 KiB",
+            "failedRuns": 3
+          },
+          {
+            "id": "forced-reflow-insight",
+            "title": "Forced reflow",
+            "displayValue": null,
+            "failedRuns": 3
+          },
+          {
+            "id": "render-blocking-insight",
+            "title": "Render-blocking requests",
+            "displayValue": null,
+            "failedRuns": 3
+          },
+          {
+            "id": "unminified-css",
+            "title": "Minify CSS",
+            "displayValue": "Est savings of 2 KiB",
+            "failedRuns": 3
+          },
+          {
+            "id": "unminified-javascript",
+            "title": "Minify JavaScript",
+            "displayValue": "Est savings of 7 KiB",
+            "failedRuns": 3
+          },
+          {
+            "id": "mainthread-work-breakdown",
+            "title": "Minimize main-thread work",
+            "displayValue": "3.9 s",
+            "failedRuns": 3
+          },
+          {
+            "id": "cumulative-layout-shift",
+            "title": "Cumulative Layout Shift",
+            "displayValue": "0.523",
+            "failedRuns": 2
+          },
+          {
+            "id": "cls-culprits-insight",
+            "title": "Layout shift culprits",
+            "displayValue": null,
+            "failedRuns": 2
+          }
+        ],
+        "accessibility": [
+          {
+            "id": "color-contrast",
+            "title": "Background and foreground colors do not have a sufficient contrast ratio.",
+            "displayValue": null,
+            "failedRuns": 3
+          },
+          {
+            "id": "heading-order",
+            "title": "Heading elements are not in a sequentially-descending order",
+            "displayValue": null,
+            "failedRuns": 3
+          },
+          {
+            "id": "link-in-text-block",
+            "title": "Links rely on color to be distinguishable.",
+            "displayValue": null,
+            "failedRuns": 3
+          }
+        ],
+        "best-practices": [],
+        "seo": []
+      },
+      "perRun": [
+        {
+          "scores": {
+            "performance": 95,
+            "accessibility": 92,
+            "best-practices": 100,
+            "seo": 100
+          },
+          "metrics": {
+            "fcpMs": 1532,
+            "lcpMs": 2624,
+            "cls": 0.002,
+            "tbtMs": 76,
+            "speedIndexMs": 3547,
+            "domElements": 2648,
+            "totalByteWeight": 121991
+          }
+        },
+        {
+          "scores": {
+            "performance": 75,
+            "accessibility": 92,
+            "best-practices": 100,
+            "seo": 100
+          },
+          "metrics": {
+            "fcpMs": 1499,
+            "lcpMs": 2587,
+            "cls": 0.523,
+            "tbtMs": 25,
+            "speedIndexMs": 3213,
+            "domElements": 2648,
+            "totalByteWeight": 121991
+          }
+        },
+        {
+          "scores": {
+            "performance": 71,
+            "accessibility": 92,
+            "best-practices": 100,
+            "seo": 100
+          },
+          "metrics": {
+            "fcpMs": 1463,
+            "lcpMs": 2555,
+            "cls": 1.132,
+            "tbtMs": 46,
+            "speedIndexMs": 3115,
+            "domElements": 2648,
+            "totalByteWeight": 121991
+          }
+        }
+      ]
+    },
+    {
+      "path": "/",
+      "url": "http://127.0.0.1:4173/",
+      "formFactor": "desktop",
+      "runs": 3,
+      "scores": {
+        "performance": 86,
+        "accessibility": 92,
+        "best-practices": 100,
+        "seo": 100
+      },
+      "metrics": {
+        "fcpMs": 510,
+        "lcpMs": 820,
+        "cls": 0.247,
+        "tbtMs": 0,
+        "speedIndexMs": 1345,
+        "domElements": 2648,
+        "totalByteWeight": 121991
+      },
+      "failed": {
+        "performance": [
+          {
+            "id": "cumulative-layout-shift",
+            "title": "Cumulative Layout Shift",
+            "displayValue": "0.246",
+            "failedRuns": 3
+          },
+          {
+            "id": "speed-index",
+            "title": "Speed Index",
+            "displayValue": "1.4 s",
+            "failedRuns": 2
+          },
+          {
+            "id": "cache-insight",
+            "title": "Use efficient cache lifetimes",
+            "displayValue": "Est savings of 41 KiB",
+            "failedRuns": 3
+          },
+          {
+            "id": "cls-culprits-insight",
+            "title": "Layout shift culprits",
+            "displayValue": null,
+            "failedRuns": 3
+          },
+          {
+            "id": "forced-reflow-insight",
+            "title": "Forced reflow",
+            "displayValue": null,
+            "failedRuns": 3
+          },
+          {
+            "id": "render-blocking-insight",
+            "title": "Render-blocking requests",
+            "displayValue": null,
+            "failedRuns": 3
+          },
+          {
+            "id": "unminified-css",
+            "title": "Minify CSS",
+            "displayValue": "Est savings of 2 KiB",
+            "failedRuns": 3
+          },
+          {
+            "id": "unminified-javascript",
+            "title": "Minify JavaScript",
+            "displayValue": "Est savings of 7 KiB",
+            "failedRuns": 3
+          }
+        ],
+        "accessibility": [
+          {
+            "id": "color-contrast",
+            "title": "Background and foreground colors do not have a sufficient contrast ratio.",
+            "displayValue": null,
+            "failedRuns": 3
+          },
+          {
+            "id": "heading-order",
+            "title": "Heading elements are not in a sequentially-descending order",
+            "displayValue": null,
+            "failedRuns": 3
+          },
+          {
+            "id": "link-in-text-block",
+            "title": "Links rely on color to be distinguishable.",
+            "displayValue": null,
+            "failedRuns": 3
+          }
+        ],
+        "best-practices": [],
+        "seo": []
+      },
+      "perRun": [
+        {
+          "scores": {
+            "performance": 86,
+            "accessibility": 92,
+            "best-practices": 100,
+            "seo": 100
+          },
+          "metrics": {
+            "fcpMs": 510,
+            "lcpMs": 820,
+            "cls": 0.246,
+            "tbtMs": 0,
+            "speedIndexMs": 1377,
+            "domElements": 2648,
+            "totalByteWeight": 121991
+          }
+        },
+        {
+          "scores": {
+            "performance": 86,
+            "accessibility": 92,
+            "best-practices": 100,
+            "seo": 100
+          },
+          "metrics": {
+            "fcpMs": 476,
+            "lcpMs": 811,
+            "cls": 0.247,
+            "tbtMs": 0,
+            "speedIndexMs": 1309,
+            "domElements": 2648,
+            "totalByteWeight": 121991
+          }
+        },
+        {
+          "scores": {
+            "performance": 82,
+            "accessibility": 92,
+            "best-practices": 100,
+            "seo": 100
+          },
+          "metrics": {
+            "fcpMs": 516,
+            "lcpMs": 834,
+            "cls": 0.313,
+            "tbtMs": 0,
+            "speedIndexMs": 1345,
+            "domElements": 2648,
+            "totalByteWeight": 121991
+          }
+        }
+      ]
+    }
+  ]
+}

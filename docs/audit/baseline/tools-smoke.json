@@ -1,0 +1,614 @@
+{
+  "generatedAt": "2026-11-10T21:56:13.596Z",
+  "base": "http://127.0.0.1:4173",
+  "viewport": "1366x900",
+  "waitMs": 6000,
+  "serviceWorkers": "block",
+  "note": "transferredBytes / largestRequests cover what finished within load + waitMs; tools that keep downloading (Pyodide etc.) show pendingRequests > 0 and their byte totals vary between runs. Same-origin URLs are stored relative to the base.",
+  "tools": [
+    {
+      "slug": "ababahika",
+      "path": "/tools/ababahika/",
+      "status": 200,
+      "loadMs": 615,
+      "title": "Ababahika — catchment slope, land cover & soil statistics · Mahfujur Rahman Joy",
+      "h1Count": 0,
+      "h1Texts": [],
+      "controls": {
+        "buttons": 35,
+        "inputs": 0,
+        "selects": 0,
+        "fileInputs": 1
+      },
+      "iframes": 0,
+      "canvases": 1,
+      "domElements": 200,
+      "lang": "en",
+      "theme": "light",
+      "hasMetaDescription": true,
+      "bodyTextLength": 894,
+      "screenshot": "tools/ababahika.jpg",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "requestCount": 26,
+      "pendingRequests": 0,
+      "transferredBytes": 466598,
+      "largestRequests": [
+        {
+          "url": "/tools/ababahika/dist/app.js?v=mw1o2iaw",
+          "bytes": 307424
+        },
+        {
+          "url": "https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwg.woff2",
+          "bytes": 31461
+        },
+        {
+          "url": "https://fonts.gstatic.com/s/spacegrotesk/v22/V8mDoQDjQSkFtoMM3T6r8E7mPbF4Cw.woff2",
+          "bytes": 22317
+        },
+        {
+          "url": "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/7/54/95",
+          "bytes": 7904
+        },
+        {
+          "url": "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/7/54/96",
+          "bytes": 7267
+        }
+      ],
+      "externalHosts": [
+        "fonts.googleapis.com",
+        "fonts.gstatic.com",
+        "server.arcgisonline.com"
+      ],
+      "externalBytes": 143988,
+      "toolShellCss": true,
+      "toolShellJs": false
+    },
+    {
+      "slug": "brishti-idf",
+      "path": "/tools/brishti-idf/",
+      "status": 200,
+      "loadMs": 1342,
+      "title": "Brishti IDF — rainfall intensity–duration–frequency analysis · Mahfujur Rahman Joy",
+      "h1Count": 1,
+      "h1Texts": [
+        "Brishti IDF"
+      ],
+      "controls": {
+        "buttons": 22,
+        "inputs": 3,
+        "selects": 0,
+        "fileInputs": 1
+      },
+      "iframes": 0,
+      "canvases": 0,
+      "domElements": 177,
+      "lang": "en",
+      "theme": "light",
+      "hasMetaDescription": true,
+      "bodyTextLength": 1901,
+      "screenshot": "tools/brishti-idf.jpg",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "requestCount": 51,
+      "pendingRequests": 0,
+      "transferredBytes": 2010050,
+      "largestRequests": [
+        {
+          "url": "/tools/brishti-idf/vendor/plotly-3.2.0.min.js",
+          "bytes": 1478626
+        },
+        {
+          "url": "/tools/brishti-idf/vendor/xlsx-0.18.5.full.min.js",
+          "bytes": 316600
+        },
+        {
+          "url": "https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwg.woff2",
+          "bytes": 31461
+        },
+        {
+          "url": "/tools/brishti-idf/js/ui/steps.js",
+          "bytes": 26680
+        },
+        {
+          "url": "https://fonts.gstatic.com/s/spacegrotesk/v22/V8mDoQDjQSkFtoMM3T6r8E7mPbF4Cw.woff2",
+          "bytes": 22317
+        }
+      ],
+      "externalHosts": [
+        "fonts.googleapis.com",
+        "fonts.gstatic.com"
+      ],
+      "externalBytes": 55166,
+      "toolShellCss": true,
+      "toolShellJs": false
+    },
+    {
+      "slug": "cn-calculator",
+      "path": "/tools/cn-calculator/",
+      "status": 200,
+      "loadMs": 433,
+      "title": "Composite CN Calculator — SCS curve number and runoff · Mahfujur Rahman Joy",
+      "h1Count": 1,
+      "h1Texts": [
+        "SCS CURVE NUMBER · TR-55 / NEH-4 Composite CN Calculator"
+      ],
+      "controls": {
+        "buttons": 7,
+        "inputs": 692,
+        "selects": 2,
+        "fileInputs": 0
+      },
+      "iframes": 0,
+      "canvases": 0,
+      "domElements": 1830,
+      "lang": "en",
+      "theme": "light",
+      "hasMetaDescription": true,
+      "bodyTextLength": 2401,
+      "screenshot": "tools/cn-calculator.jpg",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "requestCount": 8,
+      "pendingRequests": 0,
+      "transferredBytes": 74634,
+      "largestRequests": [
+        {
+          "url": "https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwg.woff2",
+          "bytes": 31461
+        },
+        {
+          "url": "https://fonts.gstatic.com/s/spacegrotesk/v22/V8mDoQDjQSkFtoMM3T6r8E7mPbF4Cw.woff2",
+          "bytes": 22317
+        },
+        {
+          "url": "/tools/cn-calculator/",
+          "bytes": 13053
+        },
+        {
+          "url": "/assets/css/tool-shell.css",
+          "bytes": 2842
+        },
+        {
+          "url": "/assets/favicon.svg",
+          "bytes": 2381
+        }
+      ],
+      "externalHosts": [
+        "fonts.googleapis.com",
+        "fonts.gstatic.com"
+      ],
+      "externalBytes": 55166,
+      "toolShellCss": true,
+      "toolShellJs": true
+    },
+    {
+      "slug": "dependability",
+      "path": "/tools/dependability/",
+      "status": 200,
+      "loadMs": 401,
+      "title": "Dependability Analyzer — dependable water level, flow & rainfall · Mahfujur Rahman Joy",
+      "h1Count": 0,
+      "h1Texts": [],
+      "controls": {
+        "buttons": 7,
+        "inputs": 17,
+        "selects": 13,
+        "fileInputs": 1
+      },
+      "iframes": 0,
+      "canvases": 0,
+      "domElements": 205,
+      "lang": "en",
+      "theme": "light",
+      "hasMetaDescription": true,
+      "bodyTextLength": 529,
+      "screenshot": "tools/dependability.jpg",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "requestCount": 9,
+      "pendingRequests": 0,
+      "transferredBytes": 291833,
+      "largestRequests": [
+        {
+          "url": "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js",
+          "bytes": 201689
+        },
+        {
+          "url": "https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwg.woff2",
+          "bytes": 31461
+        },
+        {
+          "url": "/tools/dependability/",
+          "bytes": 28563
+        },
+        {
+          "url": "https://fonts.gstatic.com/s/spacegrotesk/v22/V8mDoQDjQSkFtoMM3T6r8E7mPbF4Cw.woff2",
+          "bytes": 22317
+        },
+        {
+          "url": "/assets/css/tool-shell.css",
+          "bytes": 2842
+        }
+      ],
+      "externalHosts": [
+        "cdnjs.cloudflare.com",
+        "fonts.googleapis.com",
+        "fonts.gstatic.com"
+      ],
+      "externalBytes": 256855,
+      "toolShellCss": true,
+      "toolShellJs": true
+    },
+    {
+      "slug": "dsbc",
+      "path": "/tools/dsbc/",
+      "status": 200,
+      "loadMs": 950,
+      "title": "DSBC Studio — downscaling and bias correction · Mahfujur Rahman Joy",
+      "h1Count": 1,
+      "h1Texts": [
+        "Downscaling and bias correction studio"
+      ],
+      "controls": {
+        "buttons": 72,
+        "inputs": 20,
+        "selects": 50,
+        "fileInputs": 1
+      },
+      "iframes": 0,
+      "canvases": 0,
+      "domElements": 724,
+      "lang": "en",
+      "theme": "light",
+      "hasMetaDescription": true,
+      "bodyTextLength": 1526,
+      "screenshot": "tools/dsbc.jpg",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "requestCount": 25,
+      "pendingRequests": 0,
+      "transferredBytes": 33849540,
+      "largestRequests": [
+        {
+          "url": "https://cdn.jsdelivr.net/pyodide/v314.0.7/full/scipy-1.18.0-cp314-cp314-pyemscripten_2026_0_wasm32.whl",
+          "bytes": 13878287
+        },
+        {
+          "url": "https://cdn.jsdelivr.net/pyodide/v314.0.7/full/scikit_learn-1.8.0-cp314-cp314-pyemscripten_2026_0_wasm32.whl",
+          "bytes": 4408468
+        },
+        {
+          "url": "https://cdn.jsdelivr.net/pyodide/v314.0.7/full/pandas-3.0.2-cp314-cp314-pyemscripten_2026_0_wasm32.whl",
+          "bytes": 4152254
+        },
+        {
+          "url": "https://cdn.jsdelivr.net/pyodide/v314.0.7/full/pyodide.asm.wasm",
+          "bytes": 3442835
+        },
+        {
+          "url": "https://cdn.jsdelivr.net/pyodide/v314.0.7/full/numpy-2.4.6-cp314-cp314-pyemscripten_2026_0_wasm32.whl",
+          "bytes": 2931967
+        }
+      ],
+      "externalHosts": [
+        "cdn.jsdelivr.net",
+        "cdnjs.cloudflare.com",
+        "fonts.googleapis.com",
+        "fonts.gstatic.com"
+      ],
+      "externalBytes": 33743954,
+      "toolShellCss": false,
+      "toolShellJs": false
+    },
+    {
+      "slug": "gaplens",
+      "path": "/tools/gaplens/",
+      "status": 200,
+      "loadMs": 357,
+      "title": "GapLens — find, fill and compare gaps in hydroclimate records · Mahfujur Rahman Joy",
+      "h1Count": 9,
+      "h1Texts": [
+        "GapLens",
+        "Data",
+        "Diagnose",
+        "Suggest",
+        "Compare",
+        "Fill",
+        "Validate two series",
+        "Rating curve",
+        "Methods"
+      ],
+      "controls": {
+        "buttons": 14,
+        "inputs": 5,
+        "selects": 15,
+        "fileInputs": 2
+      },
+      "iframes": 0,
+      "canvases": 0,
+      "domElements": 269,
+      "lang": "en",
+      "theme": "light",
+      "hasMetaDescription": true,
+      "bodyTextLength": 846,
+      "screenshot": "tools/gaplens.jpg",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "requestCount": 28,
+      "pendingRequests": 0,
+      "transferredBytes": 36515724,
+      "largestRequests": [
+        {
+          "url": "https://cdn.jsdelivr.net/pyodide/v0.27.7/full/scipy-1.14.1-cp312-cp312-pyodide_2024_0_wasm32.whl",
+          "bytes": 13440996
+        },
+        {
+          "url": "https://cdn.jsdelivr.net/pyodide/v0.27.7/full/scikit_learn-1.6.1-cp312-cp312-pyodide_2024_0_wasm32.whl",
+          "bytes": 6242951
+        },
+        {
+          "url": "https://cdn.jsdelivr.net/pyodide/v0.27.7/full/pandas-2.2.3-cp312-cp312-pyodide_2024_0_wasm32.whl",
+          "bytes": 5685834
+        },
+        {
+          "url": "https://cdn.jsdelivr.net/pyodide/v0.27.7/full/numpy-2.0.2-cp312-cp312-pyodide_2024_0_wasm32.whl",
+          "bytes": 3040226
+        },
+        {
+          "url": "https://cdn.jsdelivr.net/pyodide/v0.27.7/full/pyodide.asm.wasm",
+          "bytes": 3005542
+        }
+      ],
+      "externalHosts": [
+        "cdn.jsdelivr.net",
+        "fonts.googleapis.com",
+        "fonts.gstatic.com"
+      ],
+      "externalBytes": 36462666,
+      "toolShellCss": true,
+      "toolShellJs": true
+    },
+    {
+      "slug": "hydro-ml",
+      "path": "/tools/hydro-ml/",
+      "status": 200,
+      "loadMs": 335,
+      "title": "Hydro ML Studio — machine learning for water level, discharge & rainfall · Mahfujur Rahman Joy",
+      "h1Count": 0,
+      "h1Texts": [],
+      "controls": {
+        "buttons": 82,
+        "inputs": 68,
+        "selects": 29,
+        "fileInputs": 4
+      },
+      "iframes": 0,
+      "canvases": 0,
+      "domElements": 707,
+      "lang": "en",
+      "theme": "light",
+      "hasMetaDescription": true,
+      "bodyTextLength": 977,
+      "screenshot": "tools/hydro-ml.jpg",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "requestCount": 15,
+      "pendingRequests": 0,
+      "transferredBytes": 146249,
+      "largestRequests": [
+        {
+          "url": "/tools/hydro-ml/app.js",
+          "bytes": 46169
+        },
+        {
+          "url": "https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwg.woff2",
+          "bytes": 31461
+        },
+        {
+          "url": "https://fonts.gstatic.com/s/spacegrotesk/v22/V8mDoQDjQSkFtoMM3T6r8E7mPbF4Cw.woff2",
+          "bytes": 22317
+        },
+        {
+          "url": "/tools/hydro-ml/ml-core.js",
+          "bytes": 12925
+        },
+        {
+          "url": "/tools/hydro-ml/charts.js",
+          "bytes": 7545
+        }
+      ],
+      "externalHosts": [
+        "fonts.googleapis.com",
+        "fonts.gstatic.com"
+      ],
+      "externalBytes": 55166,
+      "toolShellCss": true,
+      "toolShellJs": true
+    },
+    {
+      "slug": "hydro-series",
+      "path": "/tools/hydro-series/",
+      "status": 200,
+      "loadMs": 405,
+      "title": "Hydro-Series Toolkit — Min-Max-Avg & Series Generator · Mahfujur Rahman Joy",
+      "h1Count": 0,
+      "h1Texts": [],
+      "controls": {
+        "buttons": 32,
+        "inputs": 17,
+        "selects": 22,
+        "fileInputs": 2
+      },
+      "iframes": 0,
+      "canvases": 0,
+      "domElements": 328,
+      "lang": "en",
+      "theme": "light",
+      "hasMetaDescription": true,
+      "bodyTextLength": 793,
+      "screenshot": "tools/hydro-series.jpg",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "requestCount": 9,
+      "pendingRequests": 0,
+      "transferredBytes": 122063,
+      "largestRequests": [
+        {
+          "url": "/tools/hydro-series/",
+          "bytes": 52051
+        },
+        {
+          "url": "https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwg.woff2",
+          "bytes": 31461
+        },
+        {
+          "url": "https://fonts.gstatic.com/s/spacegrotesk/v22/V8mDoQDjQSkFtoMM3T6r8E7mPbF4Cw.woff2",
+          "bytes": 22317
+        },
+        {
+          "url": "https://fonts.gstatic.com/s/silkscreen/v6/m8JXjfVPf62XiF7kO-i9YLNlaw.woff2",
+          "bytes": 8431
+        },
+        {
+          "url": "/assets/css/tool-shell.css",
+          "bytes": 2842
+        }
+      ],
+      "externalHosts": [
+        "fonts.googleapis.com",
+        "fonts.gstatic.com"
+      ],
+      "externalBytes": 63597,
+      "toolShellCss": true,
+      "toolShellJs": true
+    },
+    {
+      "slug": "openffa",
+      "path": "/tools/openffa/",
+      "status": 200,
+      "loadMs": 602,
+      "title": "OpenFFA — flood frequency analysis · Mahfujur Rahman Joy",
+      "h1Count": 0,
+      "h1Texts": [],
+      "controls": {
+        "buttons": 18,
+        "inputs": 1,
+        "selects": 0,
+        "fileInputs": 1
+      },
+      "iframes": 0,
+      "canvases": 0,
+      "domElements": 108,
+      "lang": "en",
+      "theme": "light",
+      "hasMetaDescription": true,
+      "bodyTextLength": 646,
+      "screenshot": "tools/openffa.jpg",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "requestCount": 65,
+      "pendingRequests": 0,
+      "transferredBytes": 704187,
+      "largestRequests": [
+        {
+          "url": "/tools/openffa/vendor/plotly.min.js",
+          "bytes": 370244
+        },
+        {
+          "url": "/tools/openffa/vendor/xlsx.core.min.js",
+          "bytes": 142463
+        },
+        {
+          "url": "https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwg.woff2",
+          "bytes": 31461
+        },
+        {
+          "url": "https://fonts.gstatic.com/s/spacegrotesk/v22/V8mDoQDjQSkFtoMM3T6r8E7mPbF4Cw.woff2",
+          "bytes": 22317
+        },
+        {
+          "url": "/tools/openffa/src/io/export.js",
+          "bytes": 7753
+        }
+      ],
+      "externalHosts": [
+        "fonts.googleapis.com",
+        "fonts.gstatic.com"
+      ],
+      "externalBytes": 55166,
+      "toolShellCss": true,
+      "toolShellJs": false
+    },
+    {
+      "slug": "river-profile",
+      "path": "/tools/river-profile/",
+      "status": 200,
+      "loadMs": 447,
+      "title": "River Profile Studio — Cross-sections, SOBEK Y-Z & profiling · Mahfujur Rahman Joy",
+      "h1Count": 1,
+      "h1Texts": [
+        "EXCEL / CSV → PROFILE.DEF · SOBEK 2.1X FLOW River Profile Studio"
+      ],
+      "controls": {
+        "buttons": 24,
+        "inputs": 40,
+        "selects": 13,
+        "fileInputs": 2
+      },
+      "iframes": 0,
+      "canvases": 0,
+      "domElements": 685,
+      "lang": "en",
+      "theme": "light",
+      "hasMetaDescription": true,
+      "bodyTextLength": 4274,
+      "screenshot": "tools/river-profile.jpg",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "requestCount": 8,
+      "pendingRequests": 0,
+      "transferredBytes": 290144,
+      "largestRequests": [
+        {
+          "url": "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js",
+          "bytes": 201689
+        },
+        {
+          "url": "https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwg.woff2",
+          "bytes": 31461
+        },
+        {
+          "url": "/tools/river-profile/",
+          "bytes": 28066
+        },
+        {
+          "url": "https://fonts.gstatic.com/s/spacegrotesk/v22/V8mDoQDjQSkFtoMM3T6r8E7mPbF4Cw.woff2",
+          "bytes": 22317
+        },
+        {
+          "url": "/assets/css/tool-shell.css",
+          "bytes": 2842
+        }
+      ],
+      "externalHosts": [
+        "cdnjs.cloudflare.com",
+        "fonts.googleapis.com",
+        "fonts.gstatic.com"
+      ],
+      "externalBytes": 256855,
+      "toolShellCss": true,
+      "toolShellJs": false
+    }
+  ]
+}

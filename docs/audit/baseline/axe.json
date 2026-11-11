@@ -1,0 +1,635 @@
+{
+  "generatedAt": "2026-11-10T21:54:11.184Z",
+  "tool": "axe-core",
+  "axeVersion": "4.14.0",
+  "tags": [
+    "wcag2a",
+    "wcag2aa",
+    "wcag21a",
+    "wcag21aa",
+    "wcag22aa",
+    "best-practice"
+  ],
+  "base": "http://127.0.0.1:4173",
+  "settleMs": 4500,
+  "summary": {
+    "totalRuns": 4,
+    "erroredRuns": 0,
+    "totalViolationNodes": 121,
+    "byRule": {
+      "aria-allowed-role": {
+        "impact": "minor",
+        "nodesByRun": {
+          "/|light|375x812": 12,
+          "/|light|1366x900": 12,
+          "/|dark|375x812": 12,
+          "/|dark|1366x900": 12
+        }
+      },
+      "color-contrast": {
+        "impact": "serious",
+        "nodesByRun": {
+          "/|light|375x812": 29,
+          "/|light|1366x900": 28,
+          "/|dark|375x812": 1,
+          "/|dark|1366x900": 1
+        }
+      },
+      "heading-order": {
+        "impact": "moderate",
+        "nodesByRun": {
+          "/|light|375x812": 1,
+          "/|light|1366x900": 1,
+          "/|dark|375x812": 1,
+          "/|dark|1366x900": 1
+        }
+      },
+      "label-content-name-mismatch": {
+        "impact": "serious",
+        "nodesByRun": {
+          "/|light|375x812": 1,
+          "/|light|1366x900": 2,
+          "/|dark|375x812": 1,
+          "/|dark|1366x900": 2
+        }
+      },
+      "link-in-text-block": {
+        "impact": "serious",
+        "nodesByRun": {
+          "/|light|375x812": 1,
+          "/|light|1366x900": 1,
+          "/|dark|375x812": 1,
+          "/|dark|1366x900": 1
+        }
+      }
+    }
+  },
+  "runs": [
+    {
+      "path": "/",
+      "url": "http://127.0.0.1:4173/",
+      "theme": "light",
+      "viewport": "375x812",
+      "viewportName": "mobile",
+      "appliedTheme": "light",
+      "violations": [
+        {
+          "id": "aria-allowed-role",
+          "impact": "minor",
+          "help": "ARIA role should be appropriate for the element",
+          "tags": [
+            "best-practice"
+          ],
+          "nodes": 12,
+          "examples": [
+            {
+              "target": "button[title=\"Sandhya-Baleshwar River Basin\"]",
+              "html": "<button class=\"site-chip now active\" data-site=\"0\" role=\"listitem\" title=\"Sandhya-Baleshwar River Basin\"><span class=\"num mono\">01</span><span class=\"nm\">Sandhya-Baleshwar River Basin</span></button>",
+              "summary": "Fix any of the following: ARIA role listitem is not allowed for given element"
+            },
+            {
+              "target": "button[title=\"Burishwar-Payra River Basin\"]",
+              "html": "<button class=\"site-chip\" data-site=\"1\" role=\"listitem\" title=\"Burishwar-Payra River Basin\"><span class=\"num mono\">02</span><span class=\"nm\">Burishwar-Payra River Basin</span></button>",
+              "summary": "Fix any of the following: ARIA role listitem is not allowed for given element"
+            },
+            {
+              "target": ".site-chip[data-site=\"2\"][role=\"listitem\"]",
+              "html": "<button class=\"site-chip\" data-site=\"2\" role=\"listitem\" title=\"Khulna Coastal Polders (5 polders)\"><span class=\"num mono\">03</span><span class=\"nm\">Khulna Coastal Polders (5 polders)</span></button>",
+              "summary": "Fix any of the following: ARIA role listitem is not allowed for given element"
+            },
+            {
+              "target": ".site-chip[data-site=\"3\"][role=\"listitem\"]",
+              "html": "<button class=\"site-chip\" data-site=\"3\" role=\"listitem\" title=\"North Rajshahi Irrigation Project (NRIP)\"><span class=\"num mono\">04</span><span class=\"nm\">North Rajshahi Irrigation Project (NRIP)</span></button>",
+              "summary": "Fix any of the following: ARIA role listitem is not allowed for given element"
+            },
+            {
+              "target": "button[title=\"Cox's Bazar Watersheds\"]",
+              "html": "<button class=\"site-chip\" data-site=\"4\" role=\"listitem\" title=\"Cox's Bazar Watersheds\"><span class=\"num mono\">05</span><span class=\"nm\">Cox's Bazar Watersheds</span></button>",
+              "summary": "Fix any of the following: ARIA role listitem is not allowed for given element"
+            }
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "tags": [
+            "wcag2aa",
+            "wcag143"
+          ],
+          "nodes": 29,
+          "examples": [
+            {
+              "target": ".q-label",
+              "html": "<span class=\"pixel q-label\">CURRENT QUEST</span>",
+              "summary": "Fix any of the following: Element has insufficient color contrast of 4.38 (foreground color: #b86200, background color: #ffffff, font size: 7.5pt (10px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "target": "#about > .sec-head > div > .sec-kicker.pixel",
+              "html": "<p class=\"pixel sec-kicker\">CHARACTER SHEET</p>",
+              "summary": "Fix any of the following: Element has insufficient color contrast of 3.79 (foreground color: #0786ad, background color: #f2f4f9, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "target": ".edu-top.mono > .live.badge",
+              "html": "<span class=\"badge live\">IN PROGRESS</span>",
+              "summary": "Fix any of the following: Element has insufficient color contrast of 4.4 (foreground color: #ffffff, background color: #2c8a22, font size: 7.9pt (10.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "target": "#experience > .sec-head > div > .sec-kicker.pixel",
+              "html": "<p class=\"pixel sec-kicker\">QUEST LOG</p>",
+              "summary": "Fix any of the following: Element has insufficient color contrast of 3.79 (foreground color: #0786ad, background color: #f2f4f9, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "target": "#tools > .sec-head > div > .sec-kicker.pixel",
+              "html": "<p class=\"pixel sec-kicker\">TOOLBOX</p>",
+              "summary": "Fix any of the following: Element has insufficient color contrast of 3.79 (foreground color: #0786ad, background color: #f2f4f9, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+            }
+          ]
+        },
+        {
+          "id": "heading-order",
+          "impact": "moderate",
+          "help": "Heading levels should only increase by one",
+          "tags": [
+            "best-practice"
+          ],
+          "nodes": 1,
+          "examples": [
+            {
+              "target": ".ref:nth-child(2) > h4",
+              "html": "<h4>Dr. Ahmad Hasan Nury</h4>",
+              "summary": "Fix any of the following: Heading order invalid"
+            }
+          ]
+        },
+        {
+          "id": "label-content-name-mismatch",
+          "impact": "serious",
+          "help": "Elements must have their visible text as part of their accessible name",
+          "tags": [
+            "wcag21a",
+            "wcag253"
+          ],
+          "nodes": 1,
+          "examples": [
+            {
+              "target": ".logo",
+              "html": "<a href=\"#home\" class=\"logo\" aria-label=\"Home\">",
+              "summary": "Fix any of the following: Text inside the element is not included in the accessible name"
+            }
+          ]
+        },
+        {
+          "id": "link-in-text-block",
+          "impact": "serious",
+          "help": "Links must be distinguishable without relying on color",
+          "tags": [
+            "wcag2a",
+            "wcag141"
+          ],
+          "nodes": 1,
+          "examples": [
+            {
+              "target": "#topLink",
+              "html": "<a href=\"#\" id=\"topLink\">back to top ↑</a>",
+              "summary": "Fix any of the following: The link has insufficient color contrast of 1.74:1 with the surrounding text. (Minimum contrast is 3:1, link text: #0786ad, surrounding text: #4a5674) The link has no styling (such as underline) to distinguish it from the surrounding text"
+            }
+          ]
+        }
+      ],
+      "incomplete": [
+        {
+          "id": "aria-prohibited-attr",
+          "impact": "serious",
+          "nodes": 1
+        },
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": 178
+        }
+      ],
+      "passes": 48,
+      "networkIdle": true,
+      "violationCount": 5,
+      "violationNodes": 44
+    },
+    {
+      "path": "/",
+      "url": "http://127.0.0.1:4173/",
+      "theme": "light",
+      "viewport": "1366x900",
+      "viewportName": "desktop",
+      "appliedTheme": "light",
+      "violations": [
+        {
+          "id": "aria-allowed-role",
+          "impact": "minor",
+          "help": "ARIA role should be appropriate for the element",
+          "tags": [
+            "best-practice"
+          ],
+          "nodes": 12,
+          "examples": [
+            {
+              "target": "button[title=\"Sandhya-Baleshwar River Basin\"]",
+              "html": "<button class=\"site-chip now active\" data-site=\"0\" role=\"listitem\" title=\"Sandhya-Baleshwar River Basin\"><span class=\"num mono\">01</span><span class=\"nm\">Sandhya-Baleshwar River Basin</span></button>",
+              "summary": "Fix any of the following: ARIA role listitem is not allowed for given element"
+            },
+            {
+              "target": "button[title=\"Burishwar-Payra River Basin\"]",
+              "html": "<button class=\"site-chip\" data-site=\"1\" role=\"listitem\" title=\"Burishwar-Payra River Basin\"><span class=\"num mono\">02</span><span class=\"nm\">Burishwar-Payra River Basin</span></button>",
+              "summary": "Fix any of the following: ARIA role listitem is not allowed for given element"
+            },
+            {
+              "target": ".site-chip[data-site=\"2\"][role=\"listitem\"]",
+              "html": "<button class=\"site-chip\" data-site=\"2\" role=\"listitem\" title=\"Khulna Coastal Polders (5 polders)\"><span class=\"num mono\">03</span><span class=\"nm\">Khulna Coastal Polders (5 polders)</span></button>",
+              "summary": "Fix any of the following: ARIA role listitem is not allowed for given element"
+            },
+            {
+              "target": ".site-chip[data-site=\"3\"][role=\"listitem\"]",
+              "html": "<button class=\"site-chip\" data-site=\"3\" role=\"listitem\" title=\"North Rajshahi Irrigation Project (NRIP)\"><span class=\"num mono\">04</span><span class=\"nm\">North Rajshahi Irrigation Project (NRIP)</span></button>",
+              "summary": "Fix any of the following: ARIA role listitem is not allowed for given element"
+            },
+            {
+              "target": "button[title=\"Cox's Bazar Watersheds\"]",
+              "html": "<button class=\"site-chip\" data-site=\"4\" role=\"listitem\" title=\"Cox's Bazar Watersheds\"><span class=\"num mono\">05</span><span class=\"nm\">Cox's Bazar Watersheds</span></button>",
+              "summary": "Fix any of the following: ARIA role listitem is not allowed for given element"
+            }
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "tags": [
+            "wcag2aa",
+            "wcag143"
+          ],
+          "nodes": 28,
+          "examples": [
+            {
+              "target": ".q-label",
+              "html": "<span class=\"pixel q-label\">CURRENT QUEST</span>",
+              "summary": "Fix any of the following: Element has insufficient color contrast of 4.38 (foreground color: #b86200, background color: #ffffff, font size: 7.5pt (10px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "target": "#about > .sec-head > div > .sec-kicker.pixel",
+              "html": "<p class=\"pixel sec-kicker\">CHARACTER SHEET</p>",
+              "summary": "Fix any of the following: Element has insufficient color contrast of 3.79 (foreground color: #0786ad, background color: #f2f4f9, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "target": ".edu-top.mono > .live.badge",
+              "html": "<span class=\"badge live\">IN PROGRESS</span>",
+              "summary": "Fix any of the following: Element has insufficient color contrast of 4.4 (foreground color: #ffffff, background color: #2c8a22, font size: 7.9pt (10.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "target": "#tools > .sec-head > div > .sec-kicker.pixel",
+              "html": "<p class=\"pixel sec-kicker\">TOOLBOX</p>",
+              "summary": "Fix any of the following: Element has insufficient color contrast of 3.79 (foreground color: #0786ad, background color: #f2f4f9, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "target": "#map > .sec-head > div > .sec-kicker.pixel",
+              "html": "<p class=\"pixel sec-kicker\">FIELD MAP</p>",
+              "summary": "Fix any of the following: Element has insufficient color contrast of 3.79 (foreground color: #0786ad, background color: #f2f4f9, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+            }
+          ]
+        },
+        {
+          "id": "heading-order",
+          "impact": "moderate",
+          "help": "Heading levels should only increase by one",
+          "tags": [
+            "best-practice"
+          ],
+          "nodes": 1,
+          "examples": [
+            {
+              "target": ".ref:nth-child(2) > h4",
+              "html": "<h4>Dr. Ahmad Hasan Nury</h4>",
+              "summary": "Fix any of the following: Heading order invalid"
+            }
+          ]
+        },
+        {
+          "id": "label-content-name-mismatch",
+          "impact": "serious",
+          "help": "Elements must have their visible text as part of their accessible name",
+          "tags": [
+            "wcag21a",
+            "wcag253"
+          ],
+          "nodes": 2,
+          "examples": [
+            {
+              "target": ".logo",
+              "html": "<a href=\"#home\" class=\"logo\" aria-label=\"Home\">",
+              "summary": "Fix any of the following: Text inside the element is not included in the accessible name"
+            },
+            {
+              "target": "#cmdBtn",
+              "html": "<button class=\"btn-icon cmdk\" id=\"cmdBtn\" title=\"Command palette (Ctrl+K)\" aria-label=\"Open command palette\">",
+              "summary": "Fix any of the following: Text inside the element is not included in the accessible name"
+            }
+          ]
+        },
+        {
+          "id": "link-in-text-block",
+          "impact": "serious",
+          "help": "Links must be distinguishable without relying on color",
+          "tags": [
+            "wcag2a",
+            "wcag141"
+          ],
+          "nodes": 1,
+          "examples": [
+            {
+              "target": "#topLink",
+              "html": "<a href=\"#\" id=\"topLink\">back to top ↑</a>",
+              "summary": "Fix any of the following: The link has insufficient color contrast of 1.74:1 with the surrounding text. (Minimum contrast is 3:1, link text: #0786ad, surrounding text: #4a5674) The link has no styling (such as underline) to distinguish it from the surrounding text"
+            }
+          ]
+        }
+      ],
+      "incomplete": [
+        {
+          "id": "aria-prohibited-attr",
+          "impact": "serious",
+          "nodes": 1
+        },
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": 228
+        }
+      ],
+      "passes": 48,
+      "networkIdle": true,
+      "violationCount": 5,
+      "violationNodes": 44
+    },
+    {
+      "path": "/",
+      "url": "http://127.0.0.1:4173/",
+      "theme": "dark",
+      "viewport": "375x812",
+      "viewportName": "mobile",
+      "appliedTheme": "dark",
+      "violations": [
+        {
+          "id": "aria-allowed-role",
+          "impact": "minor",
+          "help": "ARIA role should be appropriate for the element",
+          "tags": [
+            "best-practice"
+          ],
+          "nodes": 12,
+          "examples": [
+            {
+              "target": "button[title=\"Sandhya-Baleshwar River Basin\"]",
+              "html": "<button class=\"site-chip now active\" data-site=\"0\" role=\"listitem\" title=\"Sandhya-Baleshwar River Basin\"><span class=\"num mono\">01</span><span class=\"nm\">Sandhya-Baleshwar River Basin</span></button>",
+              "summary": "Fix any of the following: ARIA role listitem is not allowed for given element"
+            },
+            {
+              "target": "button[title=\"Burishwar-Payra River Basin\"]",
+              "html": "<button class=\"site-chip\" data-site=\"1\" role=\"listitem\" title=\"Burishwar-Payra River Basin\"><span class=\"num mono\">02</span><span class=\"nm\">Burishwar-Payra River Basin</span></button>",
+              "summary": "Fix any of the following: ARIA role listitem is not allowed for given element"
+            },
+            {
+              "target": ".site-chip[data-site=\"2\"][role=\"listitem\"]",
+              "html": "<button class=\"site-chip\" data-site=\"2\" role=\"listitem\" title=\"Khulna Coastal Polders (5 polders)\"><span class=\"num mono\">03</span><span class=\"nm\">Khulna Coastal Polders (5 polders)</span></button>",
+              "summary": "Fix any of the following: ARIA role listitem is not allowed for given element"
+            },
+            {
+              "target": ".site-chip[data-site=\"3\"][role=\"listitem\"]",
+              "html": "<button class=\"site-chip\" data-site=\"3\" role=\"listitem\" title=\"North Rajshahi Irrigation Project (NRIP)\"><span class=\"num mono\">04</span><span class=\"nm\">North Rajshahi Irrigation Project (NRIP)</span></button>",
+              "summary": "Fix any of the following: ARIA role listitem is not allowed for given element"
+            },
+            {
+              "target": "button[title=\"Cox's Bazar Watersheds\"]",
+              "html": "<button class=\"site-chip\" data-site=\"4\" role=\"listitem\" title=\"Cox's Bazar Watersheds\"><span class=\"num mono\">05</span><span class=\"nm\">Cox's Bazar Watersheds</span></button>",
+              "summary": "Fix any of the following: ARIA role listitem is not allowed for given element"
+            }
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "tags": [
+            "wcag2aa",
+            "wcag143"
+          ],
+          "nodes": 1,
+          "examples": [
+            {
+              "target": ".term-bar > span",
+              "html": "<span>joy@portfolio:~</span>",
+              "summary": "Fix any of the following: Element has insufficient color contrast of 3.41 (foreground color: #5c6a88, background color: #0d1322, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+            }
+          ]
+        },
+        {
+          "id": "heading-order",
+          "impact": "moderate",
+          "help": "Heading levels should only increase by one",
+          "tags": [
+            "best-practice"
+          ],
+          "nodes": 1,
+          "examples": [
+            {
+              "target": ".ref:nth-child(2) > h4",
+              "html": "<h4>Dr. Ahmad Hasan Nury</h4>",
+              "summary": "Fix any of the following: Heading order invalid"
+            }
+          ]
+        },
+        {
+          "id": "label-content-name-mismatch",
+          "impact": "serious",
+          "help": "Elements must have their visible text as part of their accessible name",
+          "tags": [
+            "wcag21a",
+            "wcag253"
+          ],
+          "nodes": 1,
+          "examples": [
+            {
+              "target": ".logo",
+              "html": "<a href=\"#home\" class=\"logo\" aria-label=\"Home\">",
+              "summary": "Fix any of the following: Text inside the element is not included in the accessible name"
+            }
+          ]
+        },
+        {
+          "id": "link-in-text-block",
+          "impact": "serious",
+          "help": "Links must be distinguishable without relying on color",
+          "tags": [
+            "wcag2a",
+            "wcag141"
+          ],
+          "nodes": 1,
+          "examples": [
+            {
+              "target": "#topLink",
+              "html": "<a href=\"#\" id=\"topLink\">back to top ↑</a>",
+              "summary": "Fix any of the following: The link has insufficient color contrast of 1.51:1 with the surrounding text. (Minimum contrast is 3:1, link text: #5be7ff, surrounding text: #a3aec6) The link has no styling (such as underline) to distinguish it from the surrounding text"
+            }
+          ]
+        }
+      ],
+      "incomplete": [
+        {
+          "id": "aria-prohibited-attr",
+          "impact": "serious",
+          "nodes": 1
+        },
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": 177
+        }
+      ],
+      "passes": 48,
+      "networkIdle": true,
+      "violationCount": 5,
+      "violationNodes": 16
+    },
+    {
+      "path": "/",
+      "url": "http://127.0.0.1:4173/",
+      "theme": "dark",
+      "viewport": "1366x900",
+      "viewportName": "desktop",
+      "appliedTheme": "dark",
+      "violations": [
+        {
+          "id": "aria-allowed-role",
+          "impact": "minor",
+          "help": "ARIA role should be appropriate for the element",
+          "tags": [
+            "best-practice"
+          ],
+          "nodes": 12,
+          "examples": [
+            {
+              "target": "button[title=\"Sandhya-Baleshwar River Basin\"]",
+              "html": "<button class=\"site-chip now active\" data-site=\"0\" role=\"listitem\" title=\"Sandhya-Baleshwar River Basin\"><span class=\"num mono\">01</span><span class=\"nm\">Sandhya-Baleshwar River Basin</span></button>",
+              "summary": "Fix any of the following: ARIA role listitem is not allowed for given element"
+            },
+            {
+              "target": "button[title=\"Burishwar-Payra River Basin\"]",
+              "html": "<button class=\"site-chip\" data-site=\"1\" role=\"listitem\" title=\"Burishwar-Payra River Basin\"><span class=\"num mono\">02</span><span class=\"nm\">Burishwar-Payra River Basin</span></button>",
+              "summary": "Fix any of the following: ARIA role listitem is not allowed for given element"
+            },
+            {
+              "target": ".site-chip[data-site=\"2\"][role=\"listitem\"]",
+              "html": "<button class=\"site-chip\" data-site=\"2\" role=\"listitem\" title=\"Khulna Coastal Polders (5 polders)\"><span class=\"num mono\">03</span><span class=\"nm\">Khulna Coastal Polders (5 polders)</span></button>",
+              "summary": "Fix any of the following: ARIA role listitem is not allowed for given element"
+            },
+            {
+              "target": ".site-chip[data-site=\"3\"][role=\"listitem\"]",
+              "html": "<button class=\"site-chip\" data-site=\"3\" role=\"listitem\" title=\"North Rajshahi Irrigation Project (NRIP)\"><span class=\"num mono\">04</span><span class=\"nm\">North Rajshahi Irrigation Project (NRIP)</span></button>",
+              "summary": "Fix any of the following: ARIA role listitem is not allowed for given element"
+            },
+            {
+              "target": "button[title=\"Cox's Bazar Watersheds\"]",
+              "html": "<button class=\"site-chip\" data-site=\"4\" role=\"listitem\" title=\"Cox's Bazar Watersheds\"><span class=\"num mono\">05</span><span class=\"nm\">Cox's Bazar Watersheds</span></button>",
+              "summary": "Fix any of the following: ARIA role listitem is not allowed for given element"
+            }
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "tags": [
+            "wcag2aa",
+            "wcag143"
+          ],
+          "nodes": 1,
+          "examples": [
+            {
+              "target": ".term-bar > span",
+              "html": "<span>joy@portfolio:~</span>",
+              "summary": "Fix any of the following: Element has insufficient color contrast of 3.41 (foreground color: #5c6a88, background color: #0d1322, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+            }
+          ]
+        },
+        {
+          "id": "heading-order",
+          "impact": "moderate",
+          "help": "Heading levels should only increase by one",
+          "tags": [
+            "best-practice"
+          ],
+          "nodes": 1,
+          "examples": [
+            {
+              "target": ".ref:nth-child(2) > h4",
+              "html": "<h4>Dr. Ahmad Hasan Nury</h4>",
+              "summary": "Fix any of the following: Heading order invalid"
+            }
+          ]
+        },
+        {
+          "id": "label-content-name-mismatch",
+          "impact": "serious",
+          "help": "Elements must have their visible text as part of their accessible name",
+          "tags": [
+            "wcag21a",
+            "wcag253"
+          ],
+          "nodes": 2,
+          "examples": [
+            {
+              "target": ".logo",
+              "html": "<a href=\"#home\" class=\"logo\" aria-label=\"Home\">",
+              "summary": "Fix any of the following: Text inside the element is not included in the accessible name"
+            },
+            {
+              "target": "#cmdBtn",
+              "html": "<button class=\"btn-icon cmdk\" id=\"cmdBtn\" title=\"Command palette (Ctrl+K)\" aria-label=\"Open command palette\">",
+              "summary": "Fix any of the following: Text inside the element is not included in the accessible name"
+            }
+          ]
+        },
+        {
+          "id": "link-in-text-block",
+          "impact": "serious",
+          "help": "Links must be distinguishable without relying on color",
+          "tags": [
+            "wcag2a",
+            "wcag141"
+          ],
+          "nodes": 1,
+          "examples": [
+            {
+              "target": "#topLink",
+              "html": "<a href=\"#\" id=\"topLink\">back to top ↑</a>",
+              "summary": "Fix any of the following: The link has insufficient color contrast of 1.51:1 with the surrounding text. (Minimum contrast is 3:1, link text: #5be7ff, surrounding text: #a3aec6) The link has no styling (such as underline) to distinguish it from the surrounding text"
+            }
+          ]
+        }
+      ],
+      "incomplete": [
+        {
+          "id": "aria-prohibited-attr",
+          "impact": "serious",
+          "nodes": 1
+        },
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": 227
+        }
+      ],
+      "passes": 48,
+      "networkIdle": true,
+      "violationCount": 5,
+      "violationNodes": 17
+    }
+  ]
+}

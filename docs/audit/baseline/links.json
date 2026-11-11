@@ -1,0 +1,96 @@
+{
+  "generatedAt": "2026-11-10T21:54:04.110Z",
+  "root": ".tmp/baseline-site",
+  "site": "https://meawman.github.io",
+  "pagesChecked": [
+    "index.html",
+    "404.html"
+  ],
+  "patternsWithoutMatch": [],
+  "pages": [
+    {
+      "page": "index.html",
+      "links": 38,
+      "internal": 29,
+      "external": 8,
+      "skipped": 1,
+      "broken": []
+    },
+    {
+      "page": "404.html",
+      "links": 5,
+      "internal": 2,
+      "external": 3,
+      "skipped": 0,
+      "broken": []
+    }
+  ],
+  "external": [
+    {
+      "url": "https://fonts.googleapis.com/",
+      "pages": [
+        "index.html",
+        "404.html"
+      ]
+    },
+    {
+      "url": "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Silkscreen:wght@400;700&display=swap",
+      "pages": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=JetBrains+Mono:wght@400&family=Silkscreen&display=swap",
+      "pages": [
+        "404.html"
+      ]
+    },
+    {
+      "url": "https://fonts.gstatic.com/",
+      "pages": [
+        "index.html",
+        "404.html"
+      ]
+    },
+    {
+      "url": "https://github.com/meawman",
+      "pages": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://orcid.org/0009-0003-4202-9776",
+      "pages": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://scholar.google.com/citations?user=kWzC3RUAAAAJ&hl=en",
+      "pages": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://www.linkedin.com/in/mahfujur-rahman-joy",
+      "pages": [
+        "index.html"
+      ]
+    },
+    {
+      "url": "https://www.researchgate.net/profile/Mahfujur-Rahman-Joy",
+      "pages": [
+        "index.html"
+      ]
+    }
+  ],
+  "summary": {
+    "pages": 2,
+    "links": 43,
+    "internal": 31,
+    "externalUnique": 9,
+    "brokenInternal": 0,
+    "externalChecked": false,
+    "brokenExternal": null,
+    "blockedExternal": null
+  }
+}

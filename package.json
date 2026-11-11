@@ -1,0 +1,26 @@
+{
+  "name": "meawman-portfolio",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "serve": "node scripts/serve.mjs --port 4173",
+    "audit:lighthouse": "node scripts/audit/lighthouse.mjs --out docs/audit/after --paths / --form both --runs 3",
+    "audit:axe": "node scripts/audit/axe.mjs --out docs/audit/after --paths /",
+    "audit:shots": "node scripts/audit/screenshots.mjs --out docs/audit/after --paths / --themes light,dark",
+    "audit:checks": "node scripts/audit/page-checks.mjs --out docs/audit/after --paths /",
+    "audit:tools": "node scripts/audit/tools-smoke.mjs --out docs/audit/after --compare docs/audit/baseline/tools-smoke.json",
+    "audit:links": "node scripts/audit/links.mjs --root . --out docs/audit/after",
+    "audit:jsonld": "node scripts/audit/jsonld.mjs --root . --out docs/audit/after",
+    "audit": "npm run audit:links && npm run audit:jsonld && npm run audit:checks && npm run audit:axe && npm run audit:tools && npm run audit:shots && npm run audit:lighthouse"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.65.0",
+    "axe-core": "^4.14.0",
+    "lighthouse": "^13.6.0",
+    "playwright": "^1.65.0"
+  }
+}
