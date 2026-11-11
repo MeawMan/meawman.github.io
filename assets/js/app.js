@@ -49,7 +49,7 @@
         if (draft) { document.body.classList.add('is-preview'); return JSON.parse(draft); }
       } catch (e) { /* ignore */ }
     }
-    const res = await fetch('data/content.json?v=' + Date.now(), { cache: 'no-store' });
+    const res = await fetch('data/content.json', { cache: 'no-cache' });
     if (!res.ok) throw new Error('HTTP ' + res.status);
     return res.json();
   }
@@ -328,7 +328,7 @@
     const tabsBox = $('.tb-tabs', box);
     const panel = $('#tbp', box);
 
-    const renderTabs = () => {
+    const renderTabs = (reveal) => {
       const visible = currentCat === 'all' ? tools : tools.filter((t) => t.group === currentCat);
       if (!visible.some((t) => tools.indexOf(t) === currentIdx)) {
         currentIdx = tools.indexOf(visible[0]);
@@ -346,7 +346,7 @@
       (currentCat === 'all' ? '<div class="tb-more mono">+ more tools coming</div>' : '');
 
       const activeBtn = $('#tbt-' + currentIdx, tabsBox);
-      if (activeBtn) activeBtn.scrollIntoView({ block: 'nearest' });
+      if (activeBtn && reveal) tabsBox.scrollTop = Math.max(0, activeBtn.offsetTop - tabsBox.offsetTop);
     };
 
     const show = (i) => {
@@ -378,7 +378,7 @@
       if (catBtn) {
         currentCat = catBtn.dataset.cat;
         $$('.tb-filter button', box).forEach((b) => b.setAttribute('aria-selected', b === catBtn));
-        renderTabs();
+        renderTabs(true);
         show(currentIdx);
         return;
       }
@@ -585,7 +585,7 @@
     $('#guilds').innerHTML = DATA.leadership.map((l) =>
       '<li class="reveal"><div><b>' + esc(l.role) + '</b><span class="muted">' + esc(l.org) + (l.location ? ' · ' + esc(l.location) : '') + '</span></div><span class="mono small">' + esc(l.period) + '</span></li>').join('');
     $('#refs').innerHTML = '<p class="pixel sec-kicker">REFERENCES</p>' + DATA.references.map((r) =>
-      '<article class="card ref reveal"><h4>' + esc(r.name) + '</h4><p class="small">' + esc(r.title) + '</p><p class="muted small">' + esc(r.org) + '</p>' +
+      '<article class="card ref reveal"><h3>' + esc(r.name) + '</h3><p class="small">' + esc(r.title) + '</p><p class="muted small">' + esc(r.org) + '</p>' +
       (r.email ? '<a class="mono small" href="mailto:' + esc(r.email) + '">' + esc(r.email) + '</a>' : '') + '</article>').join('');
   }
 
@@ -672,7 +672,7 @@
       '<polyline class="river flow" points="' + line(RIVERS[k]) + '"/>').join('');
     const pins = sites.map((s, i) => {
       const [x, y] = proj(s.lon, s.lat);
-      return '<g class="pin' + (s.current ? ' now' : '') + '" data-site="' + i + '" tabindex="0" transform="translate(' + x.toFixed(1) + ',' + y.toFixed(1) + ')">' +
+      return '<g class="pin' + (s.current ? ' now' : '') + '" data-site="' + i + '" transform="translate(' + x.toFixed(1) + ',' + y.toFixed(1) + ')">' +
         '<circle class="pulse" r="10"/><rect x="-5" y="-5" width="10" height="10"/><title>' + esc(s.name) + '</title></g>';
     }).join('');
     svgEl.innerHTML = '<g class="dots">' + dots + '</g>' + rivers +
@@ -682,10 +682,10 @@
     // Side panel: one detail card for the selected site + a compact numbered index
     const num = (i) => String(i + 1).padStart(2, '0');
     $('#mapSide').innerHTML =
-      '<article class="card site-detail" id="siteDetail" aria-live="polite"></article>' +
+      '<article class="card site-detail" id="siteDetail"></article>' +
       '<div class="site-index-head mono"><span>All sites</span><span>' + sites.length + '</span></div>' +
-      '<div class="site-list" role="list">' + sites.map((s, i) =>
-        '<button class="site-chip' + (s.current ? ' now' : '') + '" data-site="' + i + '" role="listitem" title="' + esc(s.name) + '">' +
+      '<div class="site-list">' + sites.map((s, i) =>
+        '<button class="site-chip' + (s.current ? ' now' : '') + '" data-site="' + i + '" title="' + esc(s.name) + '">' +
         '<span class="num mono">' + num(i) + '</span><span class="nm">' + esc(s.name) + '</span></button>').join('') + '</div>' +
       '<p class="muted small nationwide"><b>Nationwide:</b> CMIP6 drought projection, GCM precipitation reliability and soil-moisture drought studies cover all of Bangladesh.</p>';
 
@@ -728,11 +728,12 @@
     nodes.forEach((n, wi) => {
       const final = n.textContent;
       if (reduced) return;
+      n.style.width = n.offsetWidth + 'px'; n.style.whiteSpace = 'nowrap'; n.style.overflow = 'hidden'; n.style.verticalAlign = 'bottom';
       let frame = 0;
       const total = 18 + wi * 6;
       const iv = setInterval(() => {
         n.textContent = final.split('').map((ch, i) => (frame > total * (i / final.length) + wi * 3 ? ch : glyphs[(Math.random() * glyphs.length) | 0])).join('');
-        if (++frame > total + final.length) { n.textContent = final; clearInterval(iv); }
+        if (++frame > total + final.length) { n.textContent = final; n.style.width = n.style.whiteSpace = n.style.overflow = n.style.verticalAlign = ''; clearInterval(iv); }
       }, 40);
     });
   }
@@ -890,8 +891,9 @@
       sel = Math.min(sel, Math.max(0, shown.length - 1));
       list.innerHTML = shown.length ? shown.map((c, i) => '<li role="option" aria-selected="' + (i === sel) + '" data-i="' + i + '"><span>' + esc(c.k) + '</span><small class="mono">' + esc(c.h) + '</small></li>').join('') : '<li class="none mono">No matching command</li>';
     }
-    function open() { ov.hidden = false; input.value = ''; sel = 0; draw(); setTimeout(() => input.focus(), 10); }
-    function close() { ov.hidden = true; }
+    let opener = null;
+    function open() { opener = document.activeElement; ov.hidden = false; input.value = ''; sel = 0; draw(); setTimeout(() => input.focus(), 10); }
+    function close() { if (ov.hidden) return; ov.hidden = true; if (opener && opener.focus) opener.focus(); opener = null; }
     function run(i) { const c = shown[i]; if (!c) return; close(); c.f(); }
     input.addEventListener('input', () => { sel = 0; draw(); });
     input.addEventListener('keydown', (e) => {
@@ -906,18 +908,37 @@
     addEventListener('keydown', (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); ov.hidden ? open() : close(); }
       else if (e.key === 'Escape') { close(); closeModal(); }
-      else if (e.key === '/' && !/input|textarea/i.test(document.activeElement.tagName)) { e.preventDefault(); open(); }
     });
   }
 
   // ------------------------------------------------------------ modal
-  function closeModal() { $('#citeModal').hidden = true; }
+  let citeOpener = null;
+  function closeModal() {
+    const m = $('#citeModal');
+    if (m.hidden) return;
+    m.hidden = true;
+    if (citeOpener && citeOpener.focus) citeOpener.focus();
+    citeOpener = null;
+  }
+  function openModal(from) {
+    citeOpener = from;
+    const m = $('#citeModal');
+    m.hidden = false;
+    $('[data-close]', m).focus();
+  }
   function initModal() {
     const m = $('#citeModal');
     m.addEventListener('click', (e) => {
       if (e.target === m || e.target.closest('[data-close]')) closeModal();
       const c = e.target.closest('[data-copy]');
       if (c) copy($('#' + c.dataset.copy).textContent, 'Citation copied');
+    });
+    m.addEventListener('keydown', (e) => {
+      if (e.key !== 'Tab') return;
+      const f = $$('button, [href], [tabindex]:not([tabindex="-1"])', m).filter((el) => !el.disabled);
+      const first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
     });
   }
 
@@ -1028,7 +1049,7 @@
       if (c) {
         const p = DATA.publications[+c.dataset.cite];
         $('#apaBox').textContent = apa(p); $('#bibBox').textContent = bibtex(p);
-        $('#citeModal').hidden = false;
+        openModal(c);
       }
       const t = e.target.closest('[data-tag]');
       if (t) { state.query = t.dataset.tag; $('#pubSearch').value = state.query; renderPubs(); }
@@ -1042,6 +1063,7 @@
     try { DATA = await load(); }
     catch (err) {
       document.getElementById('boot') && document.getElementById('boot').remove();
+      document.documentElement.classList.add('ready');
       $('#main').innerHTML = '<section class="section"><div class="card"><h2>Content failed to load</h2><p class="muted">Could not read <code>data/content.json</code> (' + esc(err.message) +
         '). If you opened this file directly from disk, run it through a local web server instead — see README.md.</p></div></section>';
       return;
@@ -1057,6 +1079,7 @@
     const actions = initAvatar();
     bindGlobal(); initPalette(actions); initBuddy(actions); initModal(); initTerminal(actions); konami(actions);
     countUp(); reveal(); scrollSpy(); tilt(); jumpToHash();
+    document.documentElement.classList.add('ready');
     if (document.body.classList.contains('is-preview')) toast('Preview mode — showing your unsaved draft');
   }
 

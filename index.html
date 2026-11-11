@@ -20,9 +20,9 @@
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
   <link rel="icon" href="assets/favicon-32.png" sizes="32x32" type="image/png" />
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="preload" href="assets/fonts/space-grotesk-var.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="assets/fonts/jetbrains-mono-var.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="data/content.json" as="fetch" crossorigin />
   <link rel="stylesheet" href="assets/css/style.css" />
   <script>
     // Apply theme before paint to avoid a flash
@@ -31,6 +31,7 @@
       try { t = localStorage.getItem('mrj_theme'); } catch (e) {}
       if (!t) t = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', t);
+      document.documentElement.classList.add('js'); // lets the CSS show the script-driven parts only when scripts run
     })();
   </script>
 </head>
@@ -53,13 +54,13 @@
   <div class="xp" aria-hidden="true"><span id="xpFill"></span><em id="xpLabel">XP 0%</em></div>
 
   <header class="nav" id="nav">
-    <a href="#home" class="logo" aria-label="Home">
+    <a href="#home" class="logo">
       <span class="logo-mark" aria-hidden="true"><img src="assets/favicon.svg" alt="" width="40" height="40" /></span>
       <span class="logo-text"><b id="navName">Mahfujur Rahman Joy</b><small id="navSub">CEGIS · BUET · SUST</small></span>
     </a>
     <nav class="nav-links" id="navLinks" aria-label="Sections"></nav>
     <div class="nav-actions">
-      <button class="btn-icon cmdk" id="cmdBtn" title="Command palette (Ctrl+K)" aria-label="Open command palette">
+      <button class="btn-icon cmdk" id="cmdBtn" title="Command palette (Ctrl+K)" aria-label="Ctrl K: open command palette">
         <svg viewBox="0 0 24 24" width="16" height="16"><path fill="none" stroke="currentColor" stroke-width="2" d="M21 21l-5-5m2-6a8 8 0 1 1-16 0 8 8 0 0 1 16 0z"/></svg>
         <kbd>Ctrl K</kbd>
       </button>
@@ -78,7 +79,7 @@
       <section class="section noscript">
         <h1>Mahfujur Rahman Joy</h1>
         <p>Water resources engineer and researcher: Research Consultant at CEGIS, M.Sc. (WRD) student at BUET. River modeling, GIS and remote sensing, and machine learning for floods and droughts.</p>
-        <p>This site needs JavaScript for its full content. Meanwhile: <a href="https://scholar.google.com/citations?user=kWzC3RUAAAAJ&amp;hl=en">Google Scholar</a> · <a href="https://www.researchgate.net/profile/Mahfujur-Rahman-Joy">ResearchGate</a> · <a href="https://orcid.org/0009-0003-4202-9776">ORCID</a> · <a href="https://www.linkedin.com/in/mahfujur-rahman-joy">LinkedIn</a> · <a href="https://github.com/meawman">GitHub</a> · <a href="mailto:mrjoy@cegisbd.com">Email</a></p>
+        <p>This site needs JavaScript for its full content. Meanwhile: <a href="https://scholar.google.com/citations?user=kWzC3RUAAAAJ&amp;hl=en">Google Scholar</a> · <a href="https://www.researchgate.net/profile/Mahfujur-Rahman-Joy">ResearchGate</a> · <a href="https://orcid.org/0009-0003-4202-9776">ORCID</a> · <a href="https://www.linkedin.com/in/mahfujur-rahman-joy">LinkedIn</a> · <a href="https://github.com/meawman">GitHub</a> · <a href="mailto:mahfuj2sust@gmail.com">Email</a></p>
         <p>Tools: <a href="tools/gaplens/">GapLens</a> · <a href="tools/hydro-series/">Min-Max-Avg Terminal &amp; Series Generator</a> · <a href="tools/openffa/">OpenFFA</a> · <a href="tools/brishti-idf/">Brishti IDF</a> · <a href="tools/dependability/">Dependability Analyzer</a> · <a href="tools/cn-calculator/">Composite CN Calculator</a> · <a href="tools/river-profile/">River Profile Studio</a> · <a href="tools/ababahika/">Ababahika</a> · <a href="tools/hydro-ml/">Hydro ML Studio</a> · <a href="tools/dsbc/">DSBC Studio</a></p>
       </section>
     </noscript>
@@ -105,7 +106,7 @@
             <span class="muted" id="sceneMode">LVL 26 · HYDRO CLASS</span>
           </div>
           <div class="scene-wrap">
-            <div class="bubble mono" id="bubble" role="status" aria-live="polite"></div>
+            <div class="bubble mono" id="bubble"></div>
             <canvas id="scene" width="160" height="96" aria-label="Pixel-art avatar of Joy standing in front of a river. Click to make it rain." role="img"></canvas>
             <div class="scanline" aria-hidden="true"></div>
           </div>
@@ -270,7 +271,7 @@
   </div>
 
   <!-- Companion: mini avatar that follows you down the page -->
-  <div class="buddy" id="buddy" aria-live="polite">
+  <div class="buddy" id="buddy">
     <div class="buddy-bubble mono" id="buddyBubble"></div>
     <button class="buddy-btn" id="buddyBtn" aria-label="Pixel Joy — click for a reaction, double-click to open the command palette">
       <canvas id="buddyCanvas" width="56" height="48"></canvas>
