@@ -98,9 +98,6 @@ main, .footer, .nav { position: relative; z-index: 2; }
 .boot-hint { margin-top: 12px; font: 12px var(--pixel); color: #4a5a78; }
 
 /* ---------- XP bar ---------- */
-.xp { position: fixed; top: 0; left: 0; right: 0; height: 3px; z-index: 60; background: transparent; }
-.xp span { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--accent), var(--accent-3)); box-shadow: 0 0 10px var(--accent); }
-.xp em { position: fixed; right: 10px; top: 6px; font: 12px var(--pixel); color: var(--dim); font-style: normal; z-index: 61; opacity: 0; transition: opacity .3s; }
 .nav.scrolled ~ .xp em, body:has(.nav.scrolled) .xp em { opacity: 1; }
 
 /* ---------- nav ---------- */
@@ -457,7 +454,11 @@ body.is-preview::before { content: 'PREVIEW · DRAFT'; position: fixed; bottom: 
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
 
 /* ---------- card spotlight ---------- */
-.card { background-image: radial-gradient(420px circle at var(--mx, -999px) var(--my, -999px), color-mix(in srgb, var(--accent) 9%, transparent), transparent 60%); }
+@property --rr { syntax: '<length>'; inherits: false; initial-value: 0px; }
+@property --ra { syntax: '<percentage>'; inherits: false; initial-value: 0%; }
+.card { background-image: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), transparent calc(var(--rr) - 18px), color-mix(in srgb, var(--accent) var(--ra), transparent) var(--rr), transparent calc(var(--rr) + 2px)); }
+.card.ripple { animation: ripple .8s ease-out; }
+@keyframes ripple { from { --rr: 0px; --ra: 22%; } to { --rr: 560px; --ra: 0%; } }
 .card-hint { margin-top: 10px; font-size: 12px; color: var(--dim); text-align: center; }
 
 /* ---------- marquee ---------- */
@@ -678,7 +679,7 @@ body.is-preview::before { content: 'PREVIEW · DRAFT'; position: fixed; bottom: 
 /* ---------- print (clean CV) ---------- */
 @media print {
   .aurora, .grain, .marquee, .buddy, #map, .gantt-card, .card-hint,
-  #flow, .grid-bg, .xp, .nav, .hero-avatar, .cta, .pub-tools, .pub-actions, .terminal .term-input, .overlay, .toast, #boot, .footer a, .tags button, .chev { display: none !important; }
+  #flow, .grid-bg, .gauge, .rain-layer, .nav, .hero-avatar, .cta, .pub-tools, .pub-actions, .terminal .term-input, .overlay, .toast, #boot, .footer a, .tags button, .chev { display: none !important; }
   body { background: #fff; color: #000; font-size: 11pt; }
   .card, .guilds, .contact-card, .stats, .stat { background: none !important; border-color: #ccc !important; box-shadow: none !important; backdrop-filter: none !important; }
   .reveal { opacity: 1 !important; transform: none !important; }
@@ -696,7 +697,7 @@ body.is-preview::before { content: 'PREVIEW · DRAFT'; position: fixed; bottom: 
 .noscript a { color: var(--accent); }
 
 /* ---------- without JavaScript: show the plain fallback, not an empty shell or the boot screen ---------- */
-html:not(.js) .boot, html:not(.js) #flow, html:not(.js) .xp, html:not(.js) .buddy, html:not(.js) .marquee,
+html:not(.js) .boot, html:not(.js) #flow, html:not(.js) .gauge, html:not(.js) .buddy, html:not(.js) .marquee,
 html:not(.js) main > :not(noscript), html:not(.js) .nav-actions, html:not(.js) .footer { display: none !important; }
 html:not(.js) .noscript { display: block; padding-top: 120px; }
 html:not(.js) .noscript h1 { font-size: clamp(32px, 6vw, 56px); margin: 0 0 16px; color: var(--strong, inherit); }
@@ -708,3 +709,54 @@ html:not(.js) .noscript a { text-decoration: underline; }
 @media (max-width: 640px) { .hero-text { overflow-x: clip; } }
 /* content is filled in by script: keep it invisible until it is complete so the layout does not jump */
 html.js:not(.ready) main, html.js:not(.ready) .marquee, html.js:not(.ready) .footer { visibility: hidden; }
+
+/* =====================================================================
+   Motion layer. Everything here is decorative, runs on transform/opacity
+   where possible, and is switched off by prefers-reduced-motion (line 59).
+   ===================================================================== */
+.vh { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* 1. scroll gauge: a staff gauge on the right edge; the water rises as the page is read */
+.gauge { position: fixed; right: 8px; top: 88px; bottom: 28px; width: 6px; z-index: 40; border: 1px solid var(--line-2); border-radius: 3px; background: color-mix(in srgb, var(--panel-solid) 70%, transparent); pointer-events: none; }
+.gauge-fill { position: absolute; inset: 0; border-radius: 2px; background: linear-gradient(0deg, var(--accent), color-mix(in srgb, var(--accent) 55%, var(--accent-3))); box-shadow: 0 0 10px color-mix(in srgb, var(--accent) 60%, transparent); transform: scaleY(0); transform-origin: bottom; }
+.gauge-ticks i { position: absolute; right: 100%; width: 7px; height: 1px; margin-right: 2px; background: var(--dim); }
+.gauge em { position: absolute; right: 12px; bottom: 0; transform: translateY(50%); font: 12px var(--pixel); font-style: normal; color: var(--dim); white-space: nowrap; opacity: 0; transition: opacity .3s; }
+.gauge em.show { opacity: 1; }
+@media (max-width: 720px) { .gauge { right: 3px; width: 4px; top: 72px; } .gauge em, .gauge-ticks { display: none; } }
+
+/* 2. map: sites stay hidden until the rivers have been drawn */
+#bdMap.pre-draw .pin, #bdMap.pre-draw .river.flow { opacity: 0; }
+#bdMap .pin { transition: opacity .35s; }
+#bdMap.drawn .river.flow { animation: flow 1.6s linear infinite, fade 1s 1.4s both; }
+
+/* 3. tool previews */
+.tb-art .ta-obs, .tb-art .ta-real, .tb-art .ta-stream { stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw 1.2s ease-out calc(var(--i, 0) * .15s) forwards; }
+.tb-art .ta-pt, .tb-art .ta-dot { transform-box: fill-box; transform-origin: center; animation: pop .4s cubic-bezier(.3, 1.6, .6, 1) calc(.25s + var(--i, 0) * .05s) both; }
+.tb-art .ta-band, .tb-art .ta-fill, .tb-art .ta-train, .tb-art .ta-slope, .tb-art .ta-raw { animation: fade .9s ease-out both; }
+@keyframes pop { from { transform: scale(0); } }
+
+/* 4. rain over the hero while rain mode is on */
+#home { position: relative; }
+.rain-layer { position: absolute; inset: 0; overflow: hidden; pointer-events: none; opacity: 0; transition: opacity .5s; z-index: 1; }
+.raining .rain-layer { opacity: .55; }
+.rain-layer i { position: absolute; top: -24px; width: 2px; height: 16px; background: linear-gradient(transparent, var(--accent)); animation: rainfall 1s linear infinite paused; }
+.raining .rain-layer i { animation-play-state: running; }
+@keyframes rainfall { to { transform: translateY(110vh); } }
+
+/* 5. papers per year */
+.pub-chart { display: flex; align-items: flex-end; gap: 10px; height: 62px; margin-left: auto; padding: 0 4px; }
+.pc-col { display: grid; grid-template-rows: auto 1fr auto; justify-items: center; height: 100%; width: 34px; font: 12px var(--mono); color: var(--dim); position: relative; }
+.pc-col b { grid-row: 1; font-weight: 500; color: var(--muted); line-height: 1.3; }
+.pc-col em { grid-row: 3; font-style: normal; line-height: 1.4; }
+.pc-col i { grid-row: 2; align-self: end; width: 100%; height: var(--h); background: linear-gradient(0deg, var(--accent), color-mix(in srgb, var(--accent) 45%, transparent)); border-radius: 2px 2px 0 0; transform: scaleY(0); transform-origin: bottom; transition: transform .8s cubic-bezier(.2, .8, .2, 1) calc(var(--i) * .12s); }
+.pub-chart.in .pc-col i { transform: none; }
+.pub-chart:not(.in) .pc-col b { opacity: 0; }
+.pc-col b { transition: opacity .4s .6s; }
+@media (prefers-reduced-motion: reduce) { .pc-col i { transform: none; } .pub-chart .pc-col b { opacity: 1 !important; } }
+@media (max-width: 720px) { .pub-chart { margin-left: 0; margin-top: 14px; } }
+
+/* 6. typed kickers */
+.sec-kicker.typing .typed-k::after { content: '_'; animation: blink 1s steps(1) infinite; }
+
+/* 7. timeline fills as it is scrolled through */
+.timeline::after { content: ''; position: absolute; left: 7px; top: 8px; width: 2px; height: calc((100% - 16px) * var(--p, 0)); background: var(--accent); box-shadow: 0 0 8px color-mix(in srgb, var(--accent) 70%, transparent); pointer-events: none; }

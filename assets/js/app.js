@@ -10,6 +10,12 @@
   // Allow normal web, mail, phone and relative links; block script/data URLs
   const safeUrl = (u) => (u && !/^\s*(javascript|data|vbscript):/i.test(u) ? u : '#');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function onView(el, fn, threshold) {
+    if (!el) return;
+    if (reduced || !('IntersectionObserver' in window)) { fn(el); return; }
+    const io = new IntersectionObserver((entries) => entries.forEach((en) => { if (en.isIntersecting) { io.disconnect(); fn(el); } }), { threshold: threshold || 0.25 });
+    io.observe(el);
+  }
 
   const SECTIONS = [
     ['about', 'About'], ['education', 'Education'], ['experience', 'Experience'], ['tools', 'Tools'], ['map', 'Map'],
@@ -371,6 +377,8 @@
         '<div class="tb-actions">' + (live ? '<a class="btn primary tb-launch" href="' + esc(safeUrl(t.url)) + '">Launch tool <span aria-hidden="true">→</span></a>' +
           '<a class="mini" href="' + esc(safeUrl(t.url)) + '" target="_blank" rel="noopener" title="Open in a new tab">↗</a>' : '<span class="mini">Coming soon</span>') + '</div></div></div>' +
         '<div class="tb-art">' + toolArt(t.icon) + '<span class="tb-art-cap mono">preview</span></div>';
+      $$('.tb-art .ta-obs, .tb-art .ta-real, .tb-art .ta-stream', panel).forEach((p, k) => { p.setAttribute('pathLength', '1'); p.style.setProperty('--i', k); });
+      $$('.tb-art .ta-pt, .tb-art .ta-dot', panel).forEach((p, k) => p.style.setProperty('--i', k));
     };
 
     box.addEventListener('click', (e) => {
@@ -511,6 +519,15 @@
     }));
     const pub = pubs.filter((p) => p.status === 'published').length;
     $('#pubNote').textContent = pub + ' published' + (pubs.length > pub ? ' · ' + (pubs.length - pub) + ' accepted / in pipeline' : '');
+    const chart = $('#pubChart');
+    if (chart && !chart.firstChild) {
+      const byYear = {};
+      pubs.forEach((p) => { byYear[p.year] = (byYear[p.year] || 0) + 1; });
+      const years = Object.keys(byYear).sort(), top = Math.max.apply(null, years.map((y) => byYear[y]));
+      chart.setAttribute('aria-label', 'Papers per year: ' + years.map((y) => y + ': ' + byYear[y]).join(', '));
+      chart.innerHTML = years.map((y, i) => '<span class="pc-col" aria-hidden="true"><b>' + byYear[y] + '</b><i style="--h:' + Math.max(8, Math.round(byYear[y] / top * 100)) + '%;--i:' + i + '"></i><em>' + esc(y) + '</em></span>').join('');
+      onView(chart, () => chart.classList.add('in'), 0.6);
+    }
   }
 
   function renderPubs() {
@@ -690,6 +707,17 @@
       '<p class="muted small nationwide"><b>Nationwide:</b> CMIP6 drought projection, GCM precipitation reliability and soil-moisture drought studies cover all of Bangladesh.</p>';
 
     const tip = $('#mapTip'), detail = $('#siteDetail');
+    if (!reduced) {
+      const lines = $$('.river:not(.flow)', svgEl);
+      lines.forEach((l) => { const len = l.getTotalLength(); l.style.strokeDasharray = len; l.style.strokeDashoffset = len; });
+      svgEl.classList.add('pre-draw');
+      onView(svgEl, () => {
+        lines.forEach((l, i) => { l.style.transition = 'stroke-dashoffset 1.5s ease-in-out ' + (i * 0.15) + 's'; l.style.strokeDashoffset = '0'; });
+        $$('.pin', svgEl).forEach((p, i) => { p.style.transitionDelay = (1.3 + i * 0.09) + 's'; });
+        svgEl.classList.remove('pre-draw');
+        svgEl.classList.add('drawn');
+      }, 0.35);
+    }
     let selected = Math.max(0, sites.findIndex((s) => s.current));
     function show(i) {
       const s = sites[i];
@@ -784,15 +812,65 @@
     function onScroll() {
       const max = document.documentElement.scrollHeight - innerHeight;
       const pct = max > 0 ? Math.min(100, Math.round((scrollY / max) * 100)) : 0;
-      fill.style.width = pct + '%';
+      fill.style.transform = 'scaleY(' + (pct / 100) + ')';
+      label.style.bottom = pct + '%';
+      label.classList.toggle('show', scrollY > 20);
       label.textContent = 'XP ' + pct + '%';
       nav.classList.toggle('scrolled', scrollY > 20);
       let cur = '';
       SECTIONS.forEach(([id]) => { const el = document.getElementById(id); if (el && !el.hidden && el.getBoundingClientRect().top < innerHeight * 0.35) cur = id; });
       links.forEach((a) => a.classList.toggle('active', a.dataset.sec === cur));
     }
+    function ticks() {
+      const max = document.documentElement.scrollHeight - innerHeight;
+      $('#gaugeTicks').innerHTML = max > 0 ? SECTIONS.map(([id]) => {
+        const el = document.getElementById(id);
+        if (!el || el.hidden) return '';
+        const p = Math.min(100, Math.max(0, ((el.getBoundingClientRect().top + scrollY - innerHeight * 0.35) / max) * 100));
+        return '<i style="bottom:' + p.toFixed(1) + '%"></i>';
+      }).join('') : '';
+    }
+    let tickT = 0;
+    addEventListener('resize', () => { clearTimeout(tickT); tickT = setTimeout(ticks, 200); }, { passive: true });
+    addEventListener('load', ticks, { once: true });
+    ticks();
     addEventListener('scroll', onScroll, { passive: true });
     onScroll();
+  }
+
+  // Section kickers type themselves in when their section arrives. The full text stays in the page for
+  // screen readers; only the visible copy is typed.
+  function typeKickers() {
+    if (reduced) return;
+    $$('.sec-head .sec-kicker').forEach((el) => {
+      const text = el.textContent;
+      if (!text.trim()) return;
+      el.innerHTML = '<span class="vh">' + esc(text) + '</span><span class="typed-k" aria-hidden="true">&nbsp;</span>';
+      const out = el.lastChild;
+      onView(el, () => {
+        let i = 0;
+        el.classList.add('typing');
+        const iv = setInterval(() => {
+          out.textContent = text.slice(0, ++i);
+          if (i >= text.length) { clearInterval(iv); setTimeout(() => el.classList.remove('typing'), 900); }
+        }, 45);
+      }, 0.9);
+    });
+  }
+
+  // The experience timeline fills like a pipe as it is scrolled through
+  function timelineFlow() {
+    const tl = $('#timeline');
+    if (!tl) return;
+    if (reduced) { tl.style.setProperty('--p', 1); return; }
+    let queued = false;
+    const update = () => {
+      queued = false;
+      const r = tl.getBoundingClientRect();
+      tl.style.setProperty('--p', Math.min(1, Math.max(0, (innerHeight * 0.6 - r.top) / r.height)).toFixed(3));
+    };
+    addEventListener('scroll', () => { if (!queued) { queued = true; requestAnimationFrame(update); } }, { passive: true });
+    update();
   }
 
   function tilt() {
@@ -820,9 +898,20 @@
   function initAvatar() {
     const av = DATA.avatar || {};
     avatar = new window.PixelAvatar($('#scene'), $('#bubble'), { lines: av.lines });
-    avatar.setTheme(document.documentElement.getAttribute('data-theme'));
+    const hour = new Date().getHours();
+    avatar.setTheme(hour >= 6 && hour < 18 ? 'light' : 'dark');
     const rainBtn = $('#rainBtn'), shadesBtn = $('#shadesBtn');
-    const rain = () => { const on = avatar.toggleRain(); rainBtn.setAttribute('aria-pressed', on); };
+    const rain = () => {
+      const on = avatar.toggleRain(); rainBtn.setAttribute('aria-pressed', on);
+      let layer = $('.rain-layer');
+      if (on && !layer && !reduced) {
+        layer = document.createElement('div'); layer.className = 'rain-layer'; layer.setAttribute('aria-hidden', 'true');
+        let seed = 11; const rnd = () => ((seed = (seed * 9301 + 49297) % 233280) / 233280);
+        layer.innerHTML = Array.from({ length: 36 }, () => '<i style="left:' + (rnd() * 100).toFixed(1) + '%;animation-duration:' + (0.7 + rnd() * 0.7).toFixed(2) + 's;animation-delay:-' + (rnd() * 1.4).toFixed(2) + 's"></i>').join('');
+        $('#home').appendChild(layer);
+      }
+      requestAnimationFrame(() => document.body.classList.toggle('raining', !!on));
+    };
     const shades = () => { const on = avatar.toggleShades(); shadesBtn.setAttribute('aria-pressed', on); if (buddy) buddy.shades = on; };
     $('#scene').addEventListener('click', () => avatar.poke());
     rainBtn.addEventListener('click', rain);
@@ -1034,13 +1123,15 @@
       reading(true); clearTimeout(readT); readT = setTimeout(() => reading(false), 1400);
     });
     $('#pubSearch').addEventListener('blur', () => reading(false));
-    // Soft spotlight that follows the cursor across cards
-    document.addEventListener('pointermove', (e) => {
+    // A ripple spreads from the point where the cursor enters a card
+    if (!reduced) document.addEventListener('pointerover', (e) => {
       const card = e.target.closest && e.target.closest('.card');
-      if (!card) return;
+      if (!card || (e.relatedTarget && card.contains(e.relatedTarget)) || e.pointerType === 'touch') return;
       const r = card.getBoundingClientRect();
       card.style.setProperty('--mx', (e.clientX - r.left) + 'px');
       card.style.setProperty('--my', (e.clientY - r.top) + 'px');
+      card.classList.remove('ripple');
+      requestAnimationFrame(() => card.classList.add('ripple'));
     }, { passive: true });
     $('#copyMailBtn').addEventListener('click', () => copy(primaryEmail(), 'Email copied'));
     $('#topLink').addEventListener('click', (e) => { e.preventDefault(); scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' }); });
@@ -1078,7 +1169,7 @@
     renderPubTabs(); renderPubs(); renderSkills(); renderEducation(); renderLeadership(); renderContact();
     const actions = initAvatar();
     bindGlobal(); initPalette(actions); initBuddy(actions); initModal(); initTerminal(actions); konami(actions);
-    countUp(); reveal(); scrollSpy(); tilt(); jumpToHash();
+    countUp(); reveal(); scrollSpy(); tilt(); typeKickers(); timelineFlow(); jumpToHash();
     document.documentElement.classList.add('ready');
     if (document.body.classList.contains('is-preview')) toast('Preview mode — showing your unsaved draft');
   }
