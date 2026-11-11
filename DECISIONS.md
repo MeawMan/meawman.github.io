@@ -73,10 +73,10 @@ Three static mockups are kept in [`design-explorations/`](design-explorations/) 
 
 Findings and resolutions are in [docs/REVIEW.md](docs/REVIEW.md). Decisions that came out of it:
 
-- The "Current project" line was removed from the Research section (it read as a "currently" strip, which the owner ruled out);  stays in the data.
+- The "Current project" line was removed from the Research section (it read as a "currently" strip, which the owner ruled out); `profile.currentProject` stays in the data.
 - The current role shows no computed duration, because a static page cannot keep it up to date.
 - On phones the hero shows the buttons and profile links before the bio (CSS order only; source order is unchanged).
-- Hidden papers stay in , as the owner asked, even though that file is public.
+- Hidden papers stay in `content.json`, as the owner asked, even though that file is public.
 - Accessibility defects inside the tools' own interfaces are documented, not fixed, because tool behaviour was out of scope.
 
 ## 6. Tool pages and vendor libraries

@@ -28,7 +28,8 @@ function write(path, text) {
 }
 
 // ---- dates from git (fall back to today when git or history is unavailable)
-const today = new Date().toISOString().slice(0, 10);
+const now = new Date();
+const today = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 10); // local date, like git's %cs
 function git(args) {
   try { return execFileSync('git', args, { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim(); } catch { return ''; }
 }
