@@ -18,14 +18,10 @@
   function mount() { if (!card.isConnected) document.body.appendChild(card); }
   if (document.body) mount(); else document.addEventListener("DOMContentLoaded", mount);
 
-  /* On a phone, a metered or slow connection, wait for a tap before downloading Python (about 40 MB the first time).
-     After one successful start the files are in the browser cache, so later visits start straight away. */
+  /* Python (about 40 MB the first time) is not downloaded when the page merely opens. It starts on the first real
+     action: the Start button on the card, choosing or loading an example, uploading a file, or any other request to
+     the Python side. After one successful start the files are in the browser cache, so later starts are quick. */
   var LOADED_KEY = "gaplens_python_cached";
-  function lite() {
-    try { if (localStorage.getItem(LOADED_KEY) === "1") return false; } catch (e) { /* ignore */ }
-    var c = navigator.connection || {};
-    return !!(c.saveData || /(^|-)(2g|3g)$/.test(c.effectiveType || "") || c.type === "cellular" || matchMedia("(pointer: coarse) and (max-width: 900px)").matches);
-  }
   function start() {
     if (worker) return;
     card.innerHTML = BOOT_HTML;
@@ -33,12 +29,14 @@
     worker.onmessage = onMessage;
     worker.onerror = function (e) { onMessage({ data: { type: "fatal", error: "The worker failed: " + (e.message || "unknown error") } }); };
   }
-  if (lite()) {
-    card.innerHTML = '<b>Start GapLens</b><span class="gl-txt">GapLens runs real Python in your browser. The first start downloads about 40 MB, so it waits for you.</span>' +
-      '<button type="button" class="gl-go" style="margin:10px 0 6px;font:inherit;font-weight:600;padding:8px 14px;border-radius:6px;border:1px solid var(--obs,#1f5f94);background:var(--obs,#1f5f94);color:#fff;cursor:pointer">Start GapLens (about 40 MB)</button>' +
-      '<small>Your data stay in this browser. After the first start the files are cached, so it opens straight away next time.</small>';
-    card.querySelector(".gl-go").addEventListener("click", start);
-  } else start();
+  card.innerHTML = '<b>Start GapLens</b><span class="gl-txt">GapLens runs real Python in your browser. The first start downloads about 40 MB, so it waits for you.</span>' +
+    '<button type="button" class="gl-go" style="display:block;margin:10px 0 6px;font:inherit;font-weight:600;padding:8px 14px;border-radius:6px;border:1px solid var(--obs,#1f5f94);background:var(--obs,#1f5f94);color:#fff;cursor:pointer">Start GapLens (about 40 MB)</button>' +
+    '<small>It also starts when you load an example or a file. Your data stay in this browser. After the first start the files are cached, so it opens faster next time.</small>';
+  card.querySelector(".gl-go").addEventListener("click", start);
+  /* the example list comes from Python, so touching it starts GapLens too */
+  function wake(e) { if (e.target && e.target.closest && e.target.closest("#ex, #exgo")) start(); }
+  document.addEventListener("pointerdown", wake, true);
+  document.addEventListener("focusin", wake, true);
   window.GapLensStart = start;
 
   function onMessage(e) {
@@ -77,6 +75,7 @@
     var u = new URL(s, "http://gaplens.local");
     var query = {}; u.searchParams.forEach(function (v, k) { query[k] = v; });
     var method = ((init && init.method) || "GET").toUpperCase();
+    if (u.pathname !== "/api/samples") start();  /* the list of examples is asked for when the page opens; everything else is a real action */
     if (u.pathname === "/api/job" && running.has(query.id)) {  /* the worker is busy with this job: answer from the progress it reports */
       var r = running.get(query.id);
       return Promise.resolve(new Response(JSON.stringify({ id: query.id, status: "running", done: r.done, total: r.total, message: r.message, elapsed: (performance.now() - r.t0) / 1000 }), { status: 200, headers: { "Content-Type": "application/json" } }));

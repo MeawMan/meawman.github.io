@@ -14,7 +14,7 @@
     if (window.XLSX) return Promise.resolve(window.XLSX);
     return new Promise(function (res, rej) {
       var s = document.createElement("script");
-      s.src = "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js";
+      s.src = "../../assets/vendor/xlsx-0.18.5.full.min.js"; // shared copy, same build as before (SheetJS CE 0.18.5 full)
       s.onload = function () { window.XLSX ? res(window.XLSX) : rej(new Error("The Excel reader did not load.")); };
       s.onerror = function () { rej(new Error("The Excel reader could not be downloaded. Save the sheet as CSV and load that instead.")); };
       document.head.appendChild(s);

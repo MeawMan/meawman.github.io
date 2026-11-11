@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="ts-only">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -12,7 +12,7 @@
 <link rel="canonical" href="https://meawman.github.io/tools/dsbc/">
 <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="../../assets/favicon-32.png" sizes="32x32" type="image/png">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/css/tool-shell.css">
 <script>
   // share the theme with the rest of the portfolio; first visit follows the system setting
   window.DSBC_THEME_KEY = "mrj_theme";
@@ -31,21 +31,8 @@
   --accent-soft: #12303a; --unused: #18233a; --dropped: #2f3d58;
 }
 :root:root[data-theme="light"] { --surface-0: #f2f4f9; --rule: #dbe2ee; --surface-2: #eaeef6; }
-.pf-bar { display: flex; align-items: center; gap: 12px 20px; padding: 10px clamp(16px, 3vw, 40px);
-  background: var(--surface-0); border-bottom: 1px solid var(--rule); font-family: "Space Grotesk", var(--sans); }
-.pf-brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
-.pf-logo { display: block; flex: none; border-radius: 9px; box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 55%, transparent); }
-.pf-logo img { display: block; width: 34px; height: 34px; border-radius: 9px; image-rendering: pixelated; }
-.pf-crumb { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--ink-2); white-space: nowrap; overflow: hidden; }
-.pf-crumb a { color: var(--ink-2); text-decoration: none; }
-.pf-crumb a:hover { color: var(--accent); }
-.pf-crumb b { color: var(--ink); font-weight: 700; }
-.pf-crumb em { font-style: normal; color: var(--ink); font-weight: 600; overflow: hidden; text-overflow: ellipsis; }
-.pf-all { margin-left: auto; display: inline-flex; align-items: center; height: 34px; padding: 0 12px; border-radius: 8px;
-  border: 1px solid var(--rule); background: var(--surface-1); color: var(--ink); font: 500 13px "Space Grotesk", var(--sans); text-decoration: none; }
-.pf-all:hover { border-color: var(--accent); color: var(--accent); }
-@media (max-width: 640px) { .pf-crumb > a:first-child, .pf-crumb > span:first-of-type { display: none; } }
-@media print { .pf-bar { display: none; } }
+/* the shared header and footer are styled by ../../assets/css/tool-shell.css; this page scrolls the header away as before */
+header.ts-bar { position: static; }
 </style>
 <script>
   // remembered theme (set by the theme button); without one the page follows the system setting
@@ -132,12 +119,13 @@ button, input, select { font: inherit; color: inherit; }
   padding: 1.6rem clamp(16px, 3vw, 40px) 1.1rem; border-bottom: 1px solid var(--rule);
   background: var(--surface-1);
 }
-.masthead h1 { font-size: clamp(1.7rem, 3.2vw, 2.6rem); line-height: 1.05; font-weight: 500; }
+.masthead h2 { font-size: clamp(1.7rem, 3.2vw, 2.6rem); line-height: 1.05; font-weight: 500; }
 .masthead p { margin: .45rem 0 0; color: var(--ink-2); max-width: 64ch; }
 .masthead-tools { display: flex; gap: .6rem; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
 .engine { display: inline-flex; align-items: center; gap: .5rem; font-size: .85rem; color: var(--ink-2);
   padding: .35rem .7rem; border: 1px solid var(--rule); border-radius: 999px; background: var(--surface-0); }
 .engine .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--warning); flex: none; }
+.engine[data-state="idle"] .dot { background: var(--ink-3, currentColor); }
 .engine[data-state="ready"] .dot { background: var(--good); }
 .engine[data-state="error"] .dot { background: var(--critical); }
 .engine[data-state="busy"] .dot { background: var(--focus); animation: pulse 1.2s ease-in-out infinite; }
@@ -366,22 +354,24 @@ body.is-busy .btn[disabled] { cursor: progress; }
 </style>
 </head>
 <body>
-<header class="pf-bar">
-  <div class="pf-brand">
-    <a class="pf-logo" href="../../" title="Back to the portfolio"><img src="../../assets/favicon.svg" alt="Mahfujur Rahman Joy &mdash; portfolio" width="34" height="34"></a>
-    <span class="pf-crumb"><a href="../../"><b>Joy</b></a><span aria-hidden="true">/</span><a href="../../#tools">Tools</a><span aria-hidden="true">/</span><em>DSBC Studio</em></span>
+<header class="ts-bar">
+  <div class="ts-brand">
+    <nav class="ts-crumb" aria-label="Breadcrumb"><a href="../../">Mahfujur Rahman Joy</a><span aria-hidden="true">/</span><a href="../../#tools">Tools</a><span aria-hidden="true">/</span></nav>
+    <h1 class="ts-title">DSBC Studio</h1>
   </div>
-  <a class="pf-all" href="../../#tools">All tools</a>
+  <div class="ts-actions">
+    <a class="ts-btn" href="about/">About this tool</a>
+    <button class="ts-btn" id="theme-toggle" type="button">Dark theme</button>
+  </div>
 </header>
 <div class="topbar" id="topbar" aria-hidden="true"><span></span></div>
 <header class="masthead">
   <div>
-    <h1>Downscaling and bias correction studio</h1>
+    <h2>Downscaling and bias correction studio</h2>
     <p>Calibrate on the past, correct the future. Statistical downscaling and bias correction for daily, weekly or monthly climate series, with honest validation. Everything runs in this browser tab; your files are never uploaded. Look for <span class="ib-demo" aria-hidden="true">i</span> buttons next to any option for a short explanation.</p>
   </div>
   <div class="masthead-tools">
-    <span class="engine" id="engine" data-state="loading" role="status" aria-live="polite"><span class="dot" aria-hidden="true"></span><span id="engine-text">Starting the Python engine</span></span>
-    <button class="btn quiet small" id="theme-toggle" type="button">Dark theme</button>
+    <span class="engine" id="engine" data-state="idle" role="status" aria-live="polite"><span class="dot" aria-hidden="true"></span><span id="engine-text">Python starts when you load data</span></span>
   </div>
 </header>
 
@@ -644,6 +634,10 @@ body.is-busy .btn[disabled] { cursor: progress; }
 
 <footer class="site">
   <p>DSBC Studio by Mahfujur Rahman Joy. Python methods run locally through Pyodide; source code and Jupyter workflow in the accompanying <em>dsbc</em> package. Cite the original method papers listed under Methods and validation.</p>
+</footer>
+<footer class="ts-foot">
+  <p>DSBC Studio is one of the hydrology tools by <a href="../../">Mahfujur Rahman Joy</a>.</p>
+  <nav aria-label="About DSBC Studio"><ul><li><a href="about/">About this tool</a></li><li><a href="about/#validation">Validation</a></li><li><a href="about/#limitations">Limitations</a></li><li><a href="../../#tools">All tools</a></li></ul></nav>
 </footer>
 
 <script type="text/plain" id="worker-src">
@@ -930,8 +924,8 @@ window.DSBC_OPTION_HINTS = {
 };
 
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/3.1.0/plotly.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="../../assets/vendor/plotly-3.2.0.min.js"></script>
+<script src="../../assets/vendor/xlsx-0.18.5.full.min.js"></script>
 <script>
 /* DSBC Studio — browser front end. Python does the work in a Web Worker. */
 (() => {
@@ -1388,6 +1382,7 @@ class Picker {
 
 // ----------------------------------------------------------------- navigation
 function show(view) {
+  if (view !== "data") ensureEngine();
   $$(".view").forEach((v) => v.classList.toggle("active", v.id === "view-" + view));
   $$(".rail button").forEach((b) => b.setAttribute("aria-current", b.dataset.view === view ? "page" : "false"));
   if (location.hash !== "#" + view) history.replaceState(null, "", "#" + view);
@@ -1453,6 +1448,7 @@ async function readFile(file) {
 }
 function uniqueName(name) { let n = name, i = 2; while (S.datasets.some((d) => d.name === n)) n = `${name} (${i++})`; return n; }
 async function loadFiles(files) {
+  await ensureEngine();
   const status = $("#data-status");
   status.classList.remove("error");
   const bar = Progress.of($("#data-progress"));
@@ -2174,6 +2170,7 @@ function initUi() {
   ["dragleave", "drop"].forEach((t) => drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.remove("over"); }));
   drop.addEventListener("drop", (e) => loadFiles(Array.from(e.dataTransfer.files)));
   $("#btn-demo").addEventListener("click", async () => {
+    await ensureEngine();
     try { const r = await Engine.call("api_demo", {}, { progress: $("#data-progress"), start: "Generating the demo datasets" }); await refreshDatasets(r.datasets); setDemoDefaults(); $("#data-status").textContent = "Demo data loaded. Continue with Predictors, Downscale or Bias-correct."; }
     catch (e) { $("#data-status").textContent = e.message; }
   });
@@ -2237,8 +2234,11 @@ function initCatalog() {
   syncMbcControls(); syncDsControls();
 }
 
-document.addEventListener("DOMContentLoaded", async () => {
-  initUi();
+// Python (Pyodide, about 40 MB on the first visit) is not downloaded when the page merely opens. It starts on the
+// first real action: loading files, the demo data, or opening any view other than Data (those need the method lists).
+let enginePromise = null;
+function ensureEngine() { return enginePromise || (enginePromise = bootEngine()); }
+async function bootEngine() {
   setEngine("loading", "Starting the Python engine");
   $$(".btn").forEach((b) => { if (b.id && b.id.startsWith("btn-")) b.disabled = true; });
   const boot = Progress.of($("#data-progress"));
@@ -2258,9 +2258,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     boot.finish(false);
     setEngine("error", "Could not start Python: " + e.message + ". Check the internet connection (Pyodide loads from cdn.jsdelivr.net) and reload.");
   }
+}
+document.addEventListener("DOMContentLoaded", () => {
+  initUi();
+  if (!enginePromise) {
+    setEngine("idle", "Python starts when you load data (about 40 MB on the first visit)");
+    $$(".btn").forEach((b) => { if (b.id && b.id.startsWith("btn-") && b.id !== "btn-demo") b.disabled = true; });
+  }
 });
 })();
 
 </script>
+<script src="../../assets/js/tool-shell.js" defer></script>
 </body>
 </html>

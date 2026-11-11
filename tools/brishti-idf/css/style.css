@@ -56,7 +56,7 @@ a { color: var(--teal); }
   border-right: 1px solid var(--rule); background: var(--ground);
 }
 .brand { margin: 0 0 1.5rem; }
-.brand h1 { font-size: 1.375rem; line-height: 1.15; margin: 0; letter-spacing: -0.01em; font-weight: 700; }
+.brand .brand-name { font-size: 1.375rem; line-height: 1.15; margin: 0; letter-spacing: -0.01em; font-weight: 700; }
 .brand p { margin: 0.25rem 0 0; font-size: 0.8125rem; color: var(--ink-2); line-height: 1.35; }
 .steps { list-style: none; margin: 0; padding: 0; counter-reset: step; }
 .steps li { counter-increment: step; }

@@ -92,7 +92,8 @@ js/ui/                DOM helpers, the step screens, info.js (the “i” texts)
 js/report/report.js   HTML methods-and-results report
 js/worker/worker.js   Web Worker entry (heavy jobs; cancellable)
 sw.js                 offline support
-vendor/               Plotly 3.2.0, SheetJS 0.18.5, Public Sans font (with licences)
+vendor/               Public Sans font (with licence); Plotly 3.2.0 and SheetJS 0.18.5 are shared with the
+                      other portfolio tools in ../../assets/vendor/ (with licences)
 data/                 synthetic sample files; data/third-party/ real Denver record
 tests/                Node test-suite; tests/reference/ SciPy reference generator
 tools/                hold-out study, validation report, browser smoke test, sample generator

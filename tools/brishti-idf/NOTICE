@@ -1,7 +1,7 @@
 Brishti IDF bundles third-party components under their own licences:
 
-- Plotly.js 3.2.0 (vendor/plotly-3.2.0.min.js) - MIT licence, vendor/LICENSE-plotly.txt
-- SheetJS Community Edition 0.18.5 (vendor/xlsx-0.18.5.full.min.js) - Apache License 2.0, vendor/LICENSE-sheetjs.txt
+- Plotly.js 3.2.0 (../../assets/vendor/plotly-3.2.0.min.js, shared with the other portfolio tools) - MIT licence, ../../assets/vendor/LICENSE-plotly.txt
+- SheetJS Community Edition 0.18.5 (../../assets/vendor/xlsx-0.18.5.full.min.js, shared with the other portfolio tools) - Apache License 2.0, ../../assets/vendor/LICENSE-sheetjs.txt
 - Public Sans font (vendor/fonts/) - SIL Open Font License 1.1, vendor/fonts/LICENSE-OFL.txt
 - Denver hourly precipitation (data/third-party/denver_july_hourly_1949-1990.csv), from the R package
   extRemes 2.2-1 (dataset Denversp) - GPL (>= 2). Redistributed unchanged in content, separately from

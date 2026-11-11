@@ -21,7 +21,7 @@ html[data-tool-tab='features'] .pane[data-pane='features'],
 html[data-tool-tab='train'] .pane[data-pane='train'],
 html[data-tool-tab='results'] .pane[data-pane='results'],
 html[data-tool-tab='predict'] .pane[data-pane='predict'] { display: flex; }
-.ts-tab .num { font-style: normal; font: 700 11px var(--mono); width: 18px; height: 18px; display: inline-grid; place-items: center; border-radius: 5px; background: var(--line); color: var(--fg); }
+.ts-tab .num { font-style: normal; font: 700 12px var(--mono); width: 18px; height: 18px; display: inline-grid; place-items: center; border-radius: 5px; background: var(--line); color: var(--fg); }
 .ts-tab[aria-selected='true'] .num { background: var(--accent); color: var(--on-accent); }
 .ts-tab.done .num { background: color-mix(in srgb, var(--ok) 30%, transparent); color: var(--ok); }
 

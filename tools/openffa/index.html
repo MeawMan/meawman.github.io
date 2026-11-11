@@ -32,11 +32,11 @@
 <body class="guided">
 <header class="ts-bar">
   <div class="ts-brand">
-    <a class="ts-logo" href="../../" title="Back to the portfolio"><img src="../../assets/favicon.svg" alt="Mahfujur Rahman Joy — portfolio" width="34" height="34"></a>
-    <span class="ts-crumb"><a href="../../"><b>Joy</b></a><span aria-hidden="true">/</span><a href="../../#tools">Tools</a><span aria-hidden="true">/</span><em>OpenFFA</em></span>
+    <nav class="ts-crumb" aria-label="Breadcrumb"><a href="../../">Mahfujur Rahman Joy</a><span aria-hidden="true">/</span><a href="../../#tools">Tools</a><span aria-hidden="true">/</span></nav>
+    <h1 class="ts-title">OpenFFA</h1>
   </div>
   <div class="ts-actions">
-    <a class="ts-btn" href="../../#tools">All tools</a>
+    <a class="ts-btn" href="about/">About this tool</a>
     <button class="ts-btn icon" id="tsTheme" type="button" aria-label="Toggle light or dark theme" title="Toggle theme">
       <svg class="i-sun" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M11 1h2v3h-2zM11 20h2v3h-2zM1 11h3v2H1zM20 11h3v2h-3zM4.2 5.6l1.4-1.4 2.1 2.1-1.4 1.4zM16.3 17.7l1.4-1.4 2.1 2.1-1.4 1.4zM4.2 18.4l2.1-2.1 1.4 1.4-2.1 2.1zM16.3 6.3l2.1-2.1 1.4 1.4-2.1 2.1zM7 9h2V7h6v2h2v6h-2v2H9v-2H7z"/></svg>
       <svg class="i-moon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M9 2h6v2h-4v2H9v4H7v4h2v4h2v2h4v-2h4v-2h2v-4h-2v2h-2v2h-6v-2H9v-4H7v-2h2V6h2V4H9z"/></svg>
@@ -87,7 +87,12 @@
     <section class="page" id="page-about" aria-labelledby="h-about" hidden></section>
   </main>
 </div>
+<footer class="ts-foot">
+  <p>OpenFFA is one of the hydrology tools by <a href="../../">Mahfujur Rahman Joy</a>.</p>
+  <nav aria-label="About OpenFFA"><ul><li><a href="about/">About this tool</a></li><li><a href="about/#validation">Validation</a></li><li><a href="about/#limitations">Limitations</a></li><li><a href="about/#cite">Cite</a></li><li><a href="../../#tools">All tools</a></li></ul></nav>
+</footer>
 <div id="live" class="visually-hidden" aria-live="polite" style="position:absolute;left:-9999px"></div>
 <noscript><p style="padding:2rem">OpenFFA needs JavaScript. It runs entirely in your browser; no data leave your computer.</p></noscript>
+<script src="../../assets/js/tool-shell.js" defer></script>
 </body>
 </html>

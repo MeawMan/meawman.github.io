@@ -5,10 +5,12 @@
  * tool keeps working offline with the last copies seen. Nothing is sent anywhere: the cache lives
  * in this browser only. Bump CACHE when the shipped file list changes.
  */
-const CACHE = 'brishti-idf-v0.2.0';
+const CACHE = 'brishti-idf-v0.2.0-portfolio-2';
 const SHELL = [
   './', './index.html', './css/style.css', './css/portfolio.css', './js/app.js', './js/pipeline.js', './js/worker/worker.js',
-  './vendor/plotly-3.2.0.min.js', './vendor/xlsx-0.18.5.full.min.js',
+  // shared with the other portfolio tools (outside this folder, same origin)
+  '../../assets/vendor/plotly-3.2.0.min.js', '../../assets/vendor/xlsx-0.18.5.full.min.js',
+  '../../assets/css/tool-shell.css', '../../assets/js/tool-shell.js',
 ];
 
 self.addEventListener('install', (e) => {

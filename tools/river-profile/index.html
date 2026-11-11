@@ -41,8 +41,8 @@ html[data-theme="dark"]{
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.5;margin:0}
 .wrap{max-width:1380px;margin:0 auto;padding-block:20px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .header-intro{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px;padding-bottom:18px;margin-bottom:20px;border-bottom:1px solid var(--line)}
-h1{font-family:var(--f-display);font-weight:700;font-size:clamp(22px,3vw,30px);letter-spacing:-.01em;margin:0;line-height:1.15}
-h1 small{display:block;font-family:var(--f-mono);font-weight:400;font-size:12px;letter-spacing:.06em;color:var(--water);text-transform:uppercase;margin-bottom:4px}
+h1,.page-title{font-family:var(--f-display);font-weight:700;font-size:clamp(22px,3vw,30px);letter-spacing:-.01em;margin:0;line-height:1.15}
+h1 small,.page-title small{display:block;font-family:var(--f-mono);font-weight:400;font-size:12px;letter-spacing:.06em;color:var(--water);text-transform:uppercase;margin-bottom:4px}
 .lede{max-width:68ch;color:var(--muted);margin:6px 0 0;font-size:13.5px}
 .grid{display:grid;grid-template-columns:minmax(320px,380px) minmax(0,1fr);gap:20px;align-items:start}
 @media (max-width:960px){.grid{grid-template-columns:minmax(0,1fr)}}
@@ -165,13 +165,13 @@ footer.tool-foot{margin-top:32px;padding-top:14px;border-top:1px solid var(--lin
 <!-- Portfolio standard bar -->
 <header class="ts-bar">
   <div class="ts-brand">
-    <a class="ts-logo" href="../../" title="Back to the portfolio"><img src="../../assets/favicon.svg" alt="Mahfujur Rahman Joy — portfolio" width="34" height="34"></a>
-    <span class="ts-crumb"><a href="../../"><b>Joy</b></a><span aria-hidden="true">/</span><a href="../../#tools">Tools</a><span aria-hidden="true">/</span><em>River Profile Studio</em></span>
-    <small class="tagline" style="font-size:12px;color:var(--dim);margin-left:4px">cross-sections &amp; profiling</small>
+    <nav class="ts-crumb" aria-label="Breadcrumb"><a href="../../">Mahfujur Rahman Joy</a><span aria-hidden="true">/</span><a href="../../#tools">Tools</a><span aria-hidden="true">/</span></nav>
+    <h1 class="ts-title">River Profile Studio</h1>
+    <small class="ts-tag tagline">cross-sections &amp; profiling</small>
   </div>
   <div class="ts-actions">
     <span class="ts-privacy">● files stay on your computer</span>
-    <a class="ts-btn" href="../../#tools">All tools</a>
+    <a class="ts-btn" href="about/">About this tool</a>
     <button class="ts-btn icon" type="button" id="themeBtn" aria-label="Toggle light or dark theme" title="Toggle theme">
       <svg class="i-sun" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M11 1h2v3h-2zM11 20h2v3h-2zM1 11h3v2H1zM20 11h3v2h-3zM4.2 5.6l1.4-1.4 2.1 2.1-1.4 1.4zM16.3 17.7l1.4-1.4 2.1 2.1-1.4 1.4zM4.2 18.4l2.1-2.1 1.4 1.4-2.1 2.1zM16.3 6.3l2.1-2.1 1.4 1.4-2.1 2.1zM7 9h2V7h6v2h2v6h-2v2H9v-2H7z"/></svg>
       <svg class="i-moon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M9 2h6v2h-4v2H9v4H7v4h2v4h2v2h4v-2h4v-2h2v-4h-2v2h-2v2h-6v-2H9v-4H7v-2h2V6h2V4H9z"/></svg>
@@ -182,7 +182,7 @@ footer.tool-foot{margin-top:32px;padding-top:14px;border-top:1px solid var(--lin
 <div class="wrap">
   <div class="header-intro">
     <div>
-      <h1><small>Excel / CSV → PROFILE.DEF · SOBEK 2.1x Flow</small>River Profile Studio</h1>
+      <div class="page-title"><small>Excel / CSV → PROFILE.DEF · SOBEK 2.1x Flow</small>River Profile Studio</div>
       <p class="lede">Convert surveyed river cross-sections into SOBEK <code>CRDS ... lt yz</code> definitions. Check and edit points visually, orient left bank first, add vertical walls, and export a clean <code>PROFILE.DEF</code>. Runs 100% in your browser.</p>
     </div>
   </div>
@@ -447,7 +447,7 @@ footer.tool-foot{margin-top:32px;padding-top:14px;border-top:1px solid var(--lin
   </footer>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="../../assets/vendor/xlsx-0.18.5.full.min.js"></script>
 <script>
   if (typeof XLSX === 'undefined') {
     document.write('<script src="../ababahika/vendor/xlsx.core.min.js"><\/script>');
@@ -2164,5 +2164,10 @@ $("sampleBtn").onclick = () => {
 /* Start with sample data loaded */
 $("sampleBtn").click();
 </script>
+<footer class="ts-foot">
+  <p>River Profile Studio is one of the hydrology tools by <a href="../../">Mahfujur Rahman Joy</a>.</p>
+  <nav aria-label="About River Profile Studio"><ul><li><a href="about/">About this tool</a></li><li><a href="about/#limitations">Limitations</a></li><li><a href="../../#tools">All tools</a></li></ul></nav>
+</footer>
+<script src="../../assets/js/tool-shell.js" defer></script>
 </body>
 </html>

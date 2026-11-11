@@ -1,7 +1,7 @@
 /* portfolio.css — OpenFFA inside meawman.github.io.
    Loaded after app.css (and the portfolio's tool-shell.css). Re-maps OpenFFA's tokens to the portfolio palette
-   for both themes, uses the portfolio fonts, adds the portfolio header and places the gauge-staff rail under it.
-   Header rules are repeated here so the tool still looks right when served on its own. */
+   for both themes, uses the portfolio fonts and places the gauge-staff rail under the shared header
+   (the header and footer themselves are styled by the portfolio's tool-shell.css). */
 :root[data-theme="dark"] {
   --paper: #06080f; --sheet: #0d1322; --ink: #eef3fb; --muted: #a7b3cb; --grid: #24334f;
   --river: #5be7ff; --river-soft: rgba(91, 231, 255, .12);
@@ -22,29 +22,12 @@
   --font-body: 'Space Grotesk', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --font-gauge: 'Space Grotesk', system-ui, sans-serif;
   --mono: 'JetBrains Mono', ui-monospace, Consolas, monospace;
-  --bar-h: 55px;
+  --bar-h: 56px;
   --radius-control: 8px; --radius-sheet: 12px;
 }
 html[data-theme] .app { max-width: none; padding-block: 0; } /* undo tool-shell's width cap */
 
-/* ---- portfolio header ---- */
-.ts-bar { position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 12px 20px; flex-wrap: wrap; min-height: var(--bar-h);
-  padding: 10px 20px; background: color-mix(in srgb, var(--paper) 82%, transparent); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--grid); font-family: var(--font-body); }
-.ts-brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
-.ts-logo { display: block; flex: none; border-radius: 9px; box-shadow: 0 0 0 1px color-mix(in srgb, var(--river) 55%, transparent); }
-.ts-logo img { display: block; width: 34px; height: 34px; border-radius: 9px; image-rendering: pixelated; }
-.ts-crumb { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--muted); white-space: nowrap; overflow: hidden; }
-.ts-crumb a { color: var(--muted); text-decoration: none; }
-.ts-crumb a:hover { color: var(--river); }
-.ts-crumb b { color: var(--ink); font-weight: 700; }
-.ts-crumb em { font-style: normal; color: var(--ink); font-weight: 600; }
-.ts-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; }
-.ts-btn { display: inline-flex; align-items: center; justify-content: center; height: 34px; padding: 0 12px; border-radius: 8px; border: 1px solid var(--grid);
-  background: var(--sheet); color: var(--ink); font: 500 13px var(--font-body); text-decoration: none; cursor: pointer; }
-.ts-btn:hover { border-color: var(--river); color: var(--river); }
-.ts-btn.icon { width: 34px; padding: 0; }
-:root[data-theme="light"] .i-moon, :root[data-theme="dark"] .i-sun { display: none; }
+/* ---- portfolio header: styled by ../../assets/css/tool-shell.css (shared by every tool page) ---- */
 .ts-privacy { font: 12px var(--mono); color: var(--ok); border: 1px solid color-mix(in srgb, var(--ok) 40%, transparent); padding: 4px 10px; border-radius: 999px; }
 
 /* ---- tool bar and rail under the header ---- */
@@ -74,9 +57,6 @@ ol.refs li { margin-bottom: .35rem; overflow-wrap: anywhere; }
 
 @media (max-width: 860px) {
   .staff { top: 0; height: auto; position: static; }
-  .ts-bar { padding: 10px 14px; }
-  .ts-crumb > a:first-child, .ts-crumb > span:first-of-type { display: none; }
-  .ts-actions .ts-btn:not(.icon) { display: none; }
   .ts-privacy { white-space: normal; }
   /* the further analyses and Methods stay reachable on phones (app.css hid them) */
   .staff .extras { display: flex; flex-wrap: wrap; gap: .25rem .5rem; margin-top: .5rem; padding-right: 0; }

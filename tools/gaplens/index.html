@@ -51,8 +51,7 @@ html[data-theme] .btn{border-radius:4px}
 html[data-theme] .brand b{font:inherit;letter-spacing:normal}
 html[data-theme] tbody tr:hover td{background:rgba(var(--gap-rgb),.07)}
 html[data-theme] td{border-bottom-color:var(--rule)}
-.ts-bar{position:static}
-.ts-bar .ts-btn{font-family:var(--font)}
+header.ts-bar{position:static}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html{color-scheme:light dark}html[data-theme=light]{color-scheme:light}html[data-theme=dark]{color-scheme:dark}
@@ -65,7 +64,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.55 var(--text
 .rail{position:sticky;top:0;height:100vh;align-self:start;display:flex;flex-direction:column;gap:26px;padding:24px 16px 20px 20px;border-right:1px solid var(--rule);overflow:auto}
 .brand{display:flex;gap:11px;align-items:flex-start}
 .brand svg{flex:none;margin-top:2px}
-.brand h1{margin:0;font:600 1.55rem/1.05 var(--display);letter-spacing:.01em}
+.brand .brand-name{margin:0;font:600 1.55rem/1.05 var(--display);letter-spacing:.01em}
 .brand small{display:block;margin-top:5px;color:var(--mute);font-size:.78rem;line-height:1.35}
 nav{display:flex;flex-direction:column;gap:2px}
 nav .gt{color:var(--mute);font-size:.8rem;margin:0 0 5px 10px}
@@ -98,7 +97,7 @@ nav button.done[aria-selected=true] .mk{color:var(--paper)}
 main{max-width:1110px;padding:8px 40px 90px}
 .tabwrap{display:none}.tabwrap.on{display:block}
 .pagehead{padding:26px 0 16px}
-.pagehead h1{margin:0;font:600 2.15rem/1.1 var(--display);letter-spacing:.005em}
+.pagehead h2{margin:0;font:600 2.15rem/1.1 var(--display);letter-spacing:.005em}
 .pagehead p{margin:6px 0 0;color:var(--mute);max-width:64ch}
 
 /* content */
@@ -208,7 +207,7 @@ svg text.rt-lbl{font-size:10.5px}
   .recbar{padding:10px 16px 6px;position:static}
   .stat{flex:1 1 40%;border-right:0;margin-right:0}
   main{padding:4px 16px 70px}
-  .pagehead h1{font-size:1.8rem}
+  .pagehead h2{font-size:1.8rem}
 }
 </style>
 </head>
@@ -219,14 +218,14 @@ svg text.rt-lbl{font-size:10.5px}
 <a class="skip" href="#content">Skip to content</a>
 <header class="ts-bar">
   <div class="ts-brand">
-    <a class="ts-logo" href="../../" title="Back to the portfolio"><img src="../../assets/favicon.svg" alt="Mahfujur Rahman Joy &mdash; portfolio" width="34" height="34"></a>
-    <span class="ts-crumb"><a href="../../"><b>Joy</b></a><span aria-hidden="true">/</span><a href="../../#tools">Tools</a><span aria-hidden="true">/</span><em>GapLens</em></span>
+    <nav class="ts-crumb" aria-label="Breadcrumb"><a href="../../">Mahfujur Rahman Joy</a><span aria-hidden="true">/</span><a href="../../#tools">Tools</a><span aria-hidden="true">/</span></nav>
+    <h1 class="ts-title">GapLens</h1>
   </div>
-  <div class="ts-actions" style="margin-left:auto">
-    <a class="ts-btn" href="../../#tools">All tools</a>
-    <button class="ts-btn icon" id="tsTheme" type="button" aria-label="Toggle light or dark theme" title="Toggle theme">
-      <svg class="i-sun" viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M11 1h2v3h-2zM11 20h2v3h-2zM1 11h3v2H1zM20 11h3v2h-3zM4.2 5.6l1.4-1.4 2.1 2.1-1.4 1.4zM16.3 17.7l1.4-1.4 2.1 2.1-1.4 1.4zM4.2 18.4l2.1-2.1 1.4 1.4-2.1 2.1zM16.3 6.3l2.1-2.1 1.4 1.4-2.1 2.1zM7 9h2V7h6v2h2v6h-2v2H9v-2H7z"/></svg>
-      <svg class="i-moon" viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M9 2h6v2h-4v2H9v4H7v4h2v4h2v2h4v-2h4v-2h2v-4h-2v2h-2v2h-6v-2H9v-4H7v-2h2V6h2V4H9z"/></svg>
+  <div class="ts-actions">
+    <a class="ts-btn" href="about/">About this tool</a>
+    <button class="ts-btn icon" id="tsTheme" type="button" data-ts-theme aria-label="Dark theme" aria-pressed="false" title="Toggle light or dark theme">
+      <svg class="i-sun" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M11 1h2v3h-2zM11 20h2v3h-2zM1 11h3v2H1zM20 11h3v2h-3zM4.2 5.6l1.4-1.4 2.1 2.1-1.4 1.4zM16.3 17.7l1.4-1.4 2.1 2.1-1.4 1.4zM4.2 18.4l2.1-2.1 1.4 1.4-2.1 2.1zM16.3 6.3l2.1-2.1 1.4 1.4-2.1 2.1zM7 9h2V7h6v2h2v6h-2v2H9v-2H7z"/></svg>
+      <svg class="i-moon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M9 2h6v2h-4v2H9v4H7v4h2v4h2v2h4v-2h4v-2h2v-4h-2v2h-2v2h-6v-2H9v-4H7v-2h2V6h2V4H9z"/></svg>
     </button>
   </div>
 </header>
@@ -234,7 +233,7 @@ svg text.rt-lbl{font-size:10.5px}
   <aside class="rail">
     <div class="brand">
       <svg viewBox="0 0 32 32" width="34" height="34" aria-hidden="true"><circle cx="16" cy="16" r="12.5" fill="none" style="stroke:var(--ink)" stroke-width="2.8"/><path d="M7.5 19L11 14.5 14 18M19 13.5L22 19 24.5 16" fill="none" style="stroke:var(--obs)" stroke-width="2.4" stroke-linejoin="round"/><path d="M14 18L19 13.5" fill="none" style="stroke:var(--fill)" stroke-width="2.4" stroke-dasharray="1.8 1.8"/></svg>
-      <div><h1>GapLens</h1><small>Find, fill and compare gaps in hydroclimate records</small></div>
+      <div><div class="brand-name">GapLens</div><small>Find, fill and compare gaps in hydroclimate records</small></div>
     </div>
     <nav id="nav" role="tablist" aria-label="Workflow"></nav>
     <p class="rail-foot">Runs in your browser with Python (Pyodide). Your data are not uploaded anywhere.</p>
@@ -410,7 +409,7 @@ const nav=$("#nav"),pages=$("#pages");
 function navBtn(k,t,n){const b=document.createElement("button");b.type="button";b.dataset.k=k;b.setAttribute("role","tab");b.setAttribute("aria-selected",k==="data");b.innerHTML=`<span class="mk${n?"":" tool"}">${n||""}</span><span>${t}</span>`;b.onclick=()=>show(k);return b}
 function groupTitle(t){const d=document.createElement("div");d.className="gt";d.textContent=t;nav.appendChild(d)}
 groupTitle("Workflow");STEPS.forEach(([k,t],i)=>nav.appendChild(navBtn(k,t,i+1)));groupTitle("Other tools");TOOLS.forEach(([k,t])=>nav.appendChild(navBtn(k,t,0)));
-Object.entries(PAGES).forEach(([k,[h,p]])=>{const w=document.createElement("div");w.className="tabwrap"+(k==="data"?" on":"");w.dataset.k=k;w.innerHTML=`<header class="pagehead"><h1>${esc(h)}</h1><p>${esc(p)}</p></header><section class="tab" id="t-${k}"></section>`;pages.appendChild(w)});
+Object.entries(PAGES).forEach(([k,[h,p]])=>{const w=document.createElement("div");w.className="tabwrap"+(k==="data"?" on":"");w.dataset.k=k;w.innerHTML=`<header class="pagehead"><h2>${esc(h)}</h2><p>${esc(p)}</p></header><section class="tab" id="t-${k}"></section>`;pages.appendChild(w)});
 function done(k){S.done[k]=true;const b=nav.querySelector(`[data-k=${k}]`);if(b)b.classList.add("done")}
 function resetResults(){
   S.prof=S.sug=S.comp=S.fill=S.picked=S.fillMethods=S.rec=S.jobCompare=null;
@@ -456,15 +455,15 @@ function drawData(){
     </div>
     <div><h2>Or start from an example</h2>
       <p class="mute small">Synthetic records with known true values, so a fill can be checked against the truth.</p>
-      <div class="row"><label>Example<select id="ex"></select></label><button class="ghost" id="exgo" type="button">Load example</button></div>
-      <p class="small" id="ex-desc"></p><span id="up-msg" aria-live="polite"></span></div>
+      <div class="row"><label>Example<select id="ex"><option value="" disabled selected>Listed when GapLens starts</option></select></label><button class="ghost" id="exgo" type="button">Load example</button></div>
+      <p class="small" id="ex-desc">The examples are built by Python: choose one or press Load example and GapLens starts (the first start downloads about 40 MB).</p><span id="up-msg" aria-live="polite"></span></div>
   </div></div>
   <div id="data-body"></div>`;
   const drop=$("#drop"),file=$("#file");drop.onclick=()=>file.click();drop.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();file.click()}};
   drop.ondragover=e=>{e.preventDefault();drop.classList.add("over")};drop.ondragleave=()=>drop.classList.remove("over");
   drop.ondrop=e=>{e.preventDefault();drop.classList.remove("over");if(e.dataTransfer.files[0])upload(e.dataTransfer.files[0])};file.onchange=()=>file.files[0]&&upload(file.files[0]);
-  api("/api/samples").then(r=>{const ex=$("#ex");S.samples=r.samples;Object.entries(r.samples).forEach(([k,v])=>{const o=document.createElement("option");o.value=k;o.textContent=k.replace(/_/g," ");ex.appendChild(o)});const d=()=>{$("#ex-desc").textContent=S.samples[ex.value]||""};ex.onchange=d;d()});
-  $("#exgo").onclick=async()=>{const m=$("#up-msg");say(m,"Building the example...");try{const r=await api("/api/sample",{name:$("#ex").value});S.gaug=r.gaugings_id||null;S.stations=r.stations_id||null;S.ds=r;S.pre=r.settings;resetResults();done("data");say(m,"");drawDataBody()}catch(e){say(m,esc(e.message),"err")}};
+  const samplesReady=api("/api/samples").then(r=>{const ex=$("#ex");ex.innerHTML="";S.samples=r.samples;Object.entries(r.samples).forEach(([k,v])=>{const o=document.createElement("option");o.value=k;o.textContent=k.replace(/_/g," ");ex.appendChild(o)});const d=()=>{$("#ex-desc").textContent=S.samples[ex.value]||""};ex.onchange=d;d()});
+  $("#exgo").onclick=async()=>{const m=$("#up-msg");say(m,"Building the example...");try{if(window.GapLensStart)window.GapLensStart();await samplesReady;const r=await api("/api/sample",{name:$("#ex").value});S.gaug=r.gaugings_id||null;S.stations=r.stations_id||null;S.ds=r;S.pre=r.settings;resetResults();done("data");say(m,"");drawDataBody()}catch(e){say(m,esc(e.message),"err")}};
   if(S.ds)drawDataBody();
 }
 async function upload(f){
@@ -993,6 +992,10 @@ async function loadMethods(){
 }
 drawData();drawVal();drawRate();
 </script>
+<footer class="ts-foot">
+  <p>GapLens is one of the hydrology tools by <a href="../../">Mahfujur Rahman Joy</a>.</p>
+  <nav aria-label="About GapLens"><ul><li><a href="about/">About this tool</a></li><li><a href="about/#limitations">Limitations</a></li><li><a href="../../#tools">All tools</a></li></ul></nav>
+</footer>
 <script src="../../assets/js/tool-shell.js"></script>
 </body>
 </html>

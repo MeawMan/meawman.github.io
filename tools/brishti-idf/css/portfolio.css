@@ -2,7 +2,7 @@
    Loaded after style.css (and the portfolio's tool-shell.css). Re-maps Brishti's colour tokens to the
    portfolio palette for both themes, switches to the portfolio fonts, places the rail under the sticky
    portfolio header, and styles the “i” buttons and the Methods screen.
-   The header rules are repeated here so the tool still looks right when served on its own. */
+   The header and footer themselves are styled by the portfolio's tool-shell.css. */
 
 :root[data-theme="dark"] {
   --ground: #06080f; --surface: #0d1322; --ink: #eef3fb; --ink-2: #a7b3cb;
@@ -25,7 +25,7 @@
 :root {
   --font-ui: 'Space Grotesk', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  --bar-h: 55px;
+  --bar-h: 56px;
   --radius-s: 7px; --radius-m: 12px;
 }
 body { font-family: var(--font-ui); }
@@ -34,31 +34,14 @@ body { font-family: var(--font-ui); }
 @media (min-width: 861px) { html { font-size: 112.5%; } }
 html[data-theme] .app { max-width: none; padding-block: 0; } /* undo tool-shell's width cap: the rail layout needs the full width */
 
-/* ---- portfolio header (also defined in tool-shell.css) ---- */
-.ts-bar { position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 12px 20px; flex-wrap: wrap; min-height: var(--bar-h);
-  padding: 10px 20px; background: color-mix(in srgb, var(--ground) 82%, transparent); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--rule); font-family: var(--font-ui); }
-.ts-brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
-.ts-logo { display: block; flex: none; border-radius: 9px; box-shadow: 0 0 0 1px color-mix(in srgb, var(--teal) 55%, transparent); }
-.ts-logo img { display: block; width: 34px; height: 34px; border-radius: 9px; image-rendering: pixelated; }
-.ts-crumb { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--ink-2); white-space: nowrap; overflow: hidden; }
-.ts-crumb a { color: var(--ink-2); text-decoration: none; }
-.ts-crumb a:hover { color: var(--teal); }
-.ts-crumb b { color: var(--ink); font-weight: 700; }
-.ts-crumb em { font-style: normal; color: var(--ink); font-weight: 600; }
-.ts-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; }
-.ts-btn { display: inline-flex; align-items: center; justify-content: center; height: 34px; padding: 0 12px; border-radius: 8px; border: 1px solid var(--rule);
-  background: var(--surface); color: var(--ink); font: 500 13px var(--font-ui); text-decoration: none; cursor: pointer; }
-.ts-btn:hover { border-color: var(--teal); color: var(--teal); }
-.ts-btn.icon { width: 34px; padding: 0; }
-:root[data-theme="light"] .i-moon, :root[data-theme="dark"] .i-sun { display: none; }
+/* ---- portfolio header: styled by ../../assets/css/tool-shell.css (shared by every tool page) ---- */
 .ts-privacy { font: 12px var(--mono); color: #2c8a22; border: 1px solid color-mix(in srgb, #2c8a22 40%, transparent); padding: 4px 10px; border-radius: 999px; white-space: nowrap; }
 :root[data-theme="dark"] .ts-privacy { color: #9dff6b; border-color: rgba(157, 255, 107, .4); }
 
 /* ---- frame under the header ---- */
 .rail { top: var(--bar-h); height: calc(100vh - var(--bar-h)); background: color-mix(in srgb, var(--ground) 70%, transparent); }
-.brand h1 { font-size: 1.25rem; display: flex; align-items: center; gap: .45rem; }
-.brand h1 svg { flex: none; }
+.brand .brand-name { font-size: 1.25rem; display: flex; align-items: center; gap: .45rem; }
+.brand .brand-name svg { flex: none; }
 .steps button { border-radius: 8px; }
 .steps button[aria-current="step"] { background: color-mix(in srgb, var(--teal) 16%, transparent); }
 .steps li.sep { margin-top: .6rem; padding-top: .6rem; border-top: 1px solid var(--rule); }
@@ -103,9 +86,6 @@ h4 { margin: 1rem 0 .3rem; font-size: .9375rem; }
 
 @media (max-width: 860px) {
   .rail { top: 0; height: auto; position: static; }
-  .ts-bar { padding: 10px 14px; }
-  .ts-crumb > a:first-child, .ts-crumb > span:first-of-type { display: none; }
-  .ts-actions .ts-btn:not(.icon) { display: none; }
   .ts-privacy { white-space: normal; }
 }
 @media print { .ts-bar, .intro-line { display: none !important; } }
