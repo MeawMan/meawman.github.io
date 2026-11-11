@@ -1,0 +1,41 @@
+{
+  "slug": "river-profile",
+  "pageTitle": "River Profile Studio — Cross-sections, SOBEK Y-Z & profiling · Mahfujur Rahman Joy",
+  "version": null,
+  "problem": "Convert surveyed river cross-sections into SOBEK CRDS ... lt yz definitions. Check and edit points visually, orient left bank first, add vertical walls, and export a clean PROFILE.DEF. Runs 100% in your browser.",
+  "method": [
+    "Cross-Section Inspector (Y-Z): interactively inspect and edit elevations and distances, add or delete specific survey points, select custom left and right bank codes for orientation.",
+    "Datum shift to Z (m): MSL → PWD in Bangladesh is typically +0.46 m. Section names in SOBEK become Prefix + ID.",
+    "Vertical wall at beginning & end: None (SOBEK standard extension); Add wall of size / height (+H m); Wall to fixed level (Z = … m).",
+    "Bank crest trimming (optional — off by default): keeps only the main channel between the natural bank crests.",
+    "Output: without a file, a clean new PROFILE.DEF is written. With an existing file, matching section names are updated in place.",
+    "Thalweg & Longitudinal Profiler (L-Profile): automatically tracks the lowest bed points to plot longitudinal thalweg profiles and 2D alignment maps. Shows Thalweg Bed Profile, Left Bank Crest, Right Bank Crest, Mean Bed Gradient (S₀) and an optional Water Surface; Reach Stations Checklist & Local Gradients; Export Thalweg CSV and Export 3D GeoJSON."
+  ],
+  "references": null,
+  "data": "Drop an Excel or CSV file (.xlsx · .xls · .csv · .txt) with Cross-section ID, Distance Y (m), Level Z (m) and an optional bank / data code; optional Easting / Longitude (X), Northing / Latitude (Y) and River / Reach / Khal name for the thalweg profile and map. 'Load sample survey' loads a built-in sample (9 sections in 2 reaches).",
+  "validation": null,
+  "limitations": [
+    "Produces SOBEK 2.1x CRDS … ty 10 … lt yz blocks. Verify in SOBEK Data Edit before model execution."
+  ],
+  "cite": null,
+  "license": null,
+  "repository": null,
+  "docs": [],
+  "samples": [
+    { "label": "In-app button 'Load sample survey' (built-in sample: 9 sections in 2 reaches, Kalibari Khal and Bhola Khal; loaded automatically when the page opens)", "path": null }
+  ],
+  "sources": {
+    "pageTitle": "tools/river-profile/index.html L6",
+    "version": "none stated",
+    "problem": "tools/river-profile/index.html L186",
+    "method": "data/content.json at git HEAD 8401abc, L381 (River Profile Studio description); tools/river-profile/index.html L242, L252-255, L261-266, L277-284, L309, L328, L332, L373-374, L388-392, L419",
+    "references": "none in the tool",
+    "data": "tools/river-profile/index.html L196-197, L200, L205-210, L229-240, L2161",
+    "validation": "not documented anywhere",
+    "limitations": "tools/river-profile/index.html L445 (page footer; there is no limitations document)",
+    "cite": "no CITATION.cff",
+    "license": "no LICENSE file",
+    "repository": "none stated",
+    "samples": "tools/river-profile/index.html L200, L2128-2152, L2156-2165"
+  }
+}

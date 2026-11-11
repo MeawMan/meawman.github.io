@@ -1,0 +1,70 @@
+{
+  "slug": "ababahika",
+  "pageTitle": "Ababahika — catchment slope, land cover & soil statistics · Mahfujur Rahman Joy",
+  "version": "0.2.0",
+  "problem": "Slope, land-cover and soil-texture statistics for every catchment, with a map and basic geoprocessing. Runs entirely in the browser; files are never uploaded.",
+  "method": [
+    "Cell-in-polygon: cell centre inside (GDAL rasterize scanline rule; same as rasterio/rasterstats all_touched=False and ArcGIS Zonal Statistics). Holes and multipart polygons handled.",
+    "Polygons are reprojected to the raster CRS (proj4js); rasters are never resampled for statistics.",
+    "Slope: Horn (1981), NoData neighbours replaced by the centre value (ArcGIS rule), edges replicated. Geographic DEMs: per-row metre spacing from WGS 84 radii of curvature.",
+    "Areas: projected cells |Δx·Δy|; geographic cells exact ellipsoidal area; catchment areas geodesic (WGS 84, local Lambert equal-area); polygon-on-polygon (soil) areas in the catchment's UTM zone.",
+    "Hydrology (D8): DEM at its own or a coarser cell size; embankments burned in as walls (4-connected), sluices/regulators as openings and outlets, khals burned in as channels (shapefile or drawn on the map); Priority-Flood filling (Barnes et al. 2014, +ε for flats); D8 flow direction (ESRI codes 1–128); flow accumulation; stream network with Strahler order; drainage units per sluice, or per clicked/loaded pour point snapped to the largest flow.",
+    "Tools (GDAL 3 in WebAssembly): project raster, clip raster (polygons or map view), merge/mosaic rasters, slope raster, clip vector, merge vectors, dissolve, export vector (shapefile, GeoPackage, GeoJSON, KML, CSV) in any coordinate system."
+  ],
+  "references": [
+    "Horn, B.K.P. (1981). Hill shading and the reflectance map. Proceedings of the IEEE, 69(1), 14–47.",
+    "Strahler, A.N. (1952). Hypsometric (area-altitude) analysis of erosional topography. GSA Bulletin, 63, 1117–1142."
+  ],
+  "data": "Drop files on the map or press ＋ Add data. Shapefiles: a .zip, or select the .shp, .dbf and .prj together. Rasters: GeoTIFF of any size (read in pieces, never loaded whole); .img, .asc and others are converted with GDAL. Demo data: 'Demo: catchment statistics' and 'Demo: polder drainage units' (tools/ababahika/data/demo/).",
+  "validation": [
+    "Reference implementations: rasterio 1.4 (geometry_mask, all_touched=False), NumPy Horn slope, shapely 2 intersections, pyproj Geod areas. Synthetic data from tests/make_data.py (seeded).",
+    "tests/zonal.test.mjs: 183/183 checks — identical cell counts, slope statistics to 1e-9°, class areas to 1e-6 m², soil overlay areas to 0.02 %, geodesic areas to 0.01 %.",
+    "tests/hydro.test.mjs (tests/make_hydro.py): 22/22 — exact fill identical to pysheds fill_depressions (3 926 raised cells); D8 identical to an independent NumPy D8 on every interior cell (pysheds 0.5 flowdir is unreliable under NumPy 2); flow accumulation identical to pysheds accumulation from the same directions; catchments identical to pysheds catchment.",
+    "tests/slope.test.mjs: slope rasters vs NumPy Horn, max difference 1e-6° (float32), identical NoData mask and georeferencing.",
+    "Demo polder (2 sluices): units 21.78 + 21.64 km² vs polder polygon 43.38 km².",
+    "Not yet validated: real Bangladeshi DEMs (SRTM/ALOS/FABDEM) against ArcGIS Pro outputs — recommended before first use in a report."
+  ],
+  "limitations": [
+    "D8 on a DEM alone is unreliable in floodplains and polders. Burn in embankments, sluices and khals, prefer a bare-earth DEM (survey/LiDAR, FABDEM), and read each unit's Flat % (cells with no lower neighbour) and Filled % (cells raised by depression filling): where they are high, the boundary was set by the filling algorithm, not the terrain.",
+    "GDAL tools copy inputs into memory: inputs + outputs must fit in roughly 2 GB.",
+    "Slope raster: up to 250 million cells (uncompressed output).",
+    "Hydrology holds the whole grid in memory: up to 40 million cells (e.g. 6 300 × 6 300; 190 km square at 30 m). Use a coarser cell size or clip the DEM for larger areas.",
+    "Not yet validated: real Bangladeshi DEMs (SRTM/ALOS/FABDEM) against ArcGIS Pro outputs — recommended before first use in a report."
+  ],
+  "cite": {
+    "text": "Joy, Mahfujur Rahman (2026). Ababahika: catchment slope, land-cover and soil statistics in the browser (version 0.2.0, released 2026-11-04).",
+    "cff": "tools/ababahika/CITATION.cff"
+  },
+  "license": { "name": "MIT", "path": "tools/ababahika/LICENSE" },
+  "repository": null,
+  "docs": [
+    { "label": "README", "path": "tools/ababahika/README.md" },
+    { "label": "Validation", "path": "tools/ababahika/docs/VALIDATION.md" },
+    { "label": "Citation (CFF)", "path": "tools/ababahika/CITATION.cff" },
+    { "label": "Licence", "path": "tools/ababahika/LICENSE" }
+  ],
+  "samples": [
+    { "label": "In-app button 'Demo: catchment statistics' — catchments (zipped shapefile)", "path": "tools/ababahika/data/demo/catchments.zip" },
+    { "label": "In-app button 'Demo: catchment statistics' — DEM (GeoTIFF)", "path": "tools/ababahika/data/demo/dem_utm.tif" },
+    { "label": "In-app button 'Demo: catchment statistics' — land cover (GeoTIFF, demo classes)", "path": "tools/ababahika/data/demo/lulc.tif" },
+    { "label": "In-app button 'Demo: catchment statistics' — soil polygons (zipped shapefile)", "path": "tools/ababahika/data/demo/soil_poly.zip" },
+    { "label": "In-app button 'Demo: polder drainage units' — polder DEM (GeoTIFF)", "path": "tools/ababahika/data/demo/polder_dem.tif" },
+    { "label": "In-app button 'Demo: polder drainage units' — embankment (GeoJSON)", "path": "tools/ababahika/data/demo/embankment.geojson" },
+    { "label": "In-app button 'Demo: polder drainage units' — sluices (GeoJSON)", "path": "tools/ababahika/data/demo/sluices.geojson" },
+    { "label": "In-app button 'Demo: polder drainage units' — khals (GeoJSON)", "path": "tools/ababahika/data/demo/khals.geojson" }
+  ],
+  "sources": {
+    "pageTitle": "tools/ababahika/index.html L6",
+    "version": "tools/ababahika/CITATION.cff L4; tools/ababahika/docs/VALIDATION.md L1; tools/ababahika/src/app/main.js L33",
+    "problem": "tools/ababahika/README.md L3-4",
+    "method": "tools/ababahika/README.md L9-10, L22-25",
+    "references": "tools/ababahika/src/app/tools.js L326 (references line of the generated methods paragraph)",
+    "data": "tools/ababahika/src/app/main.js L631 (Help dialog); tools/ababahika/index.html L59-60; tools/ababahika/src/app/main.js L120-121",
+    "validation": "tools/ababahika/docs/VALIDATION.md L3-4, L20, L33; tools/ababahika/README.md L29-31",
+    "limitations": "tools/ababahika/README.md L14-16, L19; tools/ababahika/docs/VALIDATION.md L20",
+    "cite": "tools/ababahika/CITATION.cff L3-9 (the CFF has no url or repository-code field)",
+    "license": "tools/ababahika/LICENSE L1; tools/ababahika/CITATION.cff L6",
+    "repository": "none stated (tools/ababahika/CITATION.cff has no repository-code)",
+    "samples": "tools/ababahika/index.html L59-60; tools/ababahika/src/app/main.js L117-126"
+  }
+}

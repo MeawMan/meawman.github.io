@@ -1,0 +1,62 @@
+{
+  "gaplens": {
+    "src": "assets/tools/gaplens.webp",
+    "w": 800,
+    "h": 500,
+    "alt": ""
+  },
+  "hydro-series": {
+    "src": "assets/tools/hydro-series.webp",
+    "w": 800,
+    "h": 500,
+    "alt": ""
+  },
+  "openffa": {
+    "src": "assets/tools/openffa.webp",
+    "w": 800,
+    "h": 500,
+    "alt": ""
+  },
+  "brishti-idf": {
+    "src": "assets/tools/brishti-idf.webp",
+    "w": 800,
+    "h": 500,
+    "alt": ""
+  },
+  "dependability": {
+    "src": "assets/tools/dependability.webp",
+    "w": 800,
+    "h": 500,
+    "alt": ""
+  },
+  "cn-calculator": {
+    "src": "assets/tools/cn-calculator.webp",
+    "w": 800,
+    "h": 500,
+    "alt": ""
+  },
+  "river-profile": {
+    "src": "assets/tools/river-profile.webp",
+    "w": 800,
+    "h": 500,
+    "alt": ""
+  },
+  "ababahika": {
+    "src": "assets/tools/ababahika.webp",
+    "w": 800,
+    "h": 500,
+    "alt": ""
+  },
+  "hydro-ml": {
+    "src": "assets/tools/hydro-ml.webp",
+    "w": 800,
+    "h": 500,
+    "alt": ""
+  },
+  "dsbc": {
+    "src": "assets/tools/dsbc.webp",
+    "w": 800,
+    "h": 500,
+    "alt": ""
+  }
+}

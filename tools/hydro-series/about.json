@@ -1,0 +1,45 @@
+{
+  "slug": "hydro-series",
+  "pageTitle": "Hydro-Series Toolkit — Min-Max-Avg & Series Generator · Mahfujur Rahman Joy",
+  "version": null,
+  "problem": "Min-Max-Avg Terminal — daily, monthly and yearly minimum, maximum and average from any date + value series (water level, discharge, rainfall…). Export to Excel. Series Generator — fills missing values and extends a record by years, learning its seasonality, spread and day-to-day memory. Includes an accuracy test.",
+  "method": [
+    "The generator learns the seasonal pattern, the spread, the shape of the distribution and the day-to-day memory of your series, then fills the holes inside it or adds years before or after it.",
+    "Fill missing values: fills the holes inside the record. The best estimate follows the seasonal pattern and the day-to-day memory of your series, anchored to the values on both sides of each hole. Real data is never changed. Methods: Best estimate (model); Realistic (random, keeps variability); Straight line between neighbours; Seasonal average.",
+    "Accuracy test: hides parts of your real record that are known, fills them again with the model and compares with the truth. Shows how far to trust the filled values for holes of that length.",
+    "Extend the series: creates new years that behave like your record: the same seasonal pattern, spread, distribution and day-to-day memory. It continues from the last (or first) real value.",
+    "Statistical model builds new values from what it learned about your series (seasonal level and spread, distribution, day-to-day memory). Repeat real years copies whole real years, chosen at random for each new year: exact real values, but nothing new can appear.",
+    "Transform: how values are treated before learning. Auto uses a log scale for flow-like data (never negative, long upper tail, as in discharge) and no transform for levels. Generated flows never go below zero.",
+    "Random seed: a number that fixes the random draw. Same seed and same settings give the same result every time."
+  ],
+  "references": null,
+  "data": "An .xlsx, .csv or .txt file with one date column and one value column. Dates such as 2024-01-31 06:00 or 31-JAN-2024 06:00:00 AM both work. The columns are found automatically. For the generator: river discharge or water level, daily or monthly, 5 years or more is best; a workbook with several sheets can be processed in one go. 'Try an example' loads a built-in series marked 'EXAMPLE · SYNTHETIC DATA'.",
+  "validation": null,
+  "limitations": [
+    "These are plausible synthetic years, not forecasts.",
+    "Repeat real years copies whole real years, chosen at random for each new year: exact real values, but nothing new can appear.",
+    "River discharge or water level, daily or monthly, 5 years or more is best."
+  ],
+  "cite": null,
+  "license": null,
+  "repository": null,
+  "docs": [],
+  "samples": [
+    { "label": "Min-Max-Avg: in-app buttons 'Try an example' / 'Example' (built-in series, badge 'EXAMPLE · SYNTHETIC DATA')", "path": null },
+    { "label": "Series Generator: in-app buttons 'Try an example' / 'Example' (built-in series)", "path": null }
+  ],
+  "sources": {
+    "pageTitle": "tools/hydro-series/index.html L6",
+    "version": "none stated",
+    "problem": "tools/hydro-series/index.html L47-48",
+    "method": "tools/hydro-series/index.html L347, L387, L390-393, L402, L411, L435, L439-440",
+    "references": "none in the tool",
+    "data": "tools/hydro-series/index.html L282, L286, L292, L347",
+    "validation": "not documented anywhere (the in-app 'Accuracy test', L400-402, tests the user's own record; it is not a validation of the tool)",
+    "limitations": "tools/hydro-series/index.html L347, L411, L435 (in-app help text; there is no limitations document)",
+    "cite": "no CITATION.cff",
+    "license": "no LICENSE file",
+    "repository": "none stated",
+    "samples": "tools/hydro-series/index.html L275, L286, L292, L340, L352"
+  }
+}

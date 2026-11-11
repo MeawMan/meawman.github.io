@@ -1,0 +1,52 @@
+{
+  "slug": "hydro-ml",
+  "pageTitle": "Hydro ML Studio — machine learning for water level, discharge & rainfall · Mahfujur Rahman Joy",
+  "version": null,
+  "problem": "Train and compare machine-learning models to simulate or forecast water level, discharge or rainfall. Lag features, eight models (SVR, random forest, gradient boosting, neural network and more), cross-validation, automatic tuning and hydrology metrics.",
+  "method": [
+    "Simulate: inputs at the same time step are known, e.g. rebuilding a missing record from rainfall on the same day. Forecast: only data at least h steps old may be used, so the model predicts the target h steps ahead — the honest setting for early warning.",
+    "Lag analysis: for an input, cross-correlation with the target at each lag — peaks show the travel time. For the target itself: partial autocorrelation (PACF), the extra information each past value adds once the shorter lags are known. Computed on the training period only.",
+    "Splitting the record: the model learns from the training part and is judged on the test part it never saw. Keep the split chronological for time series: random rows let the model peek at the day before and after, which makes scores look better than they really are.",
+    "Which models? Start with the baselines (persistence, climatology): a useful model must beat them. Tree ensembles (random forest, extra trees, gradient boosting) and SVR are usually the strongest on hydrological data; linear regression is the easiest to explain. Train several and compare.",
+    "Cross-validation: repeats training and testing on different slices of the training period to see how stable a model is. Time-series: each fold trains on the past and tests on the next block (no peeking ahead). Blocked k-fold: the record is cut into k blocks and each block is tested once.",
+    "Search methods: Grid search tries every combination of the listed values — thorough but slow. Random search samples combinations at random — often as good with far fewer trials. Bayesian optimisation fits a Gaussian-process model of score vs settings and picks the next trial where improvement is most likely (expected improvement) — usually the fewest trials.",
+    "Performance was evaluated with the Nash–Sutcliffe efficiency (NSE; Nash and Sutcliffe, 1970), the Kling–Gupta efficiency (KGE; Gupta et al., 2009), the coefficient of determination (R²), RMSE, MAE, percent bias (PBIAS) and the RMSE–observations standard deviation ratio (RSR).",
+    "Importance methods: Built-in comes from the model itself (how much the trees’ splits on a feature reduce error, or standardized coefficients for linear models). Permutation shuffles one feature at a time on the test period and measures the drop in NSE — slower, but works for every model and is easier to compare."
+  ],
+  "references": [
+    "Gupta, H. V., Kling, H., Yilmaz, K. K., & Martinez, G. F. (2009). Decomposition of the mean squared error and NSE performance criteria. Journal of Hydrology, 377(1–2), 80–91.",
+    "Moriasi, D. N., et al. (2007). Model evaluation guidelines for systematic quantification of accuracy in watershed simulations. Transactions of the ASABE, 50(3), 885–900.",
+    "Nash, J. E., & Sutcliffe, J. V. (1970). River flow forecasting through conceptual models part I. Journal of Hydrology, 10(3), 282–290.",
+    "Joy, M. R. (2026). Hydro ML Studio [Software]. https://meawman.github.io/tools/hydro-ml/"
+  ],
+  "data": "An .xlsx, .csv or .txt file with a date column and one or more numeric columns — for example daily rainfall, upstream water level and the downstream water level you want to predict. Dates and numbers are detected automatically. BWDB downloads list each day several times: REGULAR readings plus HIGH and LOW tide / peak readings; keeping only REGULAR rows gives one consistent reading per time step. 'Try an example' loads a built-in example marked 'EXAMPLE · SYNTHETIC DATA'.",
+  "validation": null,
+  "limitations": [
+    "Ratings combine NSE, RSR and PBIAS thresholds of Moriasi et al. (2007), written for monthly streamflow — use them as a guide for other variables and time steps.",
+    "Linear regression: cannot capture thresholds or non-linear runoff on its own.",
+    "K-nearest neighbours: simple and assumption-free, but cannot predict beyond the range it has seen (e.g. a record flood) and slows down on long records.",
+    "Neural network (multi-layer perceptron): flexible and smooth but needs more data and is more sensitive to settings.",
+    "Models that use past target values fill gaps recursively: each predicted step feeds the next one."
+  ],
+  "cite": null,
+  "license": null,
+  "repository": null,
+  "docs": [],
+  "samples": [
+    { "label": "In-app button 'Try an example' (synthetic catchment generated in the page: two rain gauges, upstream water level, temperature and downstream discharge; badge 'EXAMPLE · SYNTHETIC DATA')", "path": null }
+  ],
+  "sources": {
+    "pageTitle": "tools/hydro-ml/index.html L6",
+    "version": "none stated (the 'version: 1' fields in app.js L1397/L1405 are export-file format versions, not a tool version)",
+    "problem": "tools/hydro-ml/index.html L52",
+    "method": "tools/hydro-ml/app.js INFO list L69, L75, L78, L81, L82, L84, L97; methods-paragraph generator app.js L1525",
+    "references": "tools/hydro-ml/app.js L1527 (References block of the generated methods paragraph)",
+    "data": "tools/hydro-ml/index.html L64, L68, L75; tools/hydro-ml/app.js L63",
+    "validation": "not documented anywhere",
+    "limitations": "tools/hydro-ml/app.js L1061 (rating note), MODEL_INFO L107, L108, L114, INFO L101 (in-app info tooltips; there is no limitations document)",
+    "cite": "no CITATION.cff (the in-app methods paragraph cites 'Joy, M. R. (2026). Hydro ML Studio [Software]', app.js L1527)",
+    "license": "no LICENSE file",
+    "repository": "none stated",
+    "samples": "tools/hydro-ml/index.html L68, L75; tools/hydro-ml/app.js L1531-1535"
+  }
+}

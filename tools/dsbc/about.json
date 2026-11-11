@@ -1,0 +1,68 @@
+{
+  "slug": "dsbc",
+  "pageTitle": "DSBC Studio — downscaling and bias correction · Mahfujur Rahman Joy",
+  "version": "0.1.0",
+  "problem": "Calibrate on the past, correct the future. Statistical downscaling and bias correction for daily, weekly or monthly climate series, with honest validation. Everything runs in this browser tab; your files are never uploaded.",
+  "method": [
+    "Screen predictors with partial informational correlation, train and honestly validate 11 regression models, then correct climate-model runs with 10 univariate and 5 multivariate methods, checking that each correction keeps the model's projected change.",
+    "Partial informational correlation (PIC): how much new information a candidate adds about the local variable once the already selected predictors are known. It is based on mutual information, so curved and threshold relationships count too, and redundant predictors (mean, maximum and minimum temperature together) score low. Sharma & Mehrotra (2014).",
+    "Validation scheme: Blocked K-fold cuts the record into K blocks of whole years; each block is predicted by a model trained on the others. Hold-out trains on the first part and tests on the last. Expanding window always trains on the past and tests the next block, like a forecast.",
+    "Hyperparameter tuning: settings such as the number of neighbours or the depth of trees are chosen inside each training fold, with a time-ordered 3-fold cross-validation of the training data only, so test data never influence them.",
+    "Every bias correction is calibrated on the overlap of observations and the historical run and applied with those fixed parameters to the future. Standardising a future series with its own mean and spread removes the projected change entirely.",
+    "Daily, weekly and monthly data are handled at their own time step and can be aggregated to a coarser one in each step (rainfall-like variables are summed, others averaged). Nested methods correct the data's own step first and then the coarser ones (for daily data: day, month, year); for daily rainfall the daily level only rescales amounts, so dry days stay dry.",
+    "Downscaling skill is judged on years the model has not seen and against a forecast that repeats the average seasonal cycle (calendar-month means, or a smoothed day-of-year cycle for daily data), because the seasonal cycle alone gives high R² for most hydro-climatic variables.",
+    "Python methods run locally through Pyodide; source code and Jupyter workflow in the accompanying dsbc package."
+  ],
+  "references": [
+    "Linear scaling: Lenderink et al. (2007); Teutschbein & Seibert (2012)",
+    "Empirical quantile mapping (EQM): Panofsky & Brier (1968); Gudmundsson et al. (2012)",
+    "Quantile delta mapping (QDM): Cannon et al. (2015); port of R package MBC",
+    "Scaled distribution mapping (SDM): Switanek et al. (2017)",
+    "CDF-transform (CDF-t): Michelangeli et al. (2009)",
+    "Nested bias correction (NBC): Johnson & Sharma (2012)",
+    "MRNBC (multivariate recursive nested): Mehrotra & Sharma (2015, 2016)",
+    "MBCp (Pearson), MBCr (Spearman): Cannon (2016)",
+    "MBCn (N-pdf transform): Cannon (2018)",
+    "R2D2 (rank resampling): Vrac (2018)",
+    "PIC-weighted k-NN (NPRED): Sharma & Mehrotra (2014); Sharma et al. (2016)",
+    "Multiple linear regression: SDSM-type regression (Wilby et al., 2002)"
+  ],
+  "data": "Use CSV or Excel files with a date column and one column per variable, at a daily, weekly or monthly time step. Each Excel sheet is read as one station. Demo data: the demo is set up like a real study, with invented daily data: rain-gauge and thermometer records at two stations (1991 to 2020), ERA5-style large-scale predictors over each station, and a CMIP6-style historical and SSP5-8.5 run.",
+  "validation": [
+    "Each method was implemented from its original paper or translated from the authors' code, and checked against independent reference implementations.",
+    "Linear and variance scaling: identical to python-cmethods 2.3 (maximum difference 0.0000).",
+    "Scaled distribution mapping, CDF-t: identical to ibicus 1.3 with running windows switched off (maximum difference 0.0000).",
+    "Empirical quantile mapping, QDM: agree with xsdba (xclim) at r = 0.9997; differences come from where quantile nodes are placed. QDM, MBCp, MBCr, MBCn and R2D2 are translations of A. J. Cannon's R package MBC 0.10-8.",
+    "MRNBC: independent implementation from Mehrotra and Sharma (2015, 2016, 2021). On the UNSW MBC package's monthly rainfall example (15 sites, 70 years) the corrected series correlate with the UNSW output at r = 0.98 (calibration) and 0.91 (validation), with similar errors in means, spreads, lag-1 and cross-correlations.",
+    "PIC: implemented from Sharma and Mehrotra (2014); on synthetic data it selects the true non-linear drivers and rejects redundant and irrelevant candidates."
+  ],
+  "limitations": [
+    "Climate-model data on a 360-day calendar must be converted to real dates first; no-leap calendars work as they are.",
+    "With long daily records, settings are tuned on at most 3,000 evenly spaced values, SVR, Gaussian processes and PIC-kNN are fitted on a thinned sample, and each tree of a forest sees 3,000 values, so the browser stays responsive.",
+    "PIC: long daily records are estimated on a random sample of 800 time steps.",
+    "Nested bias correction rescales year-to-year variability, which also rescales trends. The default here removes the model's smooth 21-year climate signal before correcting and puts it back afterwards; the original behaviour is available for comparison.",
+    "The first visit downloads about 40 MB; the browser caches it for later visits. Pyodide loads from cdn.jsdelivr.net.",
+    "Demo data are invented with random numbers, but laid out like a real study."
+  ],
+  "cite": null,
+  "license": null,
+  "repository": null,
+  "docs": [],
+  "samples": [
+    { "label": "In-app button 'Load demo data' (invented daily data generated by the Python engine: observed stations, ERA5-style predictors, CMIP6-style historical and SSP5-8.5 run)", "path": null }
+  ],
+  "sources": {
+    "pageTitle": "tools/dsbc/index.html L6",
+    "version": "tools/dsbc/index.html L729 (embedded Python package file dsbc/__init__.py: __version__ = \"0.1.0\"). The page itself shows no studio version.",
+    "problem": "tools/dsbc/index.html L380",
+    "method": "data/content.json at git HEAD 8401abc, L457 (DSBC Studio description); tools/dsbc/index.html L646, L750, L761, L765, L2105, L2107, L2109",
+    "references": "tools/dsbc/index.html L729 (embedded Python catalogues shown in the 'Reference' column of the in-app 'Methods and validation' view, rendered at L2087-2094): dsbc/bias_correction/univariate.py L300-326, dsbc/bias_correction/__init__.py L25-33, dsbc/bias_correction/multivariate_cannon.py L190-193, dsbc/downscaling.py L50-51, L62-63. Only author–year citations exist; no full bibliographic entries.",
+    "data": "tools/dsbc/index.html L405, L415-416",
+    "validation": "tools/dsbc/index.html L638, L2096-2102 ('How the implementations were checked')",
+    "limitations": "tools/dsbc/index.html L661, L738-739, L750, L2106, L2109, L2259 (in-app help and 'Design choices that matter for projections'; there is no limitations document)",
+    "cite": "no CITATION.cff (footer L646 says: 'Cite the original method papers listed under Methods and validation.')",
+    "license": "no LICENSE file",
+    "repository": "none stated (footer L646 mentions an 'accompanying dsbc package' without a URL)",
+    "samples": "tools/dsbc/index.html L415-416, L739, L2176-2177"
+  }
+}

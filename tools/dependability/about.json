@@ -1,0 +1,37 @@
+{
+  "slug": "dependability",
+  "pageTitle": "Dependability Analyzer — dependable water level, flow & rainfall · Mahfujur Rahman Joy",
+  "version": null,
+  "problem": "Dependable water levels, flows and rainfall from long records. Filter years and months, convert the datum, rank with a plotting position, and take report-ready figures and tables into your report.",
+  "method": [
+    "Each ranked value gets a plotting position. Weibull (the default, as in the report workbook) is D = R × 100 / (n + 1); Gringorten, Cunnane and Hazen use D = (R − a) × 100 / (n + 1 − 2a) with a = 0.44, 0.4 and 0.5. Low side is ranked high to low, high side low to high.",
+    "The value at P is taken at rank ROUND(P/100 × (n + 1 − 2a) + a), which for Weibull is the report's ROUND(P/100 × (n+1)), or interpolated between ranks if you choose that.",
+    "With one value per year, \"dependable value in the year\" uses the same rule inside each year, then the years are ranked.",
+    "Low side: value equalled or exceeded P % of the time (dependable flow, dependable low level). High side: value not exceeded P % of the time (dependable high level)."
+  ],
+  "references": null,
+  "data": "Excel (.xlsx) or CSV: daily, monthly or yearly values with a date column, Year and Month columns, or a Year × Jan…Dec table. BWDB files repeat readings as HIGH / LOW rows; keep only the regular ones. 'Try an example series' loads a made-up example series, not real measurements.",
+  "validation": null,
+  "limitations": null,
+  "cite": null,
+  "license": null,
+  "repository": null,
+  "docs": [],
+  "samples": [
+    { "label": "In-app button 'Try an example series' (a made-up example series, not real measurements; generated in the page)", "path": null }
+  ],
+  "sources": {
+    "pageTitle": "tools/dependability/index.html L6",
+    "version": "none stated",
+    "problem": "tools/dependability/index.html L188",
+    "method": "tools/dependability/index.html L285-286, L353-355 ('How the numbers are worked out')",
+    "references": "none in the tool (plotting positions are named only: Weibull, Gringorten, Cunnane, Hazen, L316-319)",
+    "data": "tools/dependability/index.html L202, L239, L242, L707",
+    "validation": "not documented anywhere",
+    "limitations": "not documented anywhere",
+    "cite": "no CITATION.cff",
+    "license": "no LICENSE file",
+    "repository": "none stated",
+    "samples": "tools/dependability/index.html L242, L695-699, L707"
+  }
+}

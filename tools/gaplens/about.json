@@ -1,0 +1,53 @@
+{
+  "slug": "gaplens",
+  "pageTitle": "GapLens — find, fill and compare gaps in hydroclimate records · Mahfujur Rahman Joy",
+  "version": "0.0.1",
+  "problem": "Find, fill and compare gaps in hydroclimate records. Load a streamflow, water-level, rainfall or groundwater record with its neighbours and GapLens maps the gaps, recommends methods, ranks 70+ filling methods by hiding real observations and scoring how well each one restores them, and fills the record.",
+  "method": [
+    "Diagnose: which kinds of gap the record contains, and what they may mean for the choice of method.",
+    "Suggest: methods ranked for the gap types found. The score adds the usual choice for this kind of variable, how well the method suits the gap types found, gap length, available neighbours and special rules. This is advice before testing.",
+    "Compare: observed values are hidden in blocks of several lengths (or in blocks like your real gaps), every method fills them, and the result is scored against what was hidden. Real gaps are never scored.",
+    "Fill: methods are applied in order: the first fills every gap it can, the next fills what is left. Observed values are never changed. Every filled value is flagged in the file you download.",
+    "Validate two series: for an observation and a simulation (model output, a product, a second gauge, a rating curve). The tool aligns them, looks for a time lag, a unit factor or a datum offset, then reports metrics with block-bootstrap intervals and qualitative ratings, and tests which correction helps under cross-validation.",
+    "Calibrate: fit the parameters of a power-law rating curve, a linear reservoir or GR4J to an observed series, with split-sample or cross-validation.",
+    "Rating curve: fit a stage-discharge curve to gaugings, adjust it by hand against the gaugings, and use it to fill or convert a record. Includes automatic segments and year-by-year curves.",
+    "Runs in your browser with Python (Pyodide): the page's /api/ requests are answered by the real gaplens Python package, running in a Web Worker with Pyodide, instead of a server."
+  ],
+  "references": null,
+  "data": "One date column, then one column per series: the series to fill, neighbouring stations, drivers. A missing value can be empty, NaN or a code such as -999; the diagnosis finds such codes. Excel files and hydrometric downloads (for example BWDB) also work: title rows, HIGH / LOW rows, a separate time column and serial-number columns are handled, and irregular readings within a day become daily means. Built-in examples: synthetic records with known true values, so a fill can be checked against the truth.",
+  "validation": null,
+  "limitations": [
+    "Whether gaps are random (MCAR), depend on other observed values (MAR) or on the missing value itself (MNAR) cannot be proven from the data. The tool reports what the tests allow and flags a suspicion of MNAR when gaps sit next to extremes.",
+    "Methods ranked for the gap types found: this is advice before testing.",
+    "The first visit downloads about 40 MB (Python, numpy, pandas, scipy, scikit-learn, statsmodels). Later visits load from the browser cache.",
+    "The page needs an internet connection on the first visit to load Python from cdn.jsdelivr.net.",
+    "Every example is synthetic."
+  ],
+  "cite": null,
+  "license": null,
+  "repository": null,
+  "docs": [],
+  "samples": [
+    { "label": "Example 'rainfall network': Daily rainfall at six stations; the target has short runs and two long blocks, and a gridded product is attached (in-app 'Load example', synthetic)", "path": null },
+    { "label": "Example 'streamflow gauges': Daily discharge at four gauges; the target has short runs, long blocks and gaps next to floods; areal rainfall is attached (in-app 'Load example', synthetic)", "path": null },
+    { "label": "Example 'temperature network': Daily mean temperature at five stations with different elevations (in-app 'Load example', synthetic)", "path": null },
+    { "label": "Example 'tide hourly': Hourly tide gauge record for one year with a 12-day and a 40-day outage and river discharge as a covariate (in-app 'Load example', synthetic)", "path": null },
+    { "label": "Example 'groundwater logger': Daily groundwater head with logger failures; rainfall is attached (in-app 'Load example', synthetic)", "path": null },
+    { "label": "Example 'sediment samples': Weekly suspended-sediment samples with continuous discharge and turbidity (in-app 'Load example', synthetic)", "path": null },
+    { "label": "Example 'rating curve': Daily discharge from stage through a changing rating, with gaugings and long outage (in-app 'Load example', synthetic)", "path": null }
+  ],
+  "sources": {
+    "pageTitle": "tools/gaplens/index.html L6",
+    "version": "tools/gaplens/gaplens.zip → gaplens/__init__.py L3 (__version__ = \"0.0.1\"; shown on the in-app Methods tab as 'gaplens <version>', index.html L991). No separate tool version is stated.",
+    "problem": "tools/gaplens/index.html L237 (tagline); data/content.json at git HEAD 8401abc, L214 (GapLens description)",
+    "method": "tools/gaplens/index.html L402-407 (PAGES), L565, L581, L618, L649, L657; data/content.json at git HEAD 8401abc, L214; tools/gaplens/index.html L240; tools/gaplens/bridge.js L1-2",
+    "references": "none in the page (the method catalogue is served at run time by the Python package and lists no literature)",
+    "data": "tools/gaplens/index.html L455, L458",
+    "validation": "not documented anywhere",
+    "limitations": "tools/gaplens/index.html L403, L545; tools/gaplens/bridge.js L17, L50; tools/gaplens/gaplens.zip → gaplens/samples.py L9 (there is no limitations document)",
+    "cite": "no CITATION.cff",
+    "license": "no LICENSE file",
+    "repository": "none stated",
+    "samples": "tools/gaplens/gaplens.zip → gaplens/samples.py L20-28 (NAMES, listed in the 'Example' drop-down); tools/gaplens/index.html L457-459, L466-467"
+  }
+}
