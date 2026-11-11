@@ -6,8 +6,16 @@ export const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => 
 /** Escaped text with **bold** spans. */
 export const md = (s) => esc(s).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
 
-/** Allow web, mail, phone and relative links; block script and data URLs. */
-export const safeUrl = (u) => (u && !/^\s*(javascript|data|vbscript):/i.test(u) ? String(u) : '#');
+/** Allow http(s), mailto, tel and relative links only; control characters and whitespace are removed first. */
+export function safeUrl(u) {
+  const s = String(u == null ? '' : u).replace(/[\u0000-\u0020\u007f-\u009f]/g, '');
+  if (!s) return '#';
+  // a scheme is allowed only if it is http, https, mailto or tel; everything else must be a relative path or fragment
+  return /^[a-z][a-z0-9+.-]*:/i.test(s) && !/^(https?|mailto|tel):/i.test(s) ? '#' : s;
+}
+
+/** Escaped text with Bengali runs marked up as lang="bn" (WCAG 3.1.2). */
+export const escBn = (s) => esc(s).replace(/[\u0980-\u09FF]+/g, '<span lang="bn">$&</span>');
 
 export const slugify = (s) => String(s).toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 

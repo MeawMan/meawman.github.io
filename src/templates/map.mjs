@@ -31,7 +31,7 @@ export function mapSprite(geo) {
     '<path class="map-land" d="' + land + '"/>' +
     '<path class="map-river minor" d="' + minor + '"/>' +
     '<path class="map-river" d="' + major + '"/>' +
-    label(89.95, 24.75, 'Jamuna') + label(88.72, 23.8, 'Padma') + label(90.95, 23.35, 'Meghna') + label(90.15, 21.05, 'Bay of Bengal', ' sea') +
+    label(89.95, 24.75, 'Jamuna') + label(89.12, 23.72, 'Padma') + label(90.95, 23.35, 'Meghna') + label(89.35, 20.95, 'Bay of Bengal', ' sea') +
     '</g></defs></svg>';
 }
 
@@ -50,8 +50,12 @@ export function sitesMap(data, geo) {
   if (!geo) return '';
   const { pt, width, height } = projector(geo);
   const sites = data.studyAreas || [];
+  const placed = [];
   const pins = sites.map((s, i) => {
-    const [x, y] = pt(s.lon, s.lat);
+    let [x, y] = pt(s.lon, s.lat);
+    // markers closer than their own width are moved apart so both numbers stay readable
+    for (const q of placed) if (Math.hypot(q[0] - x, q[1] - y) < 19) { x = q[0] + 14; y = q[1] + 14; }
+    placed.push([x, y]);
     return '<a class="map-pin' + (s.current ? ' now' : '') + '" href="#site-' + (i + 1) + '" tabindex="-1" data-site="' + (i + 1) + '">' +
       '<circle class="hit" cx="' + f(x) + '" cy="' + f(y) + '" r="11"/><circle class="ring" cx="' + f(x) + '" cy="' + f(y) + '" r="9"/>' +
       '<text x="' + f(x) + '" y="' + f(y + 4.2) + '">' + (i + 1) + '</text><title>' + esc(s.name) + '</title></a>';

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-11T14:00:49.067Z",
+  "generatedAt": "2026-11-11T14:30:33.269Z",
   "root": ".",
   "site": "https://meawman.github.io",
   "pagesChecked": [
@@ -34,8 +34,8 @@
   "pages": [
     {
       "page": "index.html",
-      "links": 137,
-      "internal": 112,
+      "links": 136,
+      "internal": 111,
       "external": 22,
       "skipped": 3,
       "broken": []
@@ -511,8 +511,8 @@
   ],
   "summary": {
     "pages": 24,
-    "links": 774,
-    "internal": 674,
+    "links": 773,
+    "internal": 673,
     "externalUnique": 39,
     "brokenInternal": 0,
     "externalChecked": false,

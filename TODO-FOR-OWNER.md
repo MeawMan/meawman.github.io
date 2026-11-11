@@ -33,3 +33,10 @@ Nothing here was guessed or filled in. Each item says what to provide and where 
 
 19. **Bangla text.** The Bengali font holds only the letters used today. After adding Bangla text with new letters, run `node scripts/fonts/fetch.mjs` (other letters still display, in a system font).
 20. **Custom domain.** If you add one, change `meta.siteUrl` in the admin editor (SEO section); canonical links, the sitemap and structured data follow on the next build. Update `robots.txt` by hand.
+
+## From the independent review
+
+21. **Hidden papers are still readable in `data/content.json`.** They are on no page, but the JSON file is public. If that matters before they are published, delete the two entries and re-add them later.
+22. **Accessibility inside the tools' own interfaces** was not changed: colour contrast of some muted and accent text (1–13 elements per tool in the light theme), two ARIA attributes in Ababahika, an unlabelled plot and a scrollable preview in River Profile Studio, and no `<main>` landmark in Composite CN Calculator, Dependability Analyzer and Hydro-Series Toolkit. Details in [docs/REVIEW.md](docs/REVIEW.md).
+23. **Tool interfaces still load Google Fonts**, and the theme toggle is worded differently from tool to tool. Self-hosting those fonts and unifying the toggle are follow-ups.
+24. **Tool screenshots** show each tool's start screen in the light theme. Capturing them with a sample loaded would show more; `scripts/shots.mjs` is the place.

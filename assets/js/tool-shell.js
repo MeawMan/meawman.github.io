@@ -64,4 +64,18 @@
     }
     sync();
   }
+/* ---- skip link: added where the page has none; targets <main>, or the first block after the header ---- */
+  const bar = document.querySelector('.ts-bar');
+  if (bar && !document.querySelector('a.skip, a.ts-skip, a.skip-link')) {
+    const target = document.querySelector('main') || bar.nextElementSibling;
+    if (target) {
+      if (!target.id) target.id = 'ts-main';
+      if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
+      const a = document.createElement('a');
+      a.className = 'ts-skip';
+      a.href = '#' + target.id;
+      a.textContent = 'Skip to the tool';
+      document.body.insertBefore(a, document.body.firstChild);
+    }
+  }
 })();

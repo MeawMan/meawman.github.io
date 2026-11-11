@@ -160,3 +160,7 @@ html[data-theme='light']:where(:not(.ts-only)) .badge { color: #fff; }
   footer.ts-foot.ts-foot--slim p { display: none; }
 }
 @media print { .ts-bar, .ts-intro, .ts-foot { display: none !important; } }
+
+/* skip link (added by tool-shell.js on pages without one) */
+.ts-skip { position: absolute; left: 12px; top: -64px; z-index: 100; padding: 10px 16px; border-radius: 3px; background: #17232d; color: #f7f5ef; font: 500 15px/1.2 'IBM Plex Sans', system-ui, sans-serif; text-decoration: none; }
+.ts-skip:focus { top: 12px; }

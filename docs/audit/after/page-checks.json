@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-11T14:05:01.824Z",
+  "generatedAt": "2026-11-11T18:57:27.239Z",
   "base": "http://127.0.0.1:4173",
   "theme": "light",
   "settleMs": 4500,
@@ -25,8 +25,8 @@
             "html": "visible",
             "body": "visible"
           },
-          "pageHeight": 18521,
-          "domElements": 821,
+          "pageHeight": 18357,
+          "domElements": 829,
           "appliedTheme": null,
           "h1Count": 1,
           "h1Visible": 1,
@@ -99,7 +99,7 @@
             "h2: References",
             "h2: Contact"
           ],
-          "visibleTextNodes": 447,
+          "visibleTextNodes": 457,
           "smallText": {
             "count": 0,
             "chars": 0,
@@ -118,21 +118,21 @@
           "opaqueFixedOverlay": false,
           "renderBlockingStylesheets": [
             {
-              "href": "http://127.0.0.1:4173/assets/dist/site.3e2eb641d4.css",
+              "href": "http://127.0.0.1:4173/assets/dist/site.1580bc98c5.css",
               "external": false,
               "inHead": true
             }
           ],
           "renderBlockingHeadScripts": [],
-          "bodyTextLength": 16164,
-          "bodyTextSample": "Jamuna Padma Meghna Bay of Bengal Skip to content Mahfujur Rahman Joy Menu WATER RESOURCES ENGINEER · DHAKA, BANGLADESH Mahfujur Rahman Joy Civil & Environmenta",
+          "bodyTextLength": 16847,
+          "bodyTextSample": "Jamuna Padma Meghna Bay of Bengal Skip to content Mahfujur Rahman Joy Menu WATER RESOURCES ENGINEER · DHAKA, BANGLADESH Mahfujur Rahman Joy Research Consultant,",
           "hasVisibleH1WithText": true,
-          "linkCount": 114,
+          "linkCount": 113,
           "consoleErrors": [],
           "pageErrors": [],
           "failedRequests": [],
           "requestCount": 8,
-          "transferredBytes": 128882,
+          "transferredBytes": 129308,
           "externalHosts": {},
           "fontHosts": [
             "127.0.0.1:4173"
@@ -156,7 +156,7 @@
             },
             {
               "url": "/",
-              "bytes": 21687,
+              "bytes": 21894,
               "type": "document"
             },
             {
@@ -182,8 +182,8 @@
             "html": "visible",
             "body": "visible"
           },
-          "pageHeight": 11244,
-          "domElements": 821,
+          "pageHeight": 11158,
+          "domElements": 829,
           "appliedTheme": null,
           "h1Count": 1,
           "h1Visible": 1,
@@ -256,7 +256,7 @@
             "h2: References",
             "h2: Contact"
           ],
-          "visibleTextNodes": 453,
+          "visibleTextNodes": 463,
           "smallText": {
             "count": 0,
             "chars": 0,
@@ -265,17 +265,11 @@
             "top": []
           },
           "targets": {
-            "total": 116,
+            "total": 115,
             "under24": 3,
-            "under24ExcludingInlineLinks": 3,
+            "under24ExcludingInlineLinks": 2,
             "failingSpacingException": 0,
             "examples": [
-              {
-                "selector": "figcaption > a",
-                "size": "450x22.4",
-                "text": "See the list",
-                "inlineLink": false
-              },
               {
                 "selector": "h4 > a",
                 "size": "788.6x19",
@@ -294,21 +288,21 @@
           "opaqueFixedOverlay": false,
           "renderBlockingStylesheets": [
             {
-              "href": "http://127.0.0.1:4173/assets/dist/site.3e2eb641d4.css",
+              "href": "http://127.0.0.1:4173/assets/dist/site.1580bc98c5.css",
               "external": false,
               "inHead": true
             }
           ],
           "renderBlockingHeadScripts": [],
-          "bodyTextLength": 16302,
+          "bodyTextLength": 16985,
           "bodyTextSample": "Jamuna Padma Meghna Bay of Bengal Skip to content Mahfujur Rahman Joy Publications Tools Experience Education Contact WATER RESOURCES ENGINEER · DHAKA, BANGLADE",
           "hasVisibleH1WithText": true,
-          "linkCount": 114,
+          "linkCount": 113,
           "consoleErrors": [],
           "pageErrors": [],
           "failedRequests": [],
           "requestCount": 8,
-          "transferredBytes": 128882,
+          "transferredBytes": 129308,
           "externalHosts": {},
           "fontHosts": [
             "127.0.0.1:4173"
@@ -332,7 +326,7 @@
             },
             {
               "url": "/",
-              "bytes": 21687,
+              "bytes": 21894,
               "type": "document"
             },
             {
@@ -347,7 +341,7 @@
         "375x812": {
           "viewport": "375x812",
           "viewportName": "mobile",
-          "bodyTextLength": 16188,
+          "bodyTextLength": 16871,
           "bodyTextSample": "Jamuna Padma Meghna Bay of Bengal Skip to content Mahfujur Rahman Joy Publications Tools Experience Education Contact WATER RESOURCES ENGINEER · DHAKA, BANGLADE",
           "hasVisibleH1WithText": true,
           "h1Count": 1,
@@ -356,16 +350,16 @@
             "Mahfujur Rahman Joy"
           ],
           "headingCount": 62,
-          "linkCount": 114,
+          "linkCount": 113,
           "fixedCoveringViewport": [],
           "opaqueFixedOverlay": false,
-          "pageHeight": 18565,
+          "pageHeight": 18401,
           "horizontalOverflowPx": 0
         },
         "1366x900": {
           "viewport": "1366x900",
           "viewportName": "desktop",
-          "bodyTextLength": 16283,
+          "bodyTextLength": 16966,
           "bodyTextSample": "Jamuna Padma Meghna Bay of Bengal Skip to content Mahfujur Rahman Joy Publications Tools Experience Education Contact WATER RESOURCES ENGINEER · DHAKA, BANGLADE",
           "hasVisibleH1WithText": true,
           "h1Count": 1,
@@ -374,10 +368,10 @@
             "Mahfujur Rahman Joy"
           ],
           "headingCount": 62,
-          "linkCount": 114,
+          "linkCount": 113,
           "fixedCoveringViewport": [],
           "opaqueFixedOverlay": false,
-          "pageHeight": 11244,
+          "pageHeight": 11158,
           "horizontalOverflowPx": 0
         }
       }

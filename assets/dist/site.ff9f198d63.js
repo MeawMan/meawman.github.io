@@ -16,6 +16,7 @@ labelTheme(btn);
 btn.addEventListener('click', () => {
 const next = currentTheme() === 'dark' ? 'light' : 'dark';
 root.setAttribute('data-theme', next);
+$$('meta[name="theme-color"]').forEach((m) => { m.removeAttribute('media'); m.content = next === 'dark' ? '#0e1820' : '#f7f5ef'; });
 try { localStorage.setItem('mrj_theme', next); } catch (e) { /* private mode */ }
 labelTheme(btn);
 });
@@ -26,9 +27,14 @@ if (!btn || !top) return;
 const set = (open) => { top.classList.toggle('open', open); btn.setAttribute('aria-expanded', String(open)); };
 btn.addEventListener('click', () => set(!top.classList.contains('open')));
 $$('.top nav a').forEach((a) => a.addEventListener('click', () => set(false)));
+document.addEventListener('keydown', (e) => {
+if (e.key === 'Escape' && top.classList.contains('open')) { set(false); btn.focus(); }
+});
 }
 function flash(btn, text) {
 const old = btn.textContent;
+const live = document.getElementById('live');
+if (live) live.textContent = text === 'Copied' ? 'Copied to clipboard' : text;
 btn.textContent = text;
 setTimeout(() => { btn.textContent = old; }, 1600);
 }
@@ -51,9 +57,10 @@ copyText(from ? document.getElementById(from).textContent : btn.getAttribute('da
 });
 }
 function initCite() {
+document.addEventListener('click', (e) => {
 const dlg = $('#cite-dlg');
 if (!dlg || typeof dlg.showModal !== 'function') return;
-document.addEventListener('click', (e) => {
+if (e.target === dlg) { dlg.close(); return; }
 const a = e.target.closest ? e.target.closest('a.cite') : null;
 if (!a || e.ctrlKey || e.metaKey || e.shiftKey) return;
 e.preventDefault();
@@ -61,7 +68,6 @@ $('#cite-apa').textContent = a.getAttribute('data-apa');
 $('#cite-bib').textContent = a.getAttribute('data-bib');
 dlg.showModal();
 });
-dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
 }
 function initSites() {
 const pins = $$('.map-pin');
@@ -81,10 +87,10 @@ li.addEventListener('pointerenter', () => mark(i + 1, true));
 li.addEventListener('pointerleave', () => mark(i + 1, false));
 });
 }
-function init() {
-initTheme(); initMenu(); initCopy(); initCite(); initSites();
+function initContent() {
+initCopy(); initSites();
 }
-init();
+initTheme(); initMenu(); initCite(); initContent();
 if (new URLSearchParams(location.search).has('preview')) {
-import(new URL('../../src/js/preview.js', import.meta.url).href).then((m) => m.preview(init)).catch((e) => console.error(e));
+import(new URL('../../src/js/preview.js', import.meta.url).href).then((m) => m.preview(initContent)).catch((e) => console.error(e));
 }

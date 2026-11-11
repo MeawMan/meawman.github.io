@@ -408,7 +408,7 @@
         "Slope per catchment: mean, median, P10–P90, classes (Horn, as ArcGIS)",
         "Land cover and soil (raster or polygons): area and % per catchment",
         "Drainage units by D8 with embankments as walls, sluices as outlets, khals burned in",
-        "Flow direction, accumulation and filled DEM as GeoTIFF; validated against pysheds",
+        "Flow direction, accumulation and filled DEM as GeoTIFF; fill and accumulation validated against pysheds",
         "Streams GeoTIFFs of any size; geographic DEMs handled exactly",
         "Project, clip, merge, dissolve, slope raster with real GDAL (WebAssembly)",
         "Export shapefile, GeoPackage, GeoJSON, KML in any CRS; Excel and methods text"

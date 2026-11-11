@@ -5,7 +5,7 @@
 import { apa, bibtex } from './cite.mjs';
 import { heroMap, mapSprite, sitesMap } from './map.mjs';
 import { articleLd, graph, homeLd, personLd, toolLd } from './schema.mjs';
-import { duration, esc, fmtDate, groupPubs, liveTools, md, plural, primaryEmail, pubGroup, pubSlug, safeUrl, toolSlug } from './util.mjs';
+import { duration, esc, escBn, fmtDate, groupPubs, liveTools, md, plural, primaryEmail, pubGroup, pubSlug, safeUrl, toolSlug } from './util.mjs';
 
 const ICON = {
   ext: '<svg class="ic" viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M6 3h7v7M13 3 4 12" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>',
@@ -52,7 +52,7 @@ function header(ctx, r, home) {
 
 function footer(ctx, r) {
   const b = ctx.build;
-  return '<footer class="foot"><div class="wrap">' +
+  return '<p class="vh" id="live" role="status"></p>\n<footer class="foot"><div class="wrap">' +
     '<p>© ' + b.year + ' ' + esc(ctx.data.profile.name) + '. Last updated <time datetime="' + esc(b.updated) + '">' + fmtDate(b.updated) + '</time>.</p>' +
     '<p><a href="' + r + '#top">Back to top</a>' + (b.lab ? ' · <a href="' + r + 'lab/">Lab</a>' : '') + (b.repo ? ' · ' + ext(b.repo, 'Source on GitHub') : '') + '</p>' +
     '</div></footer>\n';
@@ -61,7 +61,7 @@ function footer(ctx, r) {
 function page(ctx, o, body) {
   const r = o.root || '';
   return head(ctx, o) + '<body id="top">\n' + (o.sprite || '') + header(ctx, r, o.home) + '<main id="main">\n' + body + '</main>\n' + footer(ctx, r) +
-    '<script type="module" src="' + r + ctx.build.js + '"></script>\n</body>\n</html>\n';
+    '<script type="module" src="' + r + ctx.build.js + '" onerror="document.documentElement.classList.remove(\'js\')"></script>\n</body>\n</html>\n';
 }
 
 const sec = (id, title, note, body, alias) => '<section class="sec" id="' + id + '" aria-labelledby="h-' + id + '">' + (alias ? '<span class="anchor" id="' + alias + '"></span>' : '') +
@@ -80,7 +80,7 @@ export function venueLine(p) {
 
 function pubLinks(p) {
   if (p.doi) return ext('https://doi.org/' + p.doi, 'doi.org/' + esc(p.doi), 'doi');
-  if (p.url) return ext(p.url, (/researchgate\.net/.test(p.url) ? 'ResearchGate' : 'Full text') + ' ' + ICON.ext);
+  if (p.url) return ext(p.url, (/researchgate\.net/.test(p.url) ? 'ResearchGate' : 'Full text') + '<span class="vh">: ' + esc(p.title) + '</span> ' + ICON.ext);
   return '';
 }
 
@@ -126,7 +126,7 @@ function toolCard(ctx, t, r) {
   }
   return '<li class="tool">' + (open ? '<a class="shot" href="' + r + esc(safeUrl(t.url)) + '" tabindex="-1">' + img + '</a>' : '<div class="shot">' + img + '</div>') +
     '<h4>' + esc(t.name) + '</h4>' +
-    (t.gloss ? '<p class="gloss">' + esc(t.gloss) + '</p>' : '') +
+    (t.gloss ? '<p class="gloss">' + escBn(t.gloss) + '</p>' : '') +
     '<p class="tag">' + esc(t.tagline || '') + '</p>' +
     '<p class="st"><span class="status ' + esc(t.status) + '">' + (STATUS[t.status] || esc(t.status)) + '</span></p>' +
     '<p class="go">' + links.filter(Boolean).join('') + '</p></li>';
@@ -149,13 +149,14 @@ function hero(ctx) {
   return '<section class="hero" aria-labelledby="h-name"><div class="hero-text">' +
     '<p class="eyebrow">' + esc([p.headline, p.location].filter(Boolean).join(' · ')) + '</p>' +
     '<h1 id="h-name">' + esc(p.name) + '</h1>' +
+    (p.status ? '<p class="role">' + esc(p.status) + '</p>' : '') +
     '<p class="lede">' + md(p.bio) + '</p>' +
     ((p.researchAreas || []).length ? '<p class="areas"><span>Research areas</span> ' + p.researchAreas.map(esc).join(' · ') + '</p>' : '') +
     '<div class="cta">' + cta + '</div>' +
     '<ul class="links" aria-label="Profiles">' + links + '</ul>' +
     (record ? '<p class="record">' + record + '</p>' : '') +
     '</div>' +
-    (b.geo && on(ctx, 'map') && (d.studyAreas || []).length ? '<figure class="hero-map"><a href="#sites" aria-label="Study sites: jump to the list">' + heroMap(d, b.geo) + '</a><figcaption>' +
+    (b.geo && on(ctx, 'map') && (d.studyAreas || []).length ? '<figure class="hero-map">' + heroMap(d, b.geo) + '<figcaption>' +
       plural(d.studyAreas.length, 'study site') + ' across Bangladesh; the filled marker is the current project basin. <a href="#sites">See the list</a></figcaption></figure>' : '') +
     '</section>\n';
 }
@@ -163,8 +164,7 @@ function hero(ctx) {
 function aboutSection(ctx) {
   const d = ctx.data;
   const areas = (d.focusAreas || []).map((f) => '<li><h3>' + esc(f.title) + '</h3><p>' + esc(f.text) + '</p></li>').join('');
-  const now = d.profile.currentProject ? '<p class="now"><span class="kicker">Current project</span> ' + esc(d.profile.currentProject) + '</p>' : '';
-  return sec('about', 'Research', (d.profile.roles || []).map(esc).join(' · '), now + '<ul class="focus">' + areas + '</ul>');
+  return sec('about', 'Research', (d.profile.roles || []).map(esc).join(' · '), '<ul class="focus">' + areas + '</ul>');
 }
 
 function sitesSection(ctx) {
@@ -184,7 +184,7 @@ function sitesSection(ctx) {
 function experienceSection(ctx) {
   const now = ctx.build.now;
   const items = (ctx.data.experience || []).map((e) => '<li class="job"><div class="when"><span>' + (fmtDate(e.start, true) || '') + ' – ' + (e.end ? fmtDate(e.end, true) : 'present') + '</span>' +
-    '<span>' + esc([duration(e.start, e.end, now), e.mode, e.location].filter(Boolean).join(' · ')) + '</span></div><div>' +
+    '<span>' + esc([e.end ? duration(e.start, e.end, now) : '', e.mode, e.location].filter(Boolean).join(' · ')) + '</span></div><div>' +
     '<h3>' + esc(e.role) + '</h3><p class="org">' + esc(e.org) + (e.orgNote ? ' <span class="muted">(' + esc(e.orgNote) + ')</span>' : '') + '</p>' +
     (e.project ? '<p class="proj"><span class="kicker">Project</span> ' + esc(e.project) + '</p>' : '') +
     (e.people ? '<p class="muted">' + esc(e.people) + '</p>' : '') +
@@ -234,7 +234,7 @@ function contactSection(ctx) {
 }
 
 const citeDialog = '<dialog class="cite-dlg" id="cite-dlg" aria-labelledby="cite-h"><form method="dialog"><div class="dlg-head"><h2 id="cite-h">Cite this work</h2><button class="chip" value="close">Close</button></div>' +
-  '<h3 class="kicker">APA</h3><pre id="cite-apa" tabindex="0"></pre><h3 class="kicker">BibTeX</h3><pre id="cite-bib" tabindex="0"></pre>' +
+  '<h3 class="kicker">APA</h3><pre id="cite-apa" tabindex="0" role="group" aria-label="APA citation"></pre><h3 class="kicker">BibTeX</h3><pre id="cite-bib" tabindex="0" role="group" aria-label="BibTeX citation"></pre>' +
   '<p class="dlg-act"><button class="btn" type="button" data-copy-from="cite-apa">Copy APA</button><button class="btn pri" type="button" data-copy-from="cite-bib">Copy BibTeX</button></p></form></dialog>\n';
 
 export function renderHomeBody(ctx) {
@@ -285,11 +285,11 @@ export function renderPublication(ctx, p) {
     (p.note ? '<p class="note">' + esc(p.note) + '</p>' : '') +
     (p.abstract ? '<h2>Abstract</h2><p class="abstract">' + esc(p.abstract) + '</p>' : '') +
     ((p.tags || []).length ? '<h2>Topics</h2><p>' + p.tags.map(esc).join(' · ') + '</p>' : '') +
-    (sites.length ? '<h2>Study site</h2><ul>' + sites.map(([s, i]) => '<li><a href="' + r + '#site-' + (i + 1) + '">' + esc(s.name) + '</a>: ' + esc(s.what) + '</li>').join('') + '</ul>' : '') +
-    '<h2 id="cite">How to cite</h2><h3 class="kicker">APA</h3><pre id="apa" tabindex="0">' + esc(apa(p)) + '</pre><p><button class="chip copy" type="button" data-copy-from="apa" hidden>Copy APA</button></p>' +
-    '<h3 class="kicker">BibTeX</h3><pre id="bib" tabindex="0">' + esc(bibtex(p)) + '</pre><p><button class="chip copy" type="button" data-copy-from="bib" hidden>Copy BibTeX</button></p>' +
+    (sites.length ? '<h2>Study site</h2><ul>' + sites.map(([s, i]) => '<li><a href="' + r + '#site-' + (i + 1) + '">' + esc(s.name) + '</a></li>').join('') + '</ul>' : '') +
+    '<h2 id="cite">How to cite</h2><h3 class="kicker">APA</h3><pre id="apa" tabindex="0" role="group" aria-label="APA citation">' + esc(apa(p)) + '</pre><p><button class="chip copy" type="button" data-copy-from="apa" hidden>Copy APA</button></p>' +
+    '<h3 class="kicker">BibTeX</h3><pre id="bib" tabindex="0" role="group" aria-label="BibTeX citation">' + esc(bibtex(p)) + '</pre><p><button class="chip copy" type="button" data-copy-from="bib" hidden>Copy BibTeX</button></p>' +
     '<p class="back"><a href="' + r + 'publications/">All publications</a></p></article>\n';
-  const desc = kind + ' by ' + (p.authors || []).join(', ') + ' (' + p.year + '). ' + String(p.venue || '').replace(/\s+—.*$/, '') + '.';
+  const desc = p.title + '. ' + kind + ' by ' + (p.authors || []).join(', ') + ' (' + p.year + '), ' + String(p.venue || '').replace(/\s+—.*$/, '') + '.';
   return page(ctx, { title: p.title + ' · ' + ctx.data.profile.name, description: desc.slice(0, 300), path: 'publications/' + pubSlug(p) + '/', root: r, ogType: 'article',
     scholar: scholarMeta(p), jsonld: graph([articleLd(ctx, p), personLd(ctx)]) }, body);
 }
@@ -315,7 +315,7 @@ export function renderToolAbout(ctx, t) {
   const body = '<article class="wrap doc">' + crumbs(r, [[r + '#tools', 'Tools'], [r + 'tools/' + slug + '/', esc(t.name)], ['', 'About']]) +
     '<p class="eyebrow">' + esc([t.group, STATUS[t.status] || t.status, a.version ? 'version ' + a.version : ''].filter(Boolean).join(' · ')) + '</p>' +
     '<h1>About ' + esc(t.name) + '</h1>' +
-    (t.gloss ? '<p class="gloss">' + esc(t.gloss) + '.</p>' : '') +
+    (t.gloss ? '<p class="gloss">' + escBn(t.gloss) + '.</p>' : '') +
     '<p class="big">' + esc(t.tagline || '') + '</p>' +
     '<p class="cta"><a class="btn pri" href="' + r + esc(safeUrl(t.url)) + '">Open ' + esc(t.name) + '</a></p>' +
     (shot ? '<p class="shot wide"><img src="' + r + esc(shot.src) + '" width="' + shot.w + '" height="' + shot.h + '" alt="Screenshot of ' + esc(t.name) + ': ' + esc(shot.alt || t.tagline) + '"></p>' : '') +
@@ -327,7 +327,7 @@ export function renderToolAbout(ctx, t) {
     ((a.samples || []).length ? '<h3 class="kicker">Bundled sample data</h3><ul>' + a.samples.map((x) => '<li>' + esc(x.label) + '</li>').join('') + '</ul>' : '') +
     '<h2 id="validation">Validation</h2>' + (a.validation ? paras(a.validation) : NA) +
     '<h2 id="limitations">Limitations</h2>' + (a.limitations ? paras(a.limitations) : NA) +
-    '<h2 id="cite">How to cite</h2>' + (a.cite ? '<pre id="tool-cite" tabindex="0">' + esc(a.cite.text) + '</pre><p><button class="chip copy" type="button" data-copy-from="tool-cite" hidden>Copy citation</button> ' + ext(gh(a.cite.cff), 'CITATION.cff ' + ICON.ext) + '</p>' : NA) +
+    '<h2 id="cite">How to cite</h2>' + (a.cite ? '<pre id="tool-cite" tabindex="0" role="group" aria-label="Citation">' + esc(a.cite.text) + '</pre><p><button class="chip copy" type="button" data-copy-from="tool-cite" hidden>Copy citation</button> ' + ext(gh(a.cite.cff), 'CITATION.cff ' + ICON.ext) + '</p>' : NA) +
     '<h2 id="source">Source and documents</h2>' +
     ((a.docs || []).length || a.repository || a.license ? '<ul>' + (a.docs || []).map((x) => '<li>' + ext(gh(x.path), esc(x.label) + ' ' + ICON.ext) + '</li>').join('') +
       (a.license ? '<li>Licence: ' + esc(a.license.name) + '</li>' : '') + (a.repository ? '<li>' + ext(a.repository, 'Code repository ' + ICON.ext) + '</li>' : '') + '</ul>' : NA) +

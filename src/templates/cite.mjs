@@ -11,7 +11,8 @@ function apaAuthor(full) {
   const ini = n.given.map((g) => g.replace(/\./g, '')[0].toUpperCase() + '.').join(' ');
   return n.last + (ini ? ', ' + ini : '');
 }
-const venueName = (p) => String(p.venue || '').replace(/\s+—.*$/, '');
+// Conference venues keep their paper number ("… — Paper 514" → "…, Paper 514"); other venues drop any note after a dash.
+const venueName = (p) => (pubGroup(p) === 'conference' ? String(p.venue || '').replace(/\s+—\s+/, ', ') : String(p.venue || '').replace(/\s+—.*$/, ''));
 const MON = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
 
 export function apa(p) {

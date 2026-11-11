@@ -77,6 +77,7 @@ b, strong { font-weight: 600; }
 .eyebrow, .kicker { font: 600 0.8125rem/1.4 var(--sans); letter-spacing: 0.08em; text-transform: uppercase; color: var(--silt); }
 .eyebrow { margin-bottom: 0.9rem; }
 h1 { font: 500 clamp(2.5rem, 6.2vw, 4.5rem)/1.03 var(--serif); letter-spacing: -0.02em; margin-bottom: 1.25rem; }
+.role { font: 500 1.1875rem/1.4 var(--sans); margin: -0.35rem 0 1rem; }
 .lede { font-size: 1.1875rem; line-height: 1.55; max-width: 38em; margin-bottom: 1rem; }
 .areas { color: var(--muted); font-size: 0.9375rem; max-width: 44em; margin-bottom: 1.5rem; }
 .areas span { font-weight: 600; color: var(--ink); margin-right: 0.35em; }
@@ -88,7 +89,6 @@ h1 { font: 500 clamp(2.5rem, 6.2vw, 4.5rem)/1.03 var(--serif); letter-spacing: -
 .links { display: flex; flex-wrap: wrap; gap: 0 1.1rem; font-size: 0.9375rem; margin-bottom: 1rem; }
 .links a { display: inline-block; padding: 0.3rem 0; }
 .record { color: var(--muted); font-size: 0.9375rem; font-variant-numeric: tabular-nums; }
-.hero-map a { display: block; }
 .hero-map svg { display: block; width: 100%; max-height: 32rem; }
 .hero-map figcaption, .rail p { color: var(--muted); font-size: 0.875rem; }
 .hero-map figcaption { border-top: 1px solid var(--rule); padding-top: 0.5rem; margin-top: 0.4rem; }
@@ -97,8 +97,8 @@ h1 { font: 500 clamp(2.5rem, 6.2vw, 4.5rem)/1.03 var(--serif); letter-spacing: -
 .map-land { fill: var(--land); stroke: var(--rule); stroke-width: 0.8; }
 .map-river { fill: none; stroke: var(--water); stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
 .map-river.minor { stroke-width: 0.9; opacity: 0.7; }
-.map-lbl { font: italic 500 12px var(--serif); fill: var(--water); }
-.map-lbl.sea { fill: var(--muted); letter-spacing: 0.18em; }
+.map-lbl { font: italic 500 12px var(--serif); fill: var(--water); paint-order: stroke; stroke: var(--land); stroke-width: 3px; stroke-linejoin: round; }
+.map-lbl.sea { fill: var(--muted); stroke: var(--bg); letter-spacing: 0.18em; }
 .map-dot { fill: var(--bg); stroke: var(--ink); stroke-width: 1.6; }
 .map-dot.now { fill: var(--silt); stroke: var(--silt); }
 .map-pin { text-decoration: none; cursor: pointer; }
@@ -115,12 +115,11 @@ h1 { font: 500 clamp(2.5rem, 6.2vw, 4.5rem)/1.03 var(--serif); letter-spacing: -
 .rail h2 { font: 500 1.75rem/1.15 var(--serif); margin-bottom: 0.5rem; }
 .kicker { margin: 2rem 0 0.25rem; }
 .body > .kicker:first-child, .kicker:first-child { margin-top: 0; }
-p .kicker, .now .kicker, .proj .kicker, .earlier .kicker { margin: 0 0.5em 0 0; }
+p .kicker, .proj .kicker, .earlier .kicker { margin: 0 0.5em 0 0; }
 
 .focus { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1.5rem 2rem; }
 .focus h3 { font: 500 1.25rem/1.25 var(--serif); margin-bottom: 0.3rem; }
 .focus p { color: var(--muted); font-size: 0.9375rem; }
-.now { margin-bottom: 1.75rem; padding-bottom: 1.25rem; border-bottom: 1px solid var(--rule); max-width: 52em; }
 
 /* publications */
 .pub { display: grid; grid-template-columns: 3.5rem minmax(0, 1fr); gap: 0.5rem; padding: 1rem 0; border-bottom: 1px solid var(--rule); }
@@ -244,6 +243,14 @@ pre { font: 0.875rem/1.55 var(--mono); background: var(--surface); border: 1px s
 }
 @media (max-width: 40em) {
   .hero-map { display: none; }
+  /* phones: routes first, then the longer bio (source order is unchanged for keyboard and screen readers) */
+  .hero-text { display: flex; flex-direction: column; }
+  .hero-text .cta { order: 1; }
+  .hero-text .links { order: 2; }
+  .hero-text .lede { order: 3; font-size: 1.0625rem; }
+  .hero-text .areas { order: 4; margin-bottom: 0.75rem; }
+  .hero-text .record { order: 5; }
+  .role { font-size: 1.0625rem; margin-bottom: 1.1rem; }
   .job, .skills div { grid-template-columns: 1fr; }
   .when { flex-direction: row; flex-wrap: wrap; gap: 0 0.75rem; }
   .pub { grid-template-columns: 1fr; gap: 0.1rem; }

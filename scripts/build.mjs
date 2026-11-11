@@ -53,6 +53,7 @@ for (const t of liveTools(data)) {
   const slug = toolSlug(t);
   if (!existsSync(at('tools', slug, 'index.html'))) { warn('tool "' + t.name + '" points to tools/' + slug + '/ which has no index.html'); continue; }
   abouts[slug] = existsSync(at('tools', slug, 'about.json')) ? json('tools/' + slug + '/about.json') : {};
+  delete abouts[slug].sources; // provenance notes stay in about.json only
   if (!shots[slug]) warn('no screenshot for ' + slug + ' (run npm run shots)');
   else if (!existsSync(at(shots[slug].src))) { warn('screenshot file missing: ' + shots[slug].src); delete shots[slug]; }
 }

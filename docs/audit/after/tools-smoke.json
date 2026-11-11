@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-11T14:06:50.542Z",
+  "generatedAt": "2026-11-11T18:57:06.296Z",
   "base": "http://127.0.0.1:4173",
   "viewport": "1366x900",
   "waitMs": 6000,
@@ -10,7 +10,7 @@
       "slug": "ababahika",
       "path": "/tools/ababahika/",
       "status": 200,
-      "loadMs": 598,
+      "loadMs": 428,
       "title": "Ababahika — catchment slope, land cover & soil statistics · Mahfujur Rahman Joy",
       "h1Count": 1,
       "h1Texts": [
@@ -24,18 +24,18 @@
       },
       "iframes": 0,
       "canvases": 1,
-      "domElements": 213,
+      "domElements": 221,
       "lang": "en",
       "theme": "light",
       "hasMetaDescription": true,
-      "bodyTextLength": 1034,
+      "bodyTextLength": 1051,
       "screenshot": "tools/ababahika.jpg",
       "consoleErrors": [],
       "pageErrors": [],
       "failedRequests": [],
       "requestCount": 28,
       "pendingRequests": 0,
-      "transferredBytes": 537612,
+      "transferredBytes": 538064,
       "largestRequests": [
         {
           "url": "/tools/ababahika/dist/app.js?v=mw1o2iaw",
@@ -71,7 +71,7 @@
       "slug": "brishti-idf",
       "path": "/tools/brishti-idf/",
       "status": 200,
-      "loadMs": 877,
+      "loadMs": 814,
       "title": "Brishti IDF — rainfall intensity–duration–frequency analysis · Mahfujur Rahman Joy",
       "h1Count": 1,
       "h1Texts": [
@@ -85,18 +85,18 @@
       },
       "iframes": 0,
       "canvases": 0,
-      "domElements": 190,
+      "domElements": 198,
       "lang": "en",
       "theme": "light",
       "hasMetaDescription": true,
-      "bodyTextLength": 2043,
+      "bodyTextLength": 2060,
       "screenshot": "tools/brishti-idf.jpg",
       "consoleErrors": [],
       "pageErrors": [],
       "failedRequests": [],
       "requestCount": 53,
       "pendingRequests": 0,
-      "transferredBytes": 2080670,
+      "transferredBytes": 2081124,
       "largestRequests": [
         {
           "url": "/assets/vendor/plotly-3.2.0.min.js",
@@ -131,7 +131,7 @@
       "slug": "cn-calculator",
       "path": "/tools/cn-calculator/",
       "status": 200,
-      "loadMs": 551,
+      "loadMs": 425,
       "title": "Composite CN Calculator — SCS curve number and runoff · Mahfujur Rahman Joy",
       "h1Count": 1,
       "h1Texts": [
@@ -145,18 +145,18 @@
       },
       "iframes": 0,
       "canvases": 0,
-      "domElements": 1836,
+      "domElements": 1844,
       "lang": "en",
       "theme": "light",
       "hasMetaDescription": true,
-      "bodyTextLength": 2527,
+      "bodyTextLength": 2544,
       "screenshot": "tools/cn-calculator.jpg",
       "consoleErrors": [],
       "pageErrors": [],
       "failedRequests": [],
       "requestCount": 9,
       "pendingRequests": 0,
-      "transferredBytes": 144413,
+      "transferredBytes": 144859,
       "largestRequests": [
         {
           "url": "/assets/fonts/plex-sans-var.woff2",
@@ -176,7 +176,7 @@
         },
         {
           "url": "/tools/cn-calculator/",
-          "bytes": 13131
+          "bytes": 13225
         }
       ],
       "externalHosts": [
@@ -191,7 +191,7 @@
       "slug": "dependability",
       "path": "/tools/dependability/",
       "status": 200,
-      "loadMs": 480,
+      "loadMs": 359,
       "title": "Dependability Analyzer — dependable water level, flow & rainfall · Mahfujur Rahman Joy",
       "h1Count": 1,
       "h1Texts": [
@@ -205,18 +205,18 @@
       },
       "iframes": 0,
       "canvases": 0,
-      "domElements": 211,
+      "domElements": 219,
       "lang": "en",
       "theme": "light",
       "hasMetaDescription": true,
-      "bodyTextLength": 654,
+      "bodyTextLength": 671,
       "screenshot": "tools/dependability.jpg",
       "consoleErrors": [],
       "pageErrors": [],
       "failedRequests": [],
       "requestCount": 10,
       "pendingRequests": 0,
-      "transferredBytes": 476556,
+      "transferredBytes": 477015,
       "largestRequests": [
         {
           "url": "/assets/vendor/xlsx-0.18.5.full.min.js",
@@ -232,7 +232,7 @@
         },
         {
           "url": "/tools/dependability/",
-          "bytes": 28674
+          "bytes": 28781
         },
         {
           "url": "/assets/fonts/newsreader-500.woff2",
@@ -251,7 +251,7 @@
       "slug": "dsbc",
       "path": "/tools/dsbc/",
       "status": 200,
-      "loadMs": 846,
+      "loadMs": 767,
       "title": "DSBC Studio — downscaling and bias correction · Mahfujur Rahman Joy",
       "h1Count": 1,
       "h1Texts": [
@@ -265,18 +265,18 @@
       },
       "iframes": 0,
       "canvases": 0,
-      "domElements": 732,
+      "domElements": 740,
       "lang": "en",
       "theme": "light",
       "hasMetaDescription": true,
-      "bodyTextLength": 1638,
+      "bodyTextLength": 1655,
       "screenshot": "tools/dsbc.jpg",
       "consoleErrors": [],
       "pageErrors": [],
       "failedRequests": [],
       "requestCount": 12,
       "pendingRequests": 0,
-      "transferredBytes": 2051022,
+      "transferredBytes": 2051460,
       "largestRequests": [
         {
           "url": "/assets/vendor/plotly-3.2.0.min.js",
@@ -288,7 +288,7 @@
         },
         {
           "url": "/tools/dsbc/",
-          "bytes": 103286
+          "bytes": 103372
         },
         {
           "url": "/assets/fonts/plex-sans-var.woff2",
@@ -311,7 +311,7 @@
       "slug": "gaplens",
       "path": "/tools/gaplens/",
       "status": 200,
-      "loadMs": 432,
+      "loadMs": 321,
       "title": "GapLens — find, fill and compare gaps in hydroclimate records · Mahfujur Rahman Joy",
       "h1Count": 1,
       "h1Texts": [
@@ -325,7 +325,7 @@
       },
       "iframes": 0,
       "canvases": 0,
-      "domElements": 278,
+      "domElements": 285,
       "lang": "en",
       "theme": "light",
       "hasMetaDescription": true,
@@ -336,7 +336,7 @@
       "failedRequests": [],
       "requestCount": 10,
       "pendingRequests": 0,
-      "transferredBytes": 146393,
+      "transferredBytes": 146846,
       "largestRequests": [
         {
           "url": "/assets/fonts/plex-sans-var.woff2",
@@ -344,7 +344,7 @@
         },
         {
           "url": "/tools/gaplens/",
-          "bytes": 37424
+          "bytes": 37525
         },
         {
           "url": "/assets/fonts/newsreader-500.woff2",
@@ -371,7 +371,7 @@
       "slug": "hydro-ml",
       "path": "/tools/hydro-ml/",
       "status": 200,
-      "loadMs": 438,
+      "loadMs": 318,
       "title": "Hydro ML Studio — machine learning for water level, discharge & rainfall · Mahfujur Rahman Joy",
       "h1Count": 1,
       "h1Texts": [
@@ -385,18 +385,18 @@
       },
       "iframes": 0,
       "canvases": 0,
-      "domElements": 715,
+      "domElements": 723,
       "lang": "en",
       "theme": "light",
       "hasMetaDescription": true,
-      "bodyTextLength": 1107,
+      "bodyTextLength": 1124,
       "screenshot": "tools/hydro-ml.jpg",
       "consoleErrors": [],
       "pageErrors": [],
       "failedRequests": [],
       "requestCount": 16,
       "pendingRequests": 0,
-      "transferredBytes": 216017,
+      "transferredBytes": 216471,
       "largestRequests": [
         {
           "url": "/tools/hydro-ml/app.js",
@@ -431,7 +431,7 @@
       "slug": "hydro-series",
       "path": "/tools/hydro-series/",
       "status": 200,
-      "loadMs": 449,
+      "loadMs": 350,
       "title": "Hydro-Series Toolkit — Min-Max-Avg & Series Generator · Mahfujur Rahman Joy",
       "h1Count": 1,
       "h1Texts": [
@@ -445,22 +445,22 @@
       },
       "iframes": 0,
       "canvases": 0,
-      "domElements": 336,
+      "domElements": 344,
       "lang": "en",
       "theme": "light",
       "hasMetaDescription": true,
-      "bodyTextLength": 928,
+      "bodyTextLength": 945,
       "screenshot": "tools/hydro-series.jpg",
       "consoleErrors": [],
       "pageErrors": [],
       "failedRequests": [],
       "requestCount": 10,
       "pendingRequests": 0,
-      "transferredBytes": 191900,
+      "transferredBytes": 192346,
       "largestRequests": [
         {
           "url": "/tools/hydro-series/",
-          "bytes": 52187
+          "bytes": 52281
         },
         {
           "url": "/assets/fonts/plex-sans-var.woff2",
@@ -491,7 +491,7 @@
       "slug": "openffa",
       "path": "/tools/openffa/",
       "status": 200,
-      "loadMs": 446,
+      "loadMs": 380,
       "title": "OpenFFA — flood frequency analysis · Mahfujur Rahman Joy",
       "h1Count": 1,
       "h1Texts": [
@@ -505,18 +505,18 @@
       },
       "iframes": 0,
       "canvases": 0,
-      "domElements": 121,
+      "domElements": 129,
       "lang": "en",
       "theme": "light",
       "hasMetaDescription": true,
-      "bodyTextLength": 784,
+      "bodyTextLength": 801,
       "screenshot": "tools/openffa.jpg",
       "consoleErrors": [],
       "pageErrors": [],
       "failedRequests": [],
       "requestCount": 67,
       "pendingRequests": 0,
-      "transferredBytes": 774747,
+      "transferredBytes": 775202,
       "largestRequests": [
         {
           "url": "/tools/openffa/vendor/plotly.min.js",
@@ -551,7 +551,7 @@
       "slug": "river-profile",
       "path": "/tools/river-profile/",
       "status": 200,
-      "loadMs": 458,
+      "loadMs": 389,
       "title": "River Profile Studio — Cross-sections, SOBEK Y-Z & profiling · Mahfujur Rahman Joy",
       "h1Count": 1,
       "h1Texts": [
@@ -565,18 +565,18 @@
       },
       "iframes": 0,
       "canvases": 0,
-      "domElements": 694,
+      "domElements": 702,
       "lang": "en",
       "theme": "light",
       "hasMetaDescription": true,
-      "bodyTextLength": 4409,
+      "bodyTextLength": 4426,
       "screenshot": "tools/river-profile.jpg",
       "consoleErrors": [],
       "pageErrors": [],
       "failedRequests": [],
       "requestCount": 10,
       "pendingRequests": 0,
-      "transferredBytes": 476095,
+      "transferredBytes": 476554,
       "largestRequests": [
         {
           "url": "/assets/vendor/xlsx-0.18.5.full.min.js",
@@ -592,7 +592,7 @@
         },
         {
           "url": "/tools/river-profile/",
-          "bytes": 28213
+          "bytes": 28320
         },
         {
           "url": "/assets/fonts/newsreader-500.woff2",

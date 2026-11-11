@@ -12,7 +12,7 @@
     "Soil textures map to hydrologic soil groups, open water can count at CN 100 or be left out, and the CN lookup for Bangladesh land-cover classes is editable."
   ],
   "references": null,
-  "data": "Click a cell, then paste (Ctrl+V) a block copied from Excel. If your block starts with a header row, columns are matched by name in any order. Areas in hectares. Soil accepts a texture (e.g. Clay Loam) or a group letter A–D. CN lookup: values from your workbook's CN_Lookup sheet (TR-55 analogues). The sheet opens with 'Rows 1–3: sample from your workbook'.",
+  "data": "Click a cell, then paste (Ctrl+V) a block copied from Excel. If your block starts with a header row, columns are matched by name in any order. Areas in hectares. Soil accepts a texture (e.g. Clay Loam) or a group letter A–D. CN lookup values are TR-55 analogues.",
   "validation": null,
   "limitations": null,
   "cite": null,
@@ -20,7 +20,10 @@
   "repository": null,
   "docs": [],
   "samples": [
-    { "label": "Built-in sample rows ('Rows 1–3: sample from your workbook': Catchment 1–3), shown on first load and restored by the 'Reset to workbook defaults' button", "path": null }
+    {
+      "label": "Three built-in sample rows (Catchment 1–3), shown on first load",
+      "path": null
+    }
   ],
   "sources": {
     "pageTitle": "tools/cn-calculator/index.html L6",

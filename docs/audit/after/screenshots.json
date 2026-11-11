@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-11-11T14:05:42.292Z",
+  "generatedAt": "2026-11-11T18:58:07.848Z",
   "base": "http://127.0.0.1:4173",
   "settleMs": 4000,
   "maxHeight": 9000,
   "quality": 60,
   "reducedMotion": true,
-  "totalBytes": 5426991,
+  "totalBytes": 5550659,
   "shots": [
     {
       "path": "/",
@@ -15,10 +15,10 @@
       "file": "home-375-js-light.jpg",
       "foldFile": "home-375-js-light-fold.jpg",
       "scrollYBeforeShot": 0,
-      "pageHeight": 18521,
+      "pageHeight": 18357,
       "clipped": true,
-      "bytes": 408909,
-      "foldBytes": 44171
+      "bytes": 415991,
+      "foldBytes": 44693
     },
     {
       "path": "/",
@@ -28,10 +28,10 @@
       "file": "home-375-nojs-light.jpg",
       "foldFile": "home-375-nojs-light-fold.jpg",
       "scrollYBeforeShot": 0,
-      "pageHeight": 18565,
+      "pageHeight": 18401,
       "clipped": true,
-      "bytes": 406379,
-      "foldBytes": 42642
+      "bytes": 414021,
+      "foldBytes": 43939
     },
     {
       "path": "/",
@@ -41,10 +41,10 @@
       "file": "home-1366-js-light.jpg",
       "foldFile": "home-1366-js-light-fold.jpg",
       "scrollYBeforeShot": 0,
-      "pageHeight": 11244,
+      "pageHeight": 11158,
       "clipped": true,
-      "bytes": 799950,
-      "foldBytes": 93209
+      "bytes": 816434,
+      "foldBytes": 98423
     },
     {
       "path": "/",
@@ -54,10 +54,10 @@
       "file": "home-1366-nojs-light.jpg",
       "foldFile": "home-1366-nojs-light-fold.jpg",
       "scrollYBeforeShot": 0,
-      "pageHeight": 11244,
+      "pageHeight": 11158,
       "clipped": true,
-      "bytes": 799507,
-      "foldBytes": 92877
+      "bytes": 816114,
+      "foldBytes": 98071
     },
     {
       "path": "/",
@@ -67,10 +67,10 @@
       "file": "home-375-js-dark.jpg",
       "foldFile": "home-375-js-dark-fold.jpg",
       "scrollYBeforeShot": 0,
-      "pageHeight": 18521,
+      "pageHeight": 18357,
       "clipped": true,
-      "bytes": 421810,
-      "foldBytes": 44494
+      "bytes": 429874,
+      "foldBytes": 45187
     },
     {
       "path": "/",
@@ -80,10 +80,10 @@
       "file": "home-375-nojs-dark.jpg",
       "foldFile": "home-375-nojs-dark-fold.jpg",
       "scrollYBeforeShot": 0,
-      "pageHeight": 18565,
+      "pageHeight": 18401,
       "clipped": true,
-      "bytes": 419023,
-      "foldBytes": 43233
+      "bytes": 427221,
+      "foldBytes": 44404
     },
     {
       "path": "/",
@@ -93,10 +93,10 @@
       "file": "home-1366-js-dark.jpg",
       "foldFile": "home-1366-js-dark-fold.jpg",
       "scrollYBeforeShot": 0,
-      "pageHeight": 11244,
+      "pageHeight": 11158,
       "clipped": true,
-      "bytes": 812496,
-      "foldBytes": 93285
+      "bytes": 830091,
+      "foldBytes": 98356
     },
     {
       "path": "/",
@@ -106,10 +106,10 @@
       "file": "home-1366-nojs-dark.jpg",
       "foldFile": "home-1366-nojs-dark-fold.jpg",
       "scrollYBeforeShot": 0,
-      "pageHeight": 11244,
+      "pageHeight": 11158,
       "clipped": true,
-      "bytes": 812047,
-      "foldBytes": 92959
+      "bytes": 829797,
+      "foldBytes": 98043
     }
   ]
 }

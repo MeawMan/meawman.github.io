@@ -8,7 +8,7 @@ A visitor-facing summary of the redesign. Reasons and alternatives are in [DECIS
 - **Complete without JavaScript.** Every page is plain HTML. Before, a black boot screen covered everything when JavaScript was off.
 - **No more game layer.** The boot splash, XP bar, pixel avatar, floating companion, command palette, fake terminal, Konami code, animated backgrounds and labels such as "QUEST LOG" and "ACHIEVEMENTS UNLOCKED" are gone. Headings say what each section is.
 - **The page no longer scrolls itself** to the Tools section on load.
-- **First screen:** name, role, affiliation, research areas, and direct routes to Publications, Tools, Contact and the profile links (Google Scholar, ORCID, ResearchGate, GitHub, LinkedIn).
+- **First screen:** name, role and affiliation in one line, research areas, and direct routes to Publications, Tools, Contact and the profile links (Google Scholar, ORCID, ResearchGate, GitHub, LinkedIn).
 - **Honest counts.** The record line ("3 journal articles · 2 preprints · 6 conference papers · 10 web tools") is computed from what the page shows. The old strip counted eleven tools and three journal articles including a preprint.
 - **Faster.** No Google Fonts requests (fonts are self-hosted and subset), no runtime fetch of the content file, minified and fingerprinted CSS and JS, lazy-loaded screenshots.
 

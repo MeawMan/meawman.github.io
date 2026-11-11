@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-11T14:08:53.511Z",
+  "generatedAt": "2026-11-11T18:59:45.773Z",
   "tool": "lighthouse",
   "lighthouseVersion": "13.6.0",
   "base": "http://127.0.0.1:4173",
@@ -17,20 +17,20 @@
         "seo": 100
       },
       "metrics": {
-        "fcpMs": 902,
-        "lcpMs": 902,
+        "fcpMs": 903,
+        "lcpMs": 903,
         "cls": 0,
         "tbtMs": 0,
-        "speedIndexMs": 902,
-        "domElements": 792,
-        "totalByteWeight": 128882
+        "speedIndexMs": 903,
+        "domElements": 800,
+        "totalByteWeight": 129308
       },
       "failed": {
         "performance": [
           {
             "id": "cache-insight",
             "title": "Use efficient cache lifetimes",
-            "displayValue": "Est savings of 95 KiB",
+            "displayValue": "Est savings of 96 KiB",
             "failedRuns": 3
           },
           {
@@ -42,7 +42,7 @@
           {
             "id": "render-blocking-insight",
             "title": "Render-blocking requests",
-            "displayValue": null,
+            "displayValue": "Est savings of 150 ms",
             "failedRuns": 3
           }
         ],
@@ -59,13 +59,13 @@
             "seo": 100
           },
           "metrics": {
-            "fcpMs": 934,
-            "lcpMs": 934,
+            "fcpMs": 903,
+            "lcpMs": 903,
             "cls": 0,
-            "tbtMs": 91,
-            "speedIndexMs": 934,
-            "domElements": 792,
-            "totalByteWeight": 128882
+            "tbtMs": 0,
+            "speedIndexMs": 903,
+            "domElements": 800,
+            "totalByteWeight": 129308
           }
         },
         {
@@ -76,13 +76,13 @@
             "seo": 100
           },
           "metrics": {
-            "fcpMs": 901,
-            "lcpMs": 901,
+            "fcpMs": 903,
+            "lcpMs": 903,
             "cls": 0,
             "tbtMs": 0,
-            "speedIndexMs": 901,
-            "domElements": 792,
-            "totalByteWeight": 128882
+            "speedIndexMs": 903,
+            "domElements": 800,
+            "totalByteWeight": 129308
           }
         },
         {
@@ -98,8 +98,8 @@
             "cls": 0,
             "tbtMs": 0,
             "speedIndexMs": 902,
-            "domElements": 792,
-            "totalByteWeight": 128882
+            "domElements": 800,
+            "totalByteWeight": 129308
           }
         }
       ]
@@ -121,8 +121,8 @@
         "cls": 0,
         "tbtMs": 0,
         "speedIndexMs": 242,
-        "domElements": 792,
-        "totalByteWeight": 240318
+        "domElements": 800,
+        "totalByteWeight": 240744
       },
       "failed": {
         "performance": [
@@ -164,13 +164,13 @@
             "seo": 100
           },
           "metrics": {
-            "fcpMs": 242,
-            "lcpMs": 242,
+            "fcpMs": 243,
+            "lcpMs": 243,
             "cls": 0,
             "tbtMs": 0,
-            "speedIndexMs": 242,
-            "domElements": 792,
-            "totalByteWeight": 240318
+            "speedIndexMs": 243,
+            "domElements": 800,
+            "totalByteWeight": 240744
           }
         },
         {
@@ -186,8 +186,8 @@
             "cls": 0,
             "tbtMs": 0,
             "speedIndexMs": 242,
-            "domElements": 792,
-            "totalByteWeight": 240318
+            "domElements": 800,
+            "totalByteWeight": 240744
           }
         },
         {
@@ -198,13 +198,13 @@
             "seo": 100
           },
           "metrics": {
-            "fcpMs": 245,
-            "lcpMs": 245,
+            "fcpMs": 242,
+            "lcpMs": 242,
             "cls": 0,
             "tbtMs": 0,
-            "speedIndexMs": 245,
-            "domElements": 792,
-            "totalByteWeight": 240318
+            "speedIndexMs": 242,
+            "domElements": 800,
+            "totalByteWeight": 240744
           }
         }
       ]
@@ -226,8 +226,8 @@
         "cls": 0,
         "tbtMs": 0,
         "speedIndexMs": 752,
-        "domElements": 62,
-        "totalByteWeight": 104362
+        "domElements": 63,
+        "totalByteWeight": 104653
       },
       "failed": {
         "performance": [
@@ -268,8 +268,8 @@
             "cls": 0,
             "tbtMs": 0,
             "speedIndexMs": 752,
-            "domElements": 62,
-            "totalByteWeight": 104362
+            "domElements": 63,
+            "totalByteWeight": 104653
           }
         },
         {
@@ -285,8 +285,8 @@
             "cls": 0,
             "tbtMs": 0,
             "speedIndexMs": 752,
-            "domElements": 62,
-            "totalByteWeight": 104362
+            "domElements": 63,
+            "totalByteWeight": 104653
           }
         },
         {
@@ -302,8 +302,8 @@
             "cls": 0,
             "tbtMs": 0,
             "speedIndexMs": 753,
-            "domElements": 62,
-            "totalByteWeight": 104362
+            "domElements": 63,
+            "totalByteWeight": 104653
           }
         }
       ]
@@ -320,13 +320,13 @@
         "seo": 100
       },
       "metrics": {
-        "fcpMs": 202,
-        "lcpMs": 202,
+        "fcpMs": 201,
+        "lcpMs": 201,
         "cls": 0,
         "tbtMs": 0,
-        "speedIndexMs": 202,
-        "domElements": 62,
-        "totalByteWeight": 104362
+        "speedIndexMs": 201,
+        "domElements": 63,
+        "totalByteWeight": 104653
       },
       "failed": {
         "performance": [
@@ -362,30 +362,13 @@
             "seo": 100
           },
           "metrics": {
-            "fcpMs": 202,
-            "lcpMs": 202,
+            "fcpMs": 201,
+            "lcpMs": 201,
             "cls": 0,
             "tbtMs": 0,
-            "speedIndexMs": 202,
-            "domElements": 62,
-            "totalByteWeight": 104362
-          }
-        },
-        {
-          "scores": {
-            "performance": 100,
-            "accessibility": 100,
-            "best-practices": 100,
-            "seo": 100
-          },
-          "metrics": {
-            "fcpMs": 202,
-            "lcpMs": 202,
-            "cls": 0,
-            "tbtMs": 0,
-            "speedIndexMs": 202,
-            "domElements": 62,
-            "totalByteWeight": 104362
+            "speedIndexMs": 201,
+            "domElements": 63,
+            "totalByteWeight": 104653
           }
         },
         {
@@ -401,8 +384,25 @@
             "cls": 0,
             "tbtMs": 0,
             "speedIndexMs": 201,
-            "domElements": 62,
-            "totalByteWeight": 104362
+            "domElements": 63,
+            "totalByteWeight": 104653
+          }
+        },
+        {
+          "scores": {
+            "performance": 100,
+            "accessibility": 100,
+            "best-practices": 100,
+            "seo": 100
+          },
+          "metrics": {
+            "fcpMs": 203,
+            "lcpMs": 203,
+            "cls": 0,
+            "tbtMs": 0,
+            "speedIndexMs": 203,
+            "domElements": 63,
+            "totalByteWeight": 104653
           }
         }
       ]
