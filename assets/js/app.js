@@ -145,14 +145,16 @@
     const p = DATA.profile;
     const ld = {
       '@context': 'https://schema.org', '@type': 'Person', name: p.name,
-      jobTitle: (DATA.experience[0] || {}).role, email: 'mailto:' + primaryEmail(),
+      jobTitle: (DATA.experience[0] || {}).role, email: primaryEmail(),
       worksFor: (DATA.experience[0] || {}).org ? { '@type': 'Organization', name: DATA.experience[0].org } : undefined,
-      alumniOf: DATA.education.map((e) => ({ '@type': 'CollegeOrUniversity', name: e.institution })),
+      url: m.siteUrl,
+      alumniOf: DATA.education.map((e) => ({ '@type': /university/i.test(e.institution) ? 'CollegeOrUniversity' : 'EducationalOrganization', name: e.institution })),
       sameAs: DATA.links.filter((l) => l.url).map((l) => l.url),
       address: { '@type': 'PostalAddress', addressLocality: p.location },
     };
-    const s = document.createElement('script'); s.type = 'application/ld+json'; s.textContent = JSON.stringify(ld);
-    document.head.appendChild(s);
+    let s = document.getElementById('ld-person');
+    if (!s) { s = document.createElement('script'); s.type = 'application/ld+json'; s.id = 'ld-person'; document.head.appendChild(s); }
+    s.textContent = JSON.stringify(ld);
   }
 
   function renderNav() {
@@ -603,7 +605,7 @@
       '<li class="reveal"><div><b>' + esc(l.role) + '</b><span class="muted">' + esc(l.org) + (l.location ? ' · ' + esc(l.location) : '') + '</span></div><span class="mono small">' + esc(l.period) + '</span></li>').join('');
     $('#refs').innerHTML = '<p class="pixel sec-kicker">REFERENCES</p>' + DATA.references.map((r) =>
       '<article class="card ref reveal"><h3>' + esc(r.name) + '</h3><p class="small">' + esc(r.title) + '</p><p class="muted small">' + esc(r.org) + '</p>' +
-      (r.email ? '<a class="mono small" href="mailto:' + esc(r.email) + '">' + esc(r.email) + '</a>' : '') + '</article>').join('');
+      '</article>').join('') + (DATA.references.length ? '<p class="muted small ref-note">Contact details available on request.</p>' : '');
   }
 
   function renderContact() {

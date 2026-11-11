@@ -3,7 +3,7 @@
     "title": "Mahfujur Rahman Joy — Water Resources Engineer & Researcher",
     "description": "Portfolio of Mahfujur Rahman Joy: Research Consultant at CEGIS, M.Sc. (WRD) candidate at BUET. Hydrodynamic modeling, GIS & remote sensing, CMIP6 downscaling and machine learning for floods and droughts.",
     "siteUrl": "https://meawman.github.io/",
-    "updated": "2026-11-08"
+    "updated": "2026-11-12"
   },
   "settings": {
     "showPhone": false,
@@ -232,47 +232,31 @@
       ]
     },
     {
-      "name": "Min-Max-Avg Terminal",
+      "name": "Hydro-Series Toolkit",
       "group": "Data preparation",
-      "tagline": "Daily, monthly & yearly statistics from any time series",
-      "description": "Load a water-level, discharge or rainfall record and get the minimum, maximum and average for every day, month and year — with an interactive range chart, a sortable table and Excel export.",
-      "url": "tools/hydro-series/#minmax",
+      "tagline": "Min-max-avg statistics and a series generator for any time series",
+      "description": "Two tools in one page. Min-Max-Avg Terminal: Load a water-level, discharge or rainfall record and get the minimum, maximum and average for every day, month and year — with an interactive range chart, a sortable table and Excel export. Series Generator: Learns the seasonal pattern, spread and day-to-day memory of a series, then fills the missing values or adds plausible years before or after the record. Includes an accuracy test for the filled values.",
+      "url": "tools/hydro-series/",
       "icon": "band",
       "accent": "cyan",
       "status": "live",
       "updated": "2026-10-17",
       "features": [
-        "Reads .xlsx, .csv, .txt or rows pasted from Excel",
-        "Finds the date and value columns automatically",
-        "Min–max band chart with hover values",
-        "Export results to .xlsx"
+        "Min-Max-Avg: Reads .xlsx, .csv, .txt or rows pasted from Excel",
+        "Min-Max-Avg: Finds the date and value columns automatically",
+        "Min-Max-Avg: Min–max band chart with hover values",
+        "Min-Max-Avg: Export results to .xlsx",
+        "Series Generator: Gap filling: model, random, linear or seasonal",
+        "Series Generator: Extend by years: statistical model or resampled years",
+        "Series Generator: Built-in accuracy test for filled holes",
+        "Series Generator: Multi-sheet workbooks, plots and Excel export"
       ],
       "tags": [
         "Water level",
         "Discharge",
-        "Statistics"
-      ]
-    },
-    {
-      "name": "Series Generator",
-      "group": "Data preparation",
-      "tagline": "Extend records with plausible synthetic years",
-      "description": "Learns the seasonal pattern, spread and day-to-day memory of a series, then fills the missing values or adds plausible years before or after the record. Includes an accuracy test for the filled values.",
-      "url": "tools/hydro-series/#generator",
-      "icon": "extend",
-      "accent": "violet",
-      "status": "live",
-      "updated": "2026-10-17",
-      "features": [
-        "Gap filling: model, random, linear or seasonal",
-        "Extend by years: statistical model or resampled years",
-        "Built-in accuracy test for filled holes",
-        "Multi-sheet workbooks, plots and Excel export"
-      ],
-      "tags": [
+        "Statistics",
         "Gap filling",
-        "Synthetic series",
-        "Discharge"
+        "Synthetic series"
       ]
     },
     {
@@ -383,7 +367,7 @@
       "icon": "profile",
       "accent": "teal",
       "status": "live",
-      "updated": "2026-11-08",
+      "updated": "2026-11-12",
       "features": [
         "Interactive cross-section inspector: edit elevations (Z), distances (Y), add or delete points",
         "Configurable bank code selection: assign left and right codes to enforce correct flow orientation",
@@ -391,7 +375,7 @@
         "SOBEK 2.1x integration: generate clean PROFILE.DEF or merge into existing case files in-place",
         "Datum shift (e.g. +0.46 m MSL → PWD in Bangladesh) & optional bank crest trimming",
         "Audit report: export comprehensive CSV summaries with widths, bed levels, and orientation status",
-        "Ready for thalweg line tracking, chainage profiling & survey coordinate mapping"
+        "Thalweg & Longitudinal Profiler: tracks the lowest bed points, with a 2D plan map, CSV and 3D GeoJSON export"
       ],
       "tags": [
         "Cross-sections",
@@ -716,8 +700,8 @@
         "Mahfujur Rahman Joy"
       ],
       "venue": "H2Open Journal",
-      "volume": "",
-      "issue": "",
+      "volume": "9",
+      "issue": "3",
       "pages": "100021",
       "doi": "10.1016/j.htopen.2026.100021",
       "url": "",
@@ -1089,20 +1073,17 @@
     {
       "name": "Dr. Ahmad Hasan Nury",
       "title": "Professor, Dept. of Civil & Environmental Engineering",
-      "org": "Shahjalal University of Science and Technology",
-      "email": "hasan-cee@sust.edu"
+      "org": "Shahjalal University of Science and Technology"
     },
     {
       "name": "Dr. Khalidur Rahman",
       "title": "Professor, Dept. of Statistics",
-      "org": "Shahjalal University of Science and Technology",
-      "email": "khalid-sta@sust.edu"
+      "org": "Shahjalal University of Science and Technology"
     },
     {
       "name": "Dr. Niaz Md. Farhat Rahman",
       "title": "Principal Scientific Officer, Agromet Lab",
-      "org": "Bangladesh Rice Research Institute",
-      "email": "niaz.sust@gmail.com"
+      "org": "Bangladesh Rice Research Institute"
     }
   ]
 }

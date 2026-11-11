@@ -760,3 +760,4 @@ html.js:not(.ready) main, html.js:not(.ready) .marquee, html.js:not(.ready) .foo
 
 /* 7. timeline fills as it is scrolled through */
 .timeline::after { content: ''; position: absolute; left: 7px; top: 8px; width: 2px; height: calc((100% - 16px) * var(--p, 0)); background: var(--accent); box-shadow: 0 0 8px color-mix(in srgb, var(--accent) 70%, transparent); pointer-events: none; }
+.ref-note { margin: 4px 2px 0; }
