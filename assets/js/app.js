@@ -10,6 +10,12 @@
   // Allow normal web, mail, phone and relative links; block script/data URLs
   const safeUrl = (u) => (u && !/^\s*(javascript|data|vbscript):/i.test(u) ? u : '#');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function onView(el, fn, threshold) {
+    if (!el) return;
+    if (reduced || !('IntersectionObserver' in window)) { fn(el); return; }
+    const io = new IntersectionObserver((entries) => entries.forEach((en) => { if (en.isIntersecting) { io.disconnect(); fn(el); } }), { threshold: threshold || 0.25 });
+    io.observe(el);
+  }
 
   const SECTIONS = [
     ['about', 'About'], ['education', 'Education'], ['experience', 'Experience'], ['tools', 'Tools'], ['map', 'Map'],
@@ -49,7 +55,7 @@
         if (draft) { document.body.classList.add('is-preview'); return JSON.parse(draft); }
       } catch (e) { /* ignore */ }
     }
-    const res = await fetch('data/content.json?v=' + Date.now(), { cache: 'no-store' });
+    const res = await fetch('data/content.json', { cache: 'no-cache' });
     if (!res.ok) throw new Error('HTTP ' + res.status);
     return res.json();
   }
@@ -139,14 +145,16 @@
     const p = DATA.profile;
     const ld = {
       '@context': 'https://schema.org', '@type': 'Person', name: p.name,
-      jobTitle: (DATA.experience[0] || {}).role, email: 'mailto:' + primaryEmail(),
+      jobTitle: (DATA.experience[0] || {}).role, email: primaryEmail(),
       worksFor: (DATA.experience[0] || {}).org ? { '@type': 'Organization', name: DATA.experience[0].org } : undefined,
-      alumniOf: DATA.education.map((e) => ({ '@type': 'CollegeOrUniversity', name: e.institution })),
+      url: m.siteUrl,
+      alumniOf: DATA.education.map((e) => ({ '@type': /university/i.test(e.institution) ? 'CollegeOrUniversity' : 'EducationalOrganization', name: e.institution })),
       sameAs: DATA.links.filter((l) => l.url).map((l) => l.url),
       address: { '@type': 'PostalAddress', addressLocality: p.location },
     };
-    const s = document.createElement('script'); s.type = 'application/ld+json'; s.textContent = JSON.stringify(ld);
-    document.head.appendChild(s);
+    let s = document.getElementById('ld-person');
+    if (!s) { s = document.createElement('script'); s.type = 'application/ld+json'; s.id = 'ld-person'; document.head.appendChild(s); }
+    s.textContent = JSON.stringify(ld);
   }
 
   function renderNav() {
@@ -328,7 +336,7 @@
     const tabsBox = $('.tb-tabs', box);
     const panel = $('#tbp', box);
 
-    const renderTabs = () => {
+    const renderTabs = (reveal) => {
       const visible = currentCat === 'all' ? tools : tools.filter((t) => t.group === currentCat);
       if (!visible.some((t) => tools.indexOf(t) === currentIdx)) {
         currentIdx = tools.indexOf(visible[0]);
@@ -346,7 +354,7 @@
       (currentCat === 'all' ? '<div class="tb-more mono">+ more tools coming</div>' : '');
 
       const activeBtn = $('#tbt-' + currentIdx, tabsBox);
-      if (activeBtn) activeBtn.scrollIntoView({ block: 'nearest' });
+      if (activeBtn && reveal) tabsBox.scrollTop = Math.max(0, activeBtn.offsetTop - tabsBox.offsetTop);
     };
 
     const show = (i) => {
@@ -371,6 +379,8 @@
         '<div class="tb-actions">' + (live ? '<a class="btn primary tb-launch" href="' + esc(safeUrl(t.url)) + '">Launch tool <span aria-hidden="true">→</span></a>' +
           '<a class="mini" href="' + esc(safeUrl(t.url)) + '" target="_blank" rel="noopener" title="Open in a new tab">↗</a>' : '<span class="mini">Coming soon</span>') + '</div></div></div>' +
         '<div class="tb-art">' + toolArt(t.icon) + '<span class="tb-art-cap mono">preview</span></div>';
+      $$('.tb-art .ta-obs, .tb-art .ta-real, .tb-art .ta-stream', panel).forEach((p, k) => { p.setAttribute('pathLength', '1'); p.style.setProperty('--i', k); });
+      $$('.tb-art .ta-pt, .tb-art .ta-dot', panel).forEach((p, k) => p.style.setProperty('--i', k));
     };
 
     box.addEventListener('click', (e) => {
@@ -378,7 +388,7 @@
       if (catBtn) {
         currentCat = catBtn.dataset.cat;
         $$('.tb-filter button', box).forEach((b) => b.setAttribute('aria-selected', b === catBtn));
-        renderTabs();
+        renderTabs(true);
         show(currentIdx);
         return;
       }
@@ -511,6 +521,15 @@
     }));
     const pub = pubs.filter((p) => p.status === 'published').length;
     $('#pubNote').textContent = pub + ' published' + (pubs.length > pub ? ' · ' + (pubs.length - pub) + ' accepted / in pipeline' : '');
+    const chart = $('#pubChart');
+    if (chart && !chart.firstChild) {
+      const byYear = {};
+      pubs.forEach((p) => { byYear[p.year] = (byYear[p.year] || 0) + 1; });
+      const years = Object.keys(byYear).sort(), top = Math.max.apply(null, years.map((y) => byYear[y]));
+      chart.setAttribute('aria-label', 'Papers per year: ' + years.map((y) => y + ': ' + byYear[y]).join(', '));
+      chart.innerHTML = years.map((y, i) => '<span class="pc-col" aria-hidden="true"><b>' + byYear[y] + '</b><i style="--h:' + Math.max(8, Math.round(byYear[y] / top * 100)) + '%;--i:' + i + '"></i><em>' + esc(y) + '</em></span>').join('');
+      onView(chart, () => chart.classList.add('in'), 0.6);
+    }
   }
 
   function renderPubs() {
@@ -585,8 +604,8 @@
     $('#guilds').innerHTML = DATA.leadership.map((l) =>
       '<li class="reveal"><div><b>' + esc(l.role) + '</b><span class="muted">' + esc(l.org) + (l.location ? ' · ' + esc(l.location) : '') + '</span></div><span class="mono small">' + esc(l.period) + '</span></li>').join('');
     $('#refs').innerHTML = '<p class="pixel sec-kicker">REFERENCES</p>' + DATA.references.map((r) =>
-      '<article class="card ref reveal"><h4>' + esc(r.name) + '</h4><p class="small">' + esc(r.title) + '</p><p class="muted small">' + esc(r.org) + '</p>' +
-      (r.email ? '<a class="mono small" href="mailto:' + esc(r.email) + '">' + esc(r.email) + '</a>' : '') + '</article>').join('');
+      '<article class="card ref reveal"><h3>' + esc(r.name) + '</h3><p class="small">' + esc(r.title) + '</p><p class="muted small">' + esc(r.org) + '</p>' +
+      '</article>').join('') + (DATA.references.length ? '<p class="muted small ref-note">Contact details available on request.</p>' : '');
   }
 
   function renderContact() {
@@ -672,7 +691,7 @@
       '<polyline class="river flow" points="' + line(RIVERS[k]) + '"/>').join('');
     const pins = sites.map((s, i) => {
       const [x, y] = proj(s.lon, s.lat);
-      return '<g class="pin' + (s.current ? ' now' : '') + '" data-site="' + i + '" tabindex="0" transform="translate(' + x.toFixed(1) + ',' + y.toFixed(1) + ')">' +
+      return '<g class="pin' + (s.current ? ' now' : '') + '" data-site="' + i + '" transform="translate(' + x.toFixed(1) + ',' + y.toFixed(1) + ')">' +
         '<circle class="pulse" r="10"/><rect x="-5" y="-5" width="10" height="10"/><title>' + esc(s.name) + '</title></g>';
     }).join('');
     svgEl.innerHTML = '<g class="dots">' + dots + '</g>' + rivers +
@@ -682,14 +701,25 @@
     // Side panel: one detail card for the selected site + a compact numbered index
     const num = (i) => String(i + 1).padStart(2, '0');
     $('#mapSide').innerHTML =
-      '<article class="card site-detail" id="siteDetail" aria-live="polite"></article>' +
+      '<article class="card site-detail" id="siteDetail"></article>' +
       '<div class="site-index-head mono"><span>All sites</span><span>' + sites.length + '</span></div>' +
-      '<div class="site-list" role="list">' + sites.map((s, i) =>
-        '<button class="site-chip' + (s.current ? ' now' : '') + '" data-site="' + i + '" role="listitem" title="' + esc(s.name) + '">' +
+      '<div class="site-list">' + sites.map((s, i) =>
+        '<button class="site-chip' + (s.current ? ' now' : '') + '" data-site="' + i + '" title="' + esc(s.name) + '">' +
         '<span class="num mono">' + num(i) + '</span><span class="nm">' + esc(s.name) + '</span></button>').join('') + '</div>' +
       '<p class="muted small nationwide"><b>Nationwide:</b> CMIP6 drought projection, GCM precipitation reliability and soil-moisture drought studies cover all of Bangladesh.</p>';
 
     const tip = $('#mapTip'), detail = $('#siteDetail');
+    if (!reduced) {
+      const lines = $$('.river:not(.flow)', svgEl);
+      lines.forEach((l) => { const len = l.getTotalLength(); l.style.strokeDasharray = len; l.style.strokeDashoffset = len; });
+      svgEl.classList.add('pre-draw');
+      onView(svgEl, () => {
+        lines.forEach((l, i) => { l.style.transition = 'stroke-dashoffset 1.5s ease-in-out ' + (i * 0.15) + 's'; l.style.strokeDashoffset = '0'; });
+        $$('.pin', svgEl).forEach((p, i) => { p.style.transitionDelay = (1.3 + i * 0.09) + 's'; });
+        svgEl.classList.remove('pre-draw');
+        svgEl.classList.add('drawn');
+      }, 0.35);
+    }
     let selected = Math.max(0, sites.findIndex((s) => s.current));
     function show(i) {
       const s = sites[i];
@@ -728,11 +758,12 @@
     nodes.forEach((n, wi) => {
       const final = n.textContent;
       if (reduced) return;
+      n.style.width = n.offsetWidth + 'px'; n.style.whiteSpace = 'nowrap'; n.style.overflow = 'hidden'; n.style.verticalAlign = 'bottom';
       let frame = 0;
       const total = 18 + wi * 6;
       const iv = setInterval(() => {
         n.textContent = final.split('').map((ch, i) => (frame > total * (i / final.length) + wi * 3 ? ch : glyphs[(Math.random() * glyphs.length) | 0])).join('');
-        if (++frame > total + final.length) { n.textContent = final; clearInterval(iv); }
+        if (++frame > total + final.length) { n.textContent = final; n.style.width = n.style.whiteSpace = n.style.overflow = n.style.verticalAlign = ''; clearInterval(iv); }
       }, 40);
     });
   }
@@ -794,6 +825,41 @@
     onScroll();
   }
 
+  // Section kickers type themselves in when their section arrives. The full text stays in the page for
+  // screen readers; only the visible copy is typed.
+  function typeKickers() {
+    if (reduced) return;
+    $$('.sec-head .sec-kicker').forEach((el) => {
+      const text = el.textContent;
+      if (!text.trim()) return;
+      el.innerHTML = '<span class="vh">' + esc(text) + '</span><span class="typed-k" aria-hidden="true">&nbsp;</span>';
+      const out = el.lastChild;
+      onView(el, () => {
+        let i = 0;
+        el.classList.add('typing');
+        const iv = setInterval(() => {
+          out.textContent = text.slice(0, ++i);
+          if (i >= text.length) { clearInterval(iv); setTimeout(() => el.classList.remove('typing'), 900); }
+        }, 45);
+      }, 0.9);
+    });
+  }
+
+  // The experience timeline fills like a pipe as it is scrolled through
+  function timelineFlow() {
+    const tl = $('#timeline');
+    if (!tl) return;
+    if (reduced) { tl.style.setProperty('--p', 1); return; }
+    let queued = false;
+    const update = () => {
+      queued = false;
+      const r = tl.getBoundingClientRect();
+      tl.style.setProperty('--p', Math.min(1, Math.max(0, (innerHeight * 0.6 - r.top) / r.height)).toFixed(3));
+    };
+    addEventListener('scroll', () => { if (!queued) { queued = true; requestAnimationFrame(update); } }, { passive: true });
+    update();
+  }
+
   function tilt() {
     const card = $('#avatarCard');
     if (reduced || matchMedia('(pointer: coarse)').matches) return;
@@ -819,9 +885,20 @@
   function initAvatar() {
     const av = DATA.avatar || {};
     avatar = new window.PixelAvatar($('#scene'), $('#bubble'), { lines: av.lines });
-    avatar.setTheme(document.documentElement.getAttribute('data-theme'));
+    const hour = new Date().getHours();
+    avatar.setTheme(hour >= 6 && hour < 18 ? 'light' : 'dark');
     const rainBtn = $('#rainBtn'), shadesBtn = $('#shadesBtn');
-    const rain = () => { const on = avatar.toggleRain(); rainBtn.setAttribute('aria-pressed', on); };
+    const rain = () => {
+      const on = avatar.toggleRain(); rainBtn.setAttribute('aria-pressed', on);
+      let layer = $('.rain-layer');
+      if (on && !layer && !reduced) {
+        layer = document.createElement('div'); layer.className = 'rain-layer'; layer.setAttribute('aria-hidden', 'true');
+        let seed = 11; const rnd = () => ((seed = (seed * 9301 + 49297) % 233280) / 233280);
+        layer.innerHTML = Array.from({ length: 36 }, () => '<i style="left:' + (rnd() * 100).toFixed(1) + '%;animation-duration:' + (0.7 + rnd() * 0.7).toFixed(2) + 's;animation-delay:-' + (rnd() * 1.4).toFixed(2) + 's"></i>').join('');
+        $('#home').appendChild(layer);
+      }
+      requestAnimationFrame(() => document.body.classList.toggle('raining', !!on));
+    };
     const shades = () => { const on = avatar.toggleShades(); shadesBtn.setAttribute('aria-pressed', on); if (buddy) buddy.shades = on; };
     $('#scene').addEventListener('click', () => avatar.poke());
     rainBtn.addEventListener('click', rain);
@@ -890,8 +967,9 @@
       sel = Math.min(sel, Math.max(0, shown.length - 1));
       list.innerHTML = shown.length ? shown.map((c, i) => '<li role="option" aria-selected="' + (i === sel) + '" data-i="' + i + '"><span>' + esc(c.k) + '</span><small class="mono">' + esc(c.h) + '</small></li>').join('') : '<li class="none mono">No matching command</li>';
     }
-    function open() { ov.hidden = false; input.value = ''; sel = 0; draw(); setTimeout(() => input.focus(), 10); }
-    function close() { ov.hidden = true; }
+    let opener = null;
+    function open() { opener = document.activeElement; ov.hidden = false; input.value = ''; sel = 0; draw(); setTimeout(() => input.focus(), 10); }
+    function close() { if (ov.hidden) return; ov.hidden = true; if (opener && opener.focus) opener.focus(); opener = null; }
     function run(i) { const c = shown[i]; if (!c) return; close(); c.f(); }
     input.addEventListener('input', () => { sel = 0; draw(); });
     input.addEventListener('keydown', (e) => {
@@ -906,18 +984,37 @@
     addEventListener('keydown', (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); ov.hidden ? open() : close(); }
       else if (e.key === 'Escape') { close(); closeModal(); }
-      else if (e.key === '/' && !/input|textarea/i.test(document.activeElement.tagName)) { e.preventDefault(); open(); }
     });
   }
 
   // ------------------------------------------------------------ modal
-  function closeModal() { $('#citeModal').hidden = true; }
+  let citeOpener = null;
+  function closeModal() {
+    const m = $('#citeModal');
+    if (m.hidden) return;
+    m.hidden = true;
+    if (citeOpener && citeOpener.focus) citeOpener.focus();
+    citeOpener = null;
+  }
+  function openModal(from) {
+    citeOpener = from;
+    const m = $('#citeModal');
+    m.hidden = false;
+    $('[data-close]', m).focus();
+  }
   function initModal() {
     const m = $('#citeModal');
     m.addEventListener('click', (e) => {
       if (e.target === m || e.target.closest('[data-close]')) closeModal();
       const c = e.target.closest('[data-copy]');
       if (c) copy($('#' + c.dataset.copy).textContent, 'Citation copied');
+    });
+    m.addEventListener('keydown', (e) => {
+      if (e.key !== 'Tab') return;
+      const f = $$('button, [href], [tabindex]:not([tabindex="-1"])', m).filter((el) => !el.disabled);
+      const first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
     });
   }
 
@@ -1013,13 +1110,15 @@
       reading(true); clearTimeout(readT); readT = setTimeout(() => reading(false), 1400);
     });
     $('#pubSearch').addEventListener('blur', () => reading(false));
-    // Soft spotlight that follows the cursor across cards
-    document.addEventListener('pointermove', (e) => {
+    // A ripple spreads from the point where the cursor enters a card
+    if (!reduced) document.addEventListener('pointerover', (e) => {
       const card = e.target.closest && e.target.closest('.card');
-      if (!card) return;
+      if (!card || (e.relatedTarget && card.contains(e.relatedTarget)) || e.pointerType === 'touch') return;
       const r = card.getBoundingClientRect();
       card.style.setProperty('--mx', (e.clientX - r.left) + 'px');
       card.style.setProperty('--my', (e.clientY - r.top) + 'px');
+      card.classList.remove('ripple');
+      requestAnimationFrame(() => card.classList.add('ripple'));
     }, { passive: true });
     $('#copyMailBtn').addEventListener('click', () => copy(primaryEmail(), 'Email copied'));
     $('#topLink').addEventListener('click', (e) => { e.preventDefault(); scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' }); });
@@ -1028,7 +1127,7 @@
       if (c) {
         const p = DATA.publications[+c.dataset.cite];
         $('#apaBox').textContent = apa(p); $('#bibBox').textContent = bibtex(p);
-        $('#citeModal').hidden = false;
+        openModal(c);
       }
       const t = e.target.closest('[data-tag]');
       if (t) { state.query = t.dataset.tag; $('#pubSearch').value = state.query; renderPubs(); }
@@ -1042,6 +1141,7 @@
     try { DATA = await load(); }
     catch (err) {
       document.getElementById('boot') && document.getElementById('boot').remove();
+      document.documentElement.classList.add('ready');
       $('#main').innerHTML = '<section class="section"><div class="card"><h2>Content failed to load</h2><p class="muted">Could not read <code>data/content.json</code> (' + esc(err.message) +
         '). If you opened this file directly from disk, run it through a local web server instead — see README.md.</p></div></section>';
       return;
@@ -1056,7 +1156,8 @@
     renderPubTabs(); renderPubs(); renderSkills(); renderEducation(); renderLeadership(); renderContact();
     const actions = initAvatar();
     bindGlobal(); initPalette(actions); initBuddy(actions); initModal(); initTerminal(actions); konami(actions);
-    countUp(); reveal(); scrollSpy(); tilt(); jumpToHash();
+    countUp(); reveal(); scrollSpy(); tilt(); typeKickers(); timelineFlow(); jumpToHash();
+    document.documentElement.classList.add('ready');
     if (document.body.classList.contains('is-preview')) toast('Preview mode — showing your unsaved draft');
   }
 
