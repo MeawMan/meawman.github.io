@@ -367,7 +367,7 @@
       "icon": "profile",
       "accent": "teal",
       "status": "live",
-      "updated": "2026-11-12",
+      "updated": "2026-11-08",
       "features": [
         "Interactive cross-section inspector: edit elevations (Z), distances (Y), add or delete points",
         "Configurable bank code selection: assign left and right codes to enforce correct flow orientation",

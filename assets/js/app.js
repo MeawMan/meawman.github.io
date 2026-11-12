@@ -814,28 +814,13 @@
     function onScroll() {
       const max = document.documentElement.scrollHeight - innerHeight;
       const pct = max > 0 ? Math.min(100, Math.round((scrollY / max) * 100)) : 0;
-      fill.style.transform = 'scaleY(' + (pct / 100) + ')';
-      label.style.bottom = pct + '%';
-      label.classList.toggle('show', scrollY > 20);
+      fill.style.width = pct + '%';
       label.textContent = 'XP ' + pct + '%';
       nav.classList.toggle('scrolled', scrollY > 20);
       let cur = '';
       SECTIONS.forEach(([id]) => { const el = document.getElementById(id); if (el && !el.hidden && el.getBoundingClientRect().top < innerHeight * 0.35) cur = id; });
       links.forEach((a) => a.classList.toggle('active', a.dataset.sec === cur));
     }
-    function ticks() {
-      const max = document.documentElement.scrollHeight - innerHeight;
-      $('#gaugeTicks').innerHTML = max > 0 ? SECTIONS.map(([id]) => {
-        const el = document.getElementById(id);
-        if (!el || el.hidden) return '';
-        const p = Math.min(100, Math.max(0, ((el.getBoundingClientRect().top + scrollY - innerHeight * 0.35) / max) * 100));
-        return '<i style="bottom:' + p.toFixed(1) + '%"></i>';
-      }).join('') : '';
-    }
-    let tickT = 0;
-    addEventListener('resize', () => { clearTimeout(tickT); tickT = setTimeout(ticks, 200); }, { passive: true });
-    addEventListener('load', ticks, { once: true });
-    ticks();
     addEventListener('scroll', onScroll, { passive: true });
     onScroll();
   }

@@ -1,3 +1,6 @@
+.xp { position: fixed; top: 0; left: 0; right: 0; height: 3px; z-index: 60; background: transparent; }
+.xp span { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--accent), var(--accent-3)); box-shadow: 0 0 10px var(--accent); }
+.xp em { position: fixed; right: 10px; top: 6px; font: 12px var(--pixel); color: var(--dim); font-style: normal; z-index: 61; opacity: 0; transition: opacity .3s; }
 /* Self-hosted fonts (same families as before, Latin subset) */
 @font-face { font-family: 'Space Grotesk'; font-style: normal; font-weight: 400 700; font-display: swap; src: url('../fonts/space-grotesk-var.woff2') format('woff2'); }
 @font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 400 700; font-display: swap; src: url('../fonts/jetbrains-mono-var.woff2') format('woff2'); }
@@ -679,7 +682,7 @@ body.is-preview::before { content: 'PREVIEW · DRAFT'; position: fixed; bottom: 
 /* ---------- print (clean CV) ---------- */
 @media print {
   .aurora, .grain, .marquee, .buddy, #map, .gantt-card, .card-hint,
-  #flow, .grid-bg, .gauge, .rain-layer, .nav, .hero-avatar, .cta, .pub-tools, .pub-actions, .terminal .term-input, .overlay, .toast, #boot, .footer a, .tags button, .chev { display: none !important; }
+  #flow, .grid-bg, .xp, .rain-layer, .nav, .hero-avatar, .cta, .pub-tools, .pub-actions, .terminal .term-input, .overlay, .toast, #boot, .footer a, .tags button, .chev { display: none !important; }
   body { background: #fff; color: #000; font-size: 11pt; }
   .card, .guilds, .contact-card, .stats, .stat { background: none !important; border-color: #ccc !important; box-shadow: none !important; backdrop-filter: none !important; }
   .reveal { opacity: 1 !important; transform: none !important; }
@@ -697,7 +700,7 @@ body.is-preview::before { content: 'PREVIEW · DRAFT'; position: fixed; bottom: 
 .noscript a { color: var(--accent); }
 
 /* ---------- without JavaScript: show the plain fallback, not an empty shell or the boot screen ---------- */
-html:not(.js) .boot, html:not(.js) #flow, html:not(.js) .gauge, html:not(.js) .buddy, html:not(.js) .marquee,
+html:not(.js) .boot, html:not(.js) #flow, html:not(.js) .xp, html:not(.js) .buddy, html:not(.js) .marquee,
 html:not(.js) main > :not(noscript), html:not(.js) .nav-actions, html:not(.js) .footer { display: none !important; }
 html:not(.js) .noscript { display: block; padding-top: 120px; }
 html:not(.js) .noscript h1 { font-size: clamp(32px, 6vw, 56px); margin: 0 0 16px; color: var(--strong, inherit); }
@@ -716,13 +719,6 @@ html.js:not(.ready) main, html.js:not(.ready) .marquee, html.js:not(.ready) .foo
    ===================================================================== */
 .vh { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
-/* 1. scroll gauge: a staff gauge on the right edge; the water rises as the page is read */
-.gauge { position: fixed; right: 8px; top: 88px; bottom: 28px; width: 6px; z-index: 40; border: 1px solid var(--line-2); border-radius: 3px; background: color-mix(in srgb, var(--panel-solid) 70%, transparent); pointer-events: none; }
-.gauge-fill { position: absolute; inset: 0; border-radius: 2px; background: linear-gradient(0deg, var(--accent), color-mix(in srgb, var(--accent) 55%, var(--accent-3))); box-shadow: 0 0 10px color-mix(in srgb, var(--accent) 60%, transparent); transform: scaleY(0); transform-origin: bottom; }
-.gauge-ticks i { position: absolute; right: 100%; width: 7px; height: 1px; margin-right: 2px; background: var(--dim); }
-.gauge em { position: absolute; right: 12px; bottom: 0; transform: translateY(50%); font: 12px var(--pixel); font-style: normal; color: var(--dim); white-space: nowrap; opacity: 0; transition: opacity .3s; }
-.gauge em.show { opacity: 1; }
-@media (max-width: 720px) { .gauge { right: 3px; width: 4px; top: 72px; } .gauge em, .gauge-ticks { display: none; } }
 
 /* 2. map: sites stay hidden until the rivers have been drawn */
 #bdMap.pre-draw .pin, #bdMap.pre-draw .river.flow { opacity: 0; }
