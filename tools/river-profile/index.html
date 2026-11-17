@@ -278,7 +278,17 @@ footer.tool-foot{margin-top:32px;padding-top:14px;border-top:1px solid var(--lin
           <label>Datum shift to Z (m)<input type="number" id="shift" step="0.001" value="0"></label>
           <label>Name prefix<input type="text" id="prefix" value="" placeholder="e.g. 35_1_"></label>
         </div>
-        <p class="hint">MSL → PWD in Bangladesh is typically +0.46 m. Section names in SOBEK become Prefix + ID.</p>
+        <div class="row2">
+          <label>Section ID
+            <select id="idMode">
+              <option value="raw">As in the data</option>
+              <option value="num">Last number only (CS-21 → 21)</option>
+              <option value="strip">Remove text…</option>
+            </select>
+          </label>
+          <label id="idStripWrap" hidden>Text to remove<input type="text" id="idStrip" placeholder="e.g. CS-, _Pre"></label>
+        </div>
+        <p class="hint">MSL → PWD in Bangladesh is typically +0.46 m. Section names in SOBEK become Prefix + ID. Separate several texts to remove with commas.</p>
         
         <label class="inline"><input type="checkbox" id="orient" checked> Orient left bank first (when bank codes are present)</label>
 
@@ -307,7 +317,13 @@ footer.tool-foot{margin-top:32px;padding-top:14px;border-top:1px solid var(--lin
               <label>Trim drop (m)<input type="number" id="thr" step="0.05" min="0.05" value="0.5"></label>
               <label>Ignore spikes (m)<input type="number" id="spike" step="0.1" min="0" value="1.0"></label>
             </div>
-            <p class="hint">Keeps only the main channel between the natural bank crests.</p>
+            <label>Trim at
+              <select id="trimAt">
+                <option value="drop">Where ground drops behind the bank crest</option>
+                <option value="codes">The bank codes (LB → RB)</option>
+              </select>
+            </label>
+            <p class="hint">Keeps only the main channel. "Ground drops" keeps rising bank up to the crest and cuts where the ground behind it falls more than the trim drop, so a floodplain level with the bank top is kept. "Bank codes" cuts exactly at the coded bank points. A side without a code always uses the crest rule. Spikes are ignored.</p>
           </div>
         </details>
 
@@ -527,7 +543,8 @@ const Core = (() => {
     const by = new Map();
     let skipped = 0;
     rows.forEach((row, i) => {
-      const id = String(row[m.id] ?? "").replace(/[\r\n]+/g, " ").trim();
+      const id0 = String(row[m.id] ?? "").replace(/[\r\n]+/g, " ").trim();
+      const id = m.idMap && m.idMap.has(id0) ? m.idMap.get(id0) : id0;
       const y = parseFloat(String(row[m.y] ?? "").replace(",", "."));
       const z = parseFloat(String(row[m.z] ?? "").replace(",", "."));
       if (!id || !isFinite(y) || !isFinite(z)) { skipped++; return; }
@@ -590,16 +607,39 @@ const Core = (() => {
     sd = p.map(q => side(q.code, o));
     Li = sd.flatMap((s, i) => s === "L" ? [i] : []);
     Ri = sd.flatMap((s, i) => s === "R" ? [i] : []);
-    const bedIdx = n ? lowest() : 0;
+    // Channel bed: when an LB … RB code pair exists, the lowest point BETWEEN the innermost pair
+    // (a deeper ditch or hole outside the coded banks must not move the channel); otherwise the lowest point.
+    const gIdx = n ? lowest() : 0;
+    let pl = -1, pr = -1;
+    for (const r of Ri) {
+      let l = -1;
+      for (const i of Li) if (i < r) l = i;
+      if (l >= 0) { pl = l; pr = r; break; }
+    }
+    let bedIdx = gIdx;
+    if (pl >= 0) { bedIdx = pl; for (let k = pl + 1; k <= pr; k++) if (p[k].z < p[bedIdx].z) bedIdx = k; }
+
+    // Data checks (independent of trimming)
+    if (n >= 3) {
+      if (pl >= 0 && p[bedIdx].z - p[gIdx].z > 0.3) flags.push(["warn", `deeper ground outside the bank codes (${r2(p[bedIdx].z - p[gIdx].z)} m lower)`]);
+      if (bedIdx === 0 || bedIdx === n - 1) flags.push(["warn", "section ends at its lowest point (incomplete?)"]);
+      else {
+        let mL = -Infinity, mR = -Infinity;
+        for (let k = 0; k < bedIdx; k++) mL = Math.max(mL, p[k].z);
+        for (let k = bedIdx + 1; k < n; k++) mR = Math.max(mR, p[k].z);
+        if (Math.min(mL, mR) - p[bedIdx].z < 0.3) flags.push(["warn", "no clear channel (banks < 0.3 m above bed)"]);
+      }
+    }
 
     let lc = 0, rc = n - 1;
     if (o.trim && n >= 3) {
       const isSpike = k => o.spike > 0 && k > 0 && k < n - 1 && p[k].z - Math.max(p[k - 1].z, p[k + 1].z) > o.spike;
       const bedZ0 = p[bedIdx].z;
-      // Anchor on each side: the innermost bank code (last L left of the bed, first R right of it).
-      let li = -1, ri = -1;
-      for (let k = bedIdx; k >= 0; k--) if (sd[k] === "L") { li = k; break; }
-      for (let k = bedIdx; k < n; k++) if (sd[k] === "R") { ri = k; break; }
+      // Anchor on each side: the innermost bank code (last L left of the channel bed, first R right of it).
+      let li = pl, ri = pr;
+      if (li < 0) for (let k = bedIdx; k >= 0; k--) if (sd[k] === "L") { li = k; break; }
+      if (ri < 0) for (let k = bedIdx; k < n; k++) if (sd[k] === "R") { ri = k; break; }
+      const liCode = li >= 0, riCode = ri >= 0;
       // No code on a side: walk out from the bed to the first point that rises to
       // min(bed + 1.5, bed + 0.7 × (side max − bed)), skipping spikes.
       if (li < 0) {
@@ -615,17 +655,25 @@ const Core = (() => {
         for (let k = bedIdx + 1; k < n; k++) { if (isSpike(k)) continue; if (p[k].z >= tgt) { ri = k; break; } }
       }
 
-      let run = p[li].z;
-      for (let k = li - 1; k >= 0; k--) {
-        if (isSpike(k)) continue;
-        if (p[k].z > run) run = p[k].z;
-        else if (run - p[k].z > o.thr) { lc = k + 1; break; }
+      // "codes": cut exactly at a coded bank. Otherwise (and on a side without a code) keep rising ground
+      // beyond the anchor up to the crest, and cut where the ground falls more than `thr` below it.
+      if (o.trimAt === "codes" && liCode) lc = li;
+      else {
+        let run = p[li].z;
+        for (let k = li - 1; k >= 0; k--) {
+          if (isSpike(k)) continue;
+          if (p[k].z > run) run = p[k].z;
+          else if (run - p[k].z > o.thr) { lc = k + 1; break; }
+        }
       }
-      run = p[ri].z;
-      for (let k = ri + 1; k < n; k++) {
-        if (isSpike(k)) continue;
-        if (p[k].z > run) run = p[k].z;
-        else if (run - p[k].z > o.thr) { rc = k - 1; break; }
+      if (o.trimAt === "codes" && riCode) rc = ri;
+      else {
+        let run = p[ri].z;
+        for (let k = ri + 1; k < n; k++) {
+          if (isSpike(k)) continue;
+          if (p[k].z > run) run = p[k].z;
+          else if (run - p[k].z > o.thr) { rc = k - 1; break; }
+        }
       }
       if (lc > 0 || rc < n - 1) flags.push(["info", "trimmed"]);
     }
@@ -1101,6 +1149,7 @@ function opts() {
     prefix: $("prefix").value.trim(),
     orient: $("orient").checked,
     trim: $("trim").checked,
+    trimAt: $("trimAt").value,
     thr: Math.max(0.01, parseFloat($("thr").value) || 0.5),
     spike: Math.max(0, parseFloat($("spike").value) || 0),
     dedupe: $("dedupe").checked,
@@ -1412,6 +1461,35 @@ function saveDerivedXlsx() {
   save(`${st.shp.base}_derived.xlsx`, new Blob([data], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }));
 }
 
+/* ---------- Section ID shortening ("CS-21" → "21") ---------- */
+// Returns { map: Map(raw → shown), clashes: [raw IDs kept unchanged because they would collide] }
+function sectionIdMap(rows, col) {
+  const mode = $("idMode").value;
+  const map = new Map();
+  if (mode === "raw") return { map, clashes: [] };
+  const parts = $("idStrip").value.split(",").map(s => s.trim()).filter(Boolean);
+  const shorten = raw => {
+    let v = raw;
+    if (mode === "num") { const mm = /(\d+)(?!.*\d)/.exec(raw); v = mm ? mm[1] : raw; }
+    else for (const p of parts) v = v.split(p).join("").trim();
+    return v || raw;
+  };
+  const raws = new Set(rows.map(r => String(r[col] ?? "").replace(/[\r\n]+/g, " ").trim()).filter(Boolean));
+  const byShown = new Map();
+  for (const raw of raws) {
+    const s = shorten(raw);
+    if (!byShown.has(s)) byShown.set(s, []);
+    byShown.get(s).push(raw);
+  }
+  const clashes = [];
+  for (const [s, list] of byShown) {
+    // Never merge different sections: if two raw IDs shorten to the same text, keep both as they are
+    if (list.length > 1 || (raws.has(s) && list[0] !== s)) clashes.push(...list);
+    else map.set(list[0], s);
+  }
+  return { map, clashes };
+}
+
 /* ---------- Calculation & Execution Pipeline ---------- */
 function run() {
   if (!st.rows.length) return;
@@ -1427,6 +1505,11 @@ function run() {
   };
   if (!m.id || !m.y || !m.z) return;
 
+  const idf = sectionIdMap(st.rows, m.id);
+  m.idMap = idf.map;
+  st.idClash = idf.clashes;
+  const rawOf = new Map([...idf.map].map(([raw, shown]) => [shown, raw]));
+
   const { by, skipped } = Core.group(st.rows, m);
   st.rawGroups = by;
   const ids = [...by.keys()].sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
@@ -1435,7 +1518,7 @@ function run() {
     const activePts = st.editedPoints.has(id) ? st.editedPoints.get(id) : by.get(id);
     const isFlipped = st.manualFlips.has(id);
     const s = Core.processSection(id, activePts, o, isFlipped);
-    const ix = st.shpIndex && st.shpIndex.get(id);
+    const ix = st.shpIndex && st.shpIndex.get(rawOf.get(id) ?? id);
     if (ix) {
       if (ix["Duplicates removed"]) s.flags.push(["info", `${ix["Duplicates removed"]} duplicate pts removed`]);
       if (ix["Reference points removed"]) s.flags.push(["info", `${ix["Reference points removed"]} reference pt(s) excluded`]);
@@ -1486,7 +1569,8 @@ function renderSummary(skipped) {
     <div><b>${flipCount}</b> <span>reversed</span></div>
     ${$("trim").checked ? `<div><b>${trimCount}</b> <span>trimmed</span></div>` : ""}
     <div><b style="color:${chkCount ? 'var(--warn)' : 'var(--ok)'}">${chkCount}</b> <span>warnings</span></div>
-    ${skipped ? `<div><b>${skipped}</b> <span>skipped rows</span></div>` : ""}`;
+    ${skipped ? `<div><b>${skipped}</b> <span>skipped rows</span></div>` : ""}
+    ${st.idClash && st.idClash.length ? `<div title="${esc(st.idClash.slice(0, 30).join(", "))}"><b style="color:var(--warn)">${st.idClash.length}</b> <span>IDs kept in full (shortened form would clash)</span></div>` : ""}`;
 }
 
 function renderList() {
@@ -2602,13 +2686,14 @@ $("checkWidth").onchange = () => {
   if (el) el.addEventListener("change", () => id === "filter" ? renderList() : run());
 });
 
-["shift", "prefix", "thr", "spike", "wallVal", "hdr", "startId", "maxW"].forEach(id => {
+$("idMode").addEventListener("change", () => { $("idStripWrap").hidden = $("idMode").value !== "strip"; run(); });
+["shift", "prefix", "idStrip", "thr", "spike", "wallVal", "hdr", "startId", "maxW"].forEach(id => {
   $(id).addEventListener("input", () => {
     clearTimeout(run.timer);
     run.timer = setTimeout(run, 200);
   });
 });
-["orient", "trim", "dedupe", "zeroY"].forEach(id => $(id).addEventListener("change", run));
+["orient", "trim", "trimAt", "dedupe", "zeroY"].forEach(id => $(id).addEventListener("change", run));
 
 $("searchSec").addEventListener("input", renderList);
 
