@@ -119,7 +119,7 @@ input.tbl-inp:focus{outline:2px solid var(--water);background:var(--panel);color
 .del-btn:hover{background:color-mix(in srgb,var(--bad) 15%,transparent)}
 pre.out{margin:0;max-height:220px;overflow:auto;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:10px;font-family:var(--f-mono);font-size:11.5px;line-height:1.45}
 .status{font-size:12.5px;min-height:1.4em}
-.status.err{color:var(--bad)} .status.okk{color:var(--ok)}
+.status.err{color:var(--bad)} .status.okk{color:var(--ok)} .status.warnc{color:var(--warn)}
 .bank-box{background:var(--soft);border-radius:var(--r);padding:10px;display:flex;flex-direction:column;gap:8px;border:1px solid var(--line)}
 .wall-box{background:var(--soft);border-radius:var(--r);padding:10px;display:flex;flex-direction:column;gap:8px;border:1px solid var(--line);margin-top:4px}
 .empty{color:var(--muted);padding:24px;text-align:center}
@@ -137,6 +137,14 @@ html[data-theme="dark"] .mode-nav .seg button[aria-selected="true"]{color:#04141
 .th-top-bar{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px 18px;padding-bottom:12px;border-bottom:1px solid var(--line)}
 .th-reach-wrap{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .th-reach-wrap select{width:auto;min-width:220px;font-weight:600}
+.th-basis-wrap{display:flex;align-items:center;gap:6px 8px;flex-wrap:wrap}
+.seg-basis{display:inline-flex;border:1px solid var(--line);border-radius:6px;background:var(--panel);padding:2px;gap:2px}
+.seg-basis button{border:0;background:none;padding:5px 10px;border-radius:5px;font-size:12.5px;font-weight:600;color:var(--muted)}
+.seg-basis button:hover{color:var(--ink);background:var(--soft)}
+.seg-basis button[aria-checked="true"]{background:var(--water);color:#fff}
+html[data-theme="dark"] .seg-basis button[aria-checked="true"]{color:#04141a}
+.th-kpi.warn{border-color:color-mix(in srgb,var(--warn) 55%,transparent)}
+.th-kpi.warn b{color:var(--warn)}
 .th-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
 .th-kpi{background:var(--soft);border:1px solid var(--line);border-radius:6px;padding:9px 12px;display:flex;flex-direction:column;gap:2px}
 .th-kpi small{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-family:var(--f-mono)}
@@ -182,7 +190,7 @@ footer.tool-foot{margin-top:32px;padding-top:14px;border-top:1px solid var(--lin
 <div class="wrap">
   <div class="header-intro">
     <div>
-      <h1><small>Excel / CSV → PROFILE.DEF · SOBEK 2.1x Flow</small>River Profile Studio</h1>
+      <h1><small>Excel / CSV / Shapefile → PROFILE.DEF · SOBEK 2.1x Flow</small>River Profile Studio</h1>
       <p class="lede">Convert surveyed river cross-sections into SOBEK <code>CRDS ... lt yz</code> definitions. Check and edit points visually, orient left bank first, add vertical walls, and export a clean <code>PROFILE.DEF</code>. Runs 100% in your browser.</p>
     </div>
   </div>
@@ -192,13 +200,31 @@ footer.tool-foot{margin-top:32px;padding-top:14px;border-top:1px solid var(--lin
       <!-- Step 1: Input Data -->
       <section class="step" aria-labelledby="s1">
         <h2 id="s1"><span class="n">1</span>Survey data</h2>
-        <div class="drop" id="drop" tabindex="0" role="button" aria-label="Choose an Excel or CSV file">
-          <strong>Drop an Excel or CSV file</strong>
-          <span>.xlsx · .xls · .csv · .txt</span>
+        <div class="drop" id="drop" tabindex="0" role="button" aria-label="Choose an Excel, CSV or shapefile">
+          <strong>Drop an Excel, CSV or shapefile</strong>
+          <span>.xlsx · .xls · .csv · .txt · shapefile .zip or .shp + .dbf (+ .prj)</span>
         </div>
-        <input type="file" id="file" accept=".xlsx,.xls,.csv,.txt" hidden>
+        <input type="file" id="file" multiple accept=".xlsx,.xls,.csv,.txt,.zip,.shp,.dbf,.shx,.prj,.cpg" hidden>
         <div class="btns"><button id="sampleBtn" type="button">Load sample survey</button></div>
         <div class="status" id="loadStatus"></div>
+        <div id="shpBox" class="dg bank-box" hidden>
+          <div style="font-weight:600;font-size:12px;color:var(--ink)">Shapefile fields:</div>
+          <div class="row2">
+            <label>CS ID field *<select id="sId"></select></label>
+            <label>Z source *<select id="sZ"></select></label>
+          </div>
+          <div class="row2">
+            <label>Bank / data code field (optional)<select id="sCode"></select></label>
+            <label>Reach / khal name field (optional)<select id="sReach"></select></label>
+          </div>
+          <label>Section lines shapefile (optional)
+            <input type="file" id="lineFile" multiple accept=".zip,.shp,.dbf,.shx,.prj,.cpg">
+          </label>
+          <label id="sLineIdWrap" hidden>Section line ID field<select id="sLineId"></select></label>
+          <p class="hint">Easting and Northing come from the point geometry. Each section's distance is measured along the best-fit line through its points; a section line (one polyline per CS, same ID) sets the left → right direction. Points without an ID can be assigned to the nearest section line.</p>
+          <div class="status" id="shpStatus"></div>
+          <div class="btns"><button id="dlDerived" type="button">Download derived table (.xlsx)</button></div>
+        </div>
         <div id="mapBox" class="dg" hidden>
           <label id="sheetWrap">Sheet<select id="sheet"></select></label>
           <div class="row2">
@@ -252,7 +278,17 @@ footer.tool-foot{margin-top:32px;padding-top:14px;border-top:1px solid var(--lin
           <label>Datum shift to Z (m)<input type="number" id="shift" step="0.001" value="0"></label>
           <label>Name prefix<input type="text" id="prefix" value="" placeholder="e.g. 35_1_"></label>
         </div>
-        <p class="hint">MSL → PWD in Bangladesh is typically +0.46 m. Section names in SOBEK become Prefix + ID.</p>
+        <div class="row2">
+          <label>Section ID
+            <select id="idMode">
+              <option value="raw">As in the data</option>
+              <option value="num">Last number only (CS-21 → 21)</option>
+              <option value="strip">Remove text…</option>
+            </select>
+          </label>
+          <label id="idStripWrap" hidden>Text to remove<input type="text" id="idStrip" placeholder="e.g. CS-, _Pre"></label>
+        </div>
+        <p class="hint">MSL → PWD in Bangladesh is typically +0.46 m. Section names in SOBEK become Prefix + ID. Separate several texts to remove with commas.</p>
         
         <label class="inline"><input type="checkbox" id="orient" checked> Orient left bank first (when bank codes are present)</label>
 
@@ -281,7 +317,13 @@ footer.tool-foot{margin-top:32px;padding-top:14px;border-top:1px solid var(--lin
               <label>Trim drop (m)<input type="number" id="thr" step="0.05" min="0.05" value="0.5"></label>
               <label>Ignore spikes (m)<input type="number" id="spike" step="0.1" min="0" value="1.0"></label>
             </div>
-            <p class="hint">Keeps only the main channel between the natural bank crests.</p>
+            <label>Trim at
+              <select id="trimAt">
+                <option value="drop">Where ground drops behind the bank crest</option>
+                <option value="codes">The bank codes (LB → RB)</option>
+              </select>
+            </label>
+            <p class="hint">Keeps only the main channel. "Ground drops" keeps rising bank up to the crest and cuts where the ground behind it falls more than the trim drop, so a floodplain level with the bank top is kept. "Bank codes" cuts exactly at the coded bank points. A side without a code always uses the crest rule. Spikes are ignored.</p>
           </div>
         </details>
 
@@ -296,6 +338,15 @@ footer.tool-foot{margin-top:32px;padding-top:14px;border-top:1px solid var(--lin
                 <input type="number" id="maxW" step="50" min="50" value="500">
               </label>
             </div>
+            <label>Shapefile input: measure distance along
+              <select id="axisMode">
+                <option value="fit">Best-fit line through the points (section line sets direction)</option>
+                <option value="line">Section line itself (first → last vertex)</option>
+              </select>
+            </label>
+            <label>Max RMS offset from that line (m, shapefile input)
+              <input type="number" id="rmsMax" step="0.5" min="0" value="3">
+            </label>
             <label>Definition header<input type="text" id="hdr" value="ty 10 lu 0 st 0 lt sw 0 0 gl 0 gu 0 lt yz"></label>
             <label>First numeric ID for definitions<input type="number" id="startId" step="1" min="1" value="1"></label>
           </div>
@@ -365,6 +416,14 @@ footer.tool-foot{margin-top:32px;padding-top:14px;border-top:1px solid var(--lin
               <select id="thReachSelect"></select>
               <button type="button" id="thReverseBtn" title="Invert reach direction (upstream ↔ downstream)">⇄ Invert Direction</button>
             </div>
+            <div class="th-basis-wrap">
+              <span id="thBasisLbl" style="font-size:12px;font-weight:600;color:var(--ink)">Bed level basis:</span>
+              <div class="seg-basis" role="radiogroup" aria-labelledby="thBasisLbl">
+                <button type="button" role="radio" data-basis="thalweg" aria-checked="true" title="Lowest point of each output section">Thalweg (lowest point)</button>
+                <button type="button" role="radio" data-basis="avg" aria-checked="false" title="Width-weighted mean bed level between the section's left and right ends">Average bed (left → right)</button>
+              </div>
+              <small class="hint" id="thBasisNote" hidden>Bank trimming is off, so the average includes floodplain.</small>
+            </div>
             <div class="btns">
               <label class="inline" title="Overlay flood or water level on the L-profile" style="font-size:12px">
                 Water Level (m):
@@ -385,7 +444,7 @@ footer.tool-foot{margin-top:32px;padding-top:14px;border-top:1px solid var(--lin
           </div>
 
           <div class="th-legend">
-            <span><i style="border-color:var(--water);border-top-width:3px"></i>Thalweg Bed Profile</span>
+            <span><i style="border-color:var(--water);border-top-width:3px"></i><span id="thBedLegend">Thalweg Bed Profile</span></span>
             <span><i style="border-color:var(--warn);border-style:dashed"></i>Left Bank Crest</span>
             <span><i style="border-color:var(--bad);border-style:dashed"></i>Right Bank Crest</span>
             <span><i style="border-color:var(--muted);border-style:dotted"></i>Mean Bed Gradient (S₀)</span>
@@ -424,10 +483,11 @@ footer.tool-foot{margin-top:32px;padding-top:14px;border-top:1px solid var(--lin
                     <th class="c">#</th>
                     <th class="l">CS ID</th>
                     <th>Chainage (m)</th>
-                    <th>Bed Z (m)</th>
+                    <th id="thBedTh">Bed Z · thalweg (m)</th>
                     <th>Left Bank (m)</th>
                     <th>Right Bank (m)</th>
                     <th>Width (m)</th>
+                    <th title="Lower bank level minus the width-averaged bed">Mean depth (m)</th>
                     <th>Local Slope (m/km)</th>
                     <th class="c">Include</th>
                   </tr>
@@ -453,6 +513,7 @@ footer.tool-foot{margin-top:32px;padding-top:14px;border-top:1px solid var(--lin
     document.write('<script src="../ababahika/vendor/xlsx.core.min.js"><\/script>');
   }
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
 <script id="core">
 /* ---------- Core Hydraulic & Geometric Functions ---------- */
@@ -468,9 +529,11 @@ const Core = (() => {
     if (opt.customL && c === norm(opt.customL)) return "L";
     if (opt.customR && c === norm(opt.customR)) return "R";
     if (opt.tok) {
-      if (opt.tok.x && opt.tok.x.some(t => c.startsWith(t))) return null;
-      const L = opt.tok.l && opt.tok.l.some(t => c === t || c.startsWith(t));
-      const R = opt.tok.r && opt.tok.r.some(t => c === t || c.startsWith(t));
+      // Also try the code without a leading water-body word: "Khal LB", "KHAL RS", "Khal BL-SL" → LB, RS, BLSL
+      const cs = [c, c.replace(/^(KHAL|CANAL|RIVER|NODI|NADI|CHANNEL)/, "")].filter(Boolean);
+      if (opt.tok.x && cs.some(v => opt.tok.x.some(t => v.startsWith(t)))) return null;
+      const L = opt.tok.l && cs.some(v => opt.tok.l.some(t => v.startsWith(t)));
+      const R = opt.tok.r && cs.some(v => opt.tok.r.some(t => v.startsWith(t)));
       return L && !R ? "L" : R && !L ? "R" : null;
     }
     return null;
@@ -480,7 +543,8 @@ const Core = (() => {
     const by = new Map();
     let skipped = 0;
     rows.forEach((row, i) => {
-      const id = String(row[m.id] ?? "").replace(/[\r\n]+/g, " ").trim();
+      const id0 = String(row[m.id] ?? "").replace(/[\r\n]+/g, " ").trim();
+      const id = m.idMap && m.idMap.has(id0) ? m.idMap.get(id0) : id0;
       const y = parseFloat(String(row[m.y] ?? "").replace(",", "."));
       const z = parseFloat(String(row[m.z] ?? "").replace(",", "."));
       if (!id || !isFinite(y) || !isFinite(z)) { skipped++; return; }
@@ -513,9 +577,10 @@ const Core = (() => {
     const n = p.length;
     if (n < 2) flags.push(["bad", "fewer than 2 points"]);
 
-    const sd = p.map(q => side(q.code, o));
-    const Li = sd.flatMap((s, i) => s === "L" ? [i] : []);
-    const Ri = sd.flatMap((s, i) => s === "R" ? [i] : []);
+    const lowest = () => { let b = 0; for (let i = 1; i < n; i++) if (p[i].z < p[b].z) b = i; return b; };
+    let sd = p.map(q => side(q.code, o));
+    let Li = sd.flatMap((s, i) => s === "L" ? [i] : []);
+    let Ri = sd.flatMap((s, i) => s === "R" ? [i] : []);
     const mean = a => a.reduce((s, i) => s + p[i].y, 0) / a.length;
 
     let flipped = isManuallyFlipped;
@@ -526,9 +591,7 @@ const Core = (() => {
         basis = "bank codes";
         if (mean(Li) > mean(Ri)) flipped = true;
       } else if (Li.length || Ri.length) {
-        let bedIdx = 0;
-        for (let i = 1; i < n; i++) if (p[i].z < p[bedIdx].z) bedIdx = i;
-        const bedY = p[bedIdx].y;
+        const bedY = p[lowest()].y;
         if (Li.length && mean(Li) > bedY) { flipped = true; basis = "left code on right of bed"; }
         else if (Ri.length && mean(Ri) < bedY) { flipped = true; basis = "right code on left of bed"; }
       }
@@ -540,31 +603,82 @@ const Core = (() => {
       flags.push(["info", "reversed"]);
     }
 
-    let bedIdx = 0;
-    for (let i = 1; i < n; i++) if (p[i].z < p[bedIdx].z) bedIdx = i;
+    // Bank sides, code indices and bed must be found on the points as they are now (after any flip).
+    sd = p.map(q => side(q.code, o));
+    Li = sd.flatMap((s, i) => s === "L" ? [i] : []);
+    Ri = sd.flatMap((s, i) => s === "R" ? [i] : []);
+    // Channel bed: when an LB … RB code pair exists, the lowest point BETWEEN the innermost pair
+    // (a deeper ditch or hole outside the coded banks must not move the channel); otherwise the lowest point.
+    const gIdx = n ? lowest() : 0;
+    let pl = -1, pr = -1;
+    for (const r of Ri) {
+      let l = -1;
+      for (const i of Li) if (i < r) l = i;
+      if (l >= 0) { pl = l; pr = r; break; }
+    }
+    let bedIdx = gIdx;
+    if (pl >= 0) { bedIdx = pl; for (let k = pl + 1; k <= pr; k++) if (p[k].z < p[bedIdx].z) bedIdx = k; }
+
+    // Data checks (independent of trimming)
+    if (n >= 3) {
+      if (pl >= 0 && p[bedIdx].z - p[gIdx].z > 0.3) flags.push(["warn", `deeper ground outside the bank codes (${r2(p[bedIdx].z - p[gIdx].z)} m lower)`]);
+      if (bedIdx === 0 || bedIdx === n - 1) flags.push(["warn", "section ends at its lowest point (incomplete?)"]);
+      else {
+        let mL = -Infinity, mR = -Infinity;
+        for (let k = 0; k < bedIdx; k++) mL = Math.max(mL, p[k].z);
+        for (let k = bedIdx + 1; k < n; k++) mR = Math.max(mR, p[k].z);
+        if (Math.min(mL, mR) - p[bedIdx].z < 0.3) flags.push(["warn", "no clear channel (banks < 0.3 m above bed)"]);
+      }
+    }
 
     let lc = 0, rc = n - 1;
     if (o.trim && n >= 3) {
       const isSpike = k => o.spike > 0 && k > 0 && k < n - 1 && p[k].z - Math.max(p[k - 1].z, p[k + 1].z) > o.spike;
-      let li = sd.indexOf("L"); if (li < 0 || li > bedIdx) li = 0;
-      let ri = sd.lastIndexOf("R"); if (ri < 0 || ri < bedIdx) ri = n - 1;
-
-      let run = p[li].z;
-      for (let k = li - 1; k >= 0; k--) {
-        if (isSpike(k)) continue;
-        if (p[k].z > run) run = p[k].z;
-        else if (run - p[k].z > o.thr) { lc = k + 1; break; }
+      const bedZ0 = p[bedIdx].z;
+      // Anchor on each side: the innermost bank code (last L left of the channel bed, first R right of it).
+      let li = pl, ri = pr;
+      if (li < 0) for (let k = bedIdx; k >= 0; k--) if (sd[k] === "L") { li = k; break; }
+      if (ri < 0) for (let k = bedIdx; k < n; k++) if (sd[k] === "R") { ri = k; break; }
+      const liCode = li >= 0, riCode = ri >= 0;
+      // No code on a side: walk out from the bed to the first point that rises to
+      // min(bed + 1.5, bed + 0.7 × (side max − bed)), skipping spikes.
+      if (li < 0) {
+        let mx = -Infinity; for (let k = 0; k <= bedIdx; k++) if (!isSpike(k)) mx = Math.max(mx, p[k].z);
+        const tgt = Math.min(bedZ0 + 1.5, bedZ0 + 0.7 * (mx - bedZ0));
+        li = 0;
+        for (let k = bedIdx - 1; k >= 0; k--) { if (isSpike(k)) continue; if (p[k].z >= tgt) { li = k; break; } }
       }
-      run = p[ri].z;
-      for (let k = ri + 1; k < n; k++) {
-        if (isSpike(k)) continue;
-        if (p[k].z > run) run = p[k].z;
-        else if (run - p[k].z > o.thr) { rc = k - 1; break; }
+      if (ri < 0) {
+        let mx = -Infinity; for (let k = bedIdx; k < n; k++) if (!isSpike(k)) mx = Math.max(mx, p[k].z);
+        const tgt = Math.min(bedZ0 + 1.5, bedZ0 + 0.7 * (mx - bedZ0));
+        ri = n - 1;
+        for (let k = bedIdx + 1; k < n; k++) { if (isSpike(k)) continue; if (p[k].z >= tgt) { ri = k; break; } }
+      }
+
+      // "codes": cut exactly at a coded bank. Otherwise (and on a side without a code) keep rising ground
+      // beyond the anchor up to the crest, and cut where the ground falls more than `thr` below it.
+      if (o.trimAt === "codes" && liCode) lc = li;
+      else {
+        let run = p[li].z;
+        for (let k = li - 1; k >= 0; k--) {
+          if (isSpike(k)) continue;
+          if (p[k].z > run) run = p[k].z;
+          else if (run - p[k].z > o.thr) { lc = k + 1; break; }
+        }
+      }
+      if (o.trimAt === "codes" && riCode) rc = ri;
+      else {
+        let run = p[ri].z;
+        for (let k = ri + 1; k < n; k++) {
+          if (isSpike(k)) continue;
+          if (p[k].z > run) run = p[k].z;
+          else if (run - p[k].z > o.thr) { rc = k - 1; break; }
+        }
       }
       if (lc > 0 || rc < n - 1) flags.push(["info", "trimmed"]);
     }
 
-    let out = p.slice(lc, rc + 1).map(q => ({ y: q.y, z: q.z, code: q.code, edited: q.edited, custom: q.custom }));
+    let out = p.slice(lc, rc + 1).map(q => ({ y: q.y, z: q.z, code: q.code, edited: q.edited, custom: q.custom, east: q.east, north: q.north }));
     const y0 = out.length ? out[0].y : 0;
     if (o.zeroY) {
       out = out.map(q => ({ ...q, y: r2(q.y - y0) }));
@@ -598,17 +712,40 @@ const Core = (() => {
       flags.push(["warn", `wide channel (${Math.round(width)} m)`]);
     }
 
-    const bedPt = p[bedIdx] || p[0] || {};
-    let lbZ = NaN, rbZ = NaN;
-    if (Li.length) lbZ = p[Li[0]].z;
-    else if (p.length) lbZ = p[0].z;
-    if (Ri.length) rbZ = p[Ri[Ri.length - 1]].z;
-    else if (p.length) rbZ = p[p.length - 1].z;
+    // Long-profile values, all taken from the OUTPUT (trimmed) section.
+    const pickPt = q => q ? { y: q.y, z: q.z, east: q.east, north: q.north } : { y: NaN, z: NaN, east: NaN, north: NaN };
+    let thalwegPt = pickPt(null), avgPt = pickPt(null);
+    let thalwegZ = NaN, avgBedZ = NaN, lbZ = NaN, rbZ = NaN;
+    if (wet.length) {
+      const lo = wet.reduce((a, b) => b.z < a.z ? b : a, wet[0]);
+      thalwegPt = pickPt(lo); thalwegZ = lo.z;
+      lbZ = wet[0].z; rbZ = wet[wet.length - 1].z;
+      const yL = wet[0].y, yR = wet[wet.length - 1].y;
+      if (yR - yL > 1e-9) {
+        let area = 0;
+        for (let i = 1; i < wet.length; i++) area += (wet[i].y - wet[i - 1].y) * (wet[i].z + wet[i - 1].z) / 2;
+        avgBedZ = r3(area / (yR - yL));
+      } else avgBedZ = r3(wet.reduce((a, q) => a + q.z, 0) / wet.length);
+      // Easting / Northing at mid-width: interpolate between the bracketing points that have coordinates.
+      const ym = (yL + yR) / 2;
+      const geo = wet.filter(q => isFinite(q.east) && isFinite(q.north));
+      let e = NaN, nn = NaN;
+      if (geo.length) {
+        let k = geo.findIndex(q => q.y >= ym);
+        if (k < 0) k = geo.length - 1;
+        const b = geo[k], a = geo[Math.max(0, k - 1)];
+        const t = b.y - a.y > 1e-9 ? Math.min(1, Math.max(0, (ym - a.y) / (b.y - a.y))) : 0;
+        e = a.east + t * (b.east - a.east); nn = a.north + t * (b.north - a.north);
+      }
+      avgPt = { y: r2(ym), z: avgBedZ, east: e, north: nn };
+    }
+    const bankZ = Math.min(lbZ, rbZ);
 
     return {
       id, all: p, lc, rc, bedIdx, flipped, basis, out, width,
-      bedZ: wet.length ? Math.min(...wet.map(q => q.z)) : (bedPt ? bedPt.z : NaN),
-      thalwegPt: bedPt,
+      bedZ: thalwegZ,
+      thalwegZ, thalwegPt, avgBedZ, avgPt, bankZ,
+      meanDepth: isFinite(bankZ) && isFinite(avgBedZ) ? r3(bankZ - avgBedZ) : NaN,
       lbZ, rbZ,
       reach: rawPoints[0]?.reach || "",
       flags, check: flags.some(f => f[0] === "warn" || f[0] === "bad")
@@ -676,6 +813,289 @@ const Core = (() => {
 })();
 </script>
 
+<script id="shp">
+/* ---------- Shapefile input: small in-page readers (original coordinates kept, no reprojection) ---------- */
+const Shp = (() => {
+  const TYPES = { 0: "Null", 1: "Point", 3: "PolyLine", 5: "Polygon", 8: "MultiPoint", 11: "PointZ", 13: "PolyLineZ", 15: "PolygonZ", 18: "MultiPointZ", 21: "PointM", 23: "PolyLineM", 25: "PolygonM", 28: "MultiPointM" };
+  const POINTISH = new Set([1, 11, 21, 8, 18, 28]);
+  const LINEISH = new Set([3, 13, 23]);
+  const HASZ = new Set([11, 18, 13]);
+
+  function shapeTypeOf(buf) {
+    const dv = new DataView(buf);
+    if (buf.byteLength < 100 || dv.getInt32(0, false) !== 9994) throw new Error("not a valid .shp file");
+    return dv.getInt32(32, true);
+  }
+
+  // Returns one entry per record (index = record order, aligned with the .dbf):
+  // { type, pts: [{x, y, z, m}] }  (Null shapes give pts = [])
+  function readShp(buf) {
+    const dv = new DataView(buf);
+    const type = shapeTypeOf(buf);
+    const fileLen = Math.min(buf.byteLength, dv.getInt32(24, false) * 2);
+    const recs = [];
+    let off = 100;
+    while (off + 8 <= fileLen) {
+      const len = dv.getInt32(off + 4, false) * 2;
+      const c = off + 8;
+      if (len < 4 || c + len > buf.byteLength) break;
+      const t = dv.getInt32(c, true);
+      const pts = [];
+      const D = o => dv.getFloat64(o, true);
+      const noData = v => !isFinite(v) || v < -1e38 ? NaN : v;
+      if (t === 1 || t === 11 || t === 21) {
+        const p = { x: D(c + 4), y: D(c + 12), z: NaN, m: NaN };
+        if (t === 11) { p.z = D(c + 20); if (len >= 36) p.m = noData(D(c + 28)); }
+        if (t === 21) p.m = noData(D(c + 20));
+        pts.push(p);
+      } else if (t === 8 || t === 18 || t === 28) {
+        const np = dv.getInt32(c + 36, true);
+        let o = c + 40;
+        for (let i = 0; i < np; i++) pts.push({ x: D(o + i * 16), y: D(o + i * 16 + 8), z: NaN, m: NaN });
+        o += np * 16;
+        if (t === 18) { o += 16; for (let i = 0; i < np; i++) pts[i].z = D(o + i * 8); o += np * 8; }
+        if ((t === 18 || t === 28) && o + 16 + np * 8 <= c + len) { o += 16; for (let i = 0; i < np; i++) pts[i].m = noData(D(o + i * 8)); }
+      } else if (t === 3 || t === 13 || t === 23 || t === 5 || t === 15 || t === 25) {
+        const nParts = dv.getInt32(c + 36, true), np = dv.getInt32(c + 40, true);
+        let o = c + 44 + nParts * 4;
+        for (let i = 0; i < np; i++) pts.push({ x: D(o + i * 16), y: D(o + i * 16 + 8), z: NaN, m: NaN });
+        o += np * 16;
+        if (t === 13 || t === 15) { o += 16; for (let i = 0; i < np; i++) pts[i].z = D(o + i * 8); }
+      }
+      recs.push({ type: t, pts });
+      off = c + len;
+    }
+    return { type, typeName: TYPES[type] || "type " + type, hasZ: HASZ.has(type), recs };
+  }
+
+  function encodingFromCpg(cpg) {
+    const s = String(cpg || "").trim().toUpperCase();
+    if (!s) return "utf-8";
+    if (/UTF-?8/.test(s)) return "utf-8";
+    const num = (s.match(/(\d{3,5})/) || [])[1];
+    if (/8859/.test(s)) { const part = (s.match(/8859[-_ ]?(\d+)/) || [])[1]; return "iso-8859-" + (part || "1"); }
+    if (num) return "windows-" + num;
+    return s.toLowerCase();
+  }
+
+  function readDbf(buf, cpg) {
+    const dv = new DataView(buf), u8 = new Uint8Array(buf);
+    const nRec = dv.getUint32(4, true), hLen = dv.getUint16(8, true), rLen = dv.getUint16(10, true);
+    const latin = new TextDecoder("windows-1252");
+    const fields = [];
+    for (let o = 32; o + 32 <= hLen && u8[o] !== 0x0D; o += 32) {
+      let e = o; while (e < o + 11 && u8[e] !== 0) e++;
+      fields.push({ name: latin.decode(u8.subarray(o, e)).trim(), type: String.fromCharCode(u8[o + 11]).toUpperCase(), len: u8[o + 16], dec: u8[o + 17] });
+    }
+    let enc = encodingFromCpg(cpg), note = "";
+    let dec;
+    try { dec = new TextDecoder(enc, { fatal: true }); } catch (e) { dec = new TextDecoder("utf-8", { fatal: true }); enc = "utf-8"; }
+    const parse = d => {
+      const rows = [];
+      for (let r = 0; r < nRec; r++) {
+        const base = hLen + r * rLen;
+        if (base + rLen > u8.length) break;
+        const row = {};
+        let o = base + 1;
+        for (const f of fields) {
+          const bytes = u8.subarray(o, o + f.len); o += f.len;
+          let v;
+          if (f.type === "C") v = d.decode(bytes).replace(/\0+$/, "").trim();
+          else {
+            const s = latin.decode(bytes).replace(/\0/g, "").trim();
+            if (f.type === "N" || f.type === "F") { const x = parseFloat(s); v = s === "" || /^\*+$/.test(s) || !isFinite(x) ? null : x; }
+            else if (f.type === "D") v = /^\d{8}$/.test(s) ? `${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)}` : s;
+            else if (f.type === "L") v = /^[TY]$/i.test(s) ? true : /^[FN]$/i.test(s) ? false : null;
+            else v = s;
+          }
+          row[f.name] = v;
+        }
+        row.__deleted = u8[base] === 0x2A;
+        rows.push(row);
+      }
+      return rows;
+    };
+    let rows;
+    try { rows = parse(dec); }
+    catch (e) { note = `text not valid ${enc}; read as windows-1252`; enc = "windows-1252"; rows = parse(latin); }
+    return { fields, rows, encoding: enc, note };
+  }
+
+  // .prj → { name, geographic, known }
+  function parsePrj(wkt) {
+    if (!wkt) return { name: "no .prj (coordinates used as metres)", geographic: false, known: false };
+    const s = String(wkt).trim();
+    const pm = /^PROJCS\s*\[\s*"([^"]*)"/i.exec(s) || /^PROJCRS\s*\[\s*"([^"]*)"/i.exec(s);
+    if (pm) return { name: pm[1].replace(/_/g, " "), geographic: false, known: true };
+    const gm = /^GEOGCS\s*\[\s*"([^"]*)"/i.exec(s) || /^GEOGCRS\s*\[\s*"([^"]*)"/i.exec(s);
+    if (gm) return { name: gm[1].replace(/_/g, " "), geographic: true, known: true };
+    return { name: "unrecognised .prj", geographic: false, known: false };
+  }
+
+  // Gather shapefile parts from picked files and/or zips → [{ base, shp, dbf, prj, cpg }]
+  async function collect(files) {
+    const parts = new Map();
+    const put = (name, kind, data) => {
+      const base = name.replace(/\\/g, "/").split("/").pop().replace(/\.[^.]+$/, "");
+      const key = base.toLowerCase();
+      if (!parts.has(key)) parts.set(key, { base });
+      parts.get(key)[kind] = data;
+    };
+    for (const f of files) {
+      const ext = (f.name.split(".").pop() || "").toLowerCase();
+      if (ext === "zip") {
+        if (typeof JSZip === "undefined") throw new Error("Zip reader (JSZip) did not load. Pick the .shp, .dbf and .prj files directly instead.");
+        const zip = await JSZip.loadAsync(await f.arrayBuffer());
+        for (const ent of Object.values(zip.files)) {
+          if (ent.dir || /(^|\/)__MACOSX\//.test(ent.name) || /(^|\/)\._/.test(ent.name)) continue;
+          const e2 = (ent.name.split(".").pop() || "").toLowerCase();
+          if (e2 === "shp" || e2 === "dbf") put(ent.name, e2, await ent.async("arraybuffer"));
+          else if (e2 === "prj" || e2 === "cpg") put(ent.name, e2, await ent.async("string"));
+        }
+      } else if (ext === "shp" || ext === "dbf") put(f.name, ext, await f.arrayBuffer());
+      else if (ext === "prj" || ext === "cpg") put(f.name, ext, await f.text());
+    }
+    return [...parts.values()].filter(p => p.shp);
+  }
+
+  function open(set) {
+    if (!set.dbf) throw new Error(`${set.base}.dbf is missing (a .shp needs its .dbf)`);
+    const shp = readShp(set.shp);
+    const dbf = readDbf(set.dbf, set.cpg);
+    const crs = parsePrj(set.prj);
+    return { base: set.base, shp, dbf, crs, hasPrj: !!set.prj };
+  }
+
+  /* ---- geometry helpers ---- */
+  function axisFit(P) {
+    // farthest-apart pair, then refined with the principal axis (PCA) through the centroid
+    let a = 0, b = Math.min(1, P.length - 1), best = -1;
+    for (let i = 0; i < P.length; i++) for (let j = i + 1; j < P.length; j++) {
+      const d = (P[i].mx - P[j].mx) ** 2 + (P[i].my - P[j].my) ** 2;
+      if (d > best) { best = d; a = i; b = j; }
+    }
+    let ux = P[b].mx - P[a].mx, uy = P[b].my - P[a].my;
+    let L = Math.hypot(ux, uy);
+    if (!(L > 0)) return { ox: P[0]?.mx || 0, oy: P[0]?.my || 0, ux: 1, uy: 0 };
+    ux /= L; uy /= L;
+    const cx = P.reduce((s, p) => s + p.mx, 0) / P.length, cy = P.reduce((s, p) => s + p.my, 0) / P.length;
+    let sxx = 0, syy = 0, sxy = 0;
+    for (const p of P) { const dx = p.mx - cx, dy = p.my - cy; sxx += dx * dx; syy += dy * dy; sxy += dx * dy; }
+    const th = 0.5 * Math.atan2(2 * sxy, sxx - syy);
+    let vx = Math.cos(th), vy = Math.sin(th);
+    if (vx * ux + vy * uy < 0) { vx = -vx; vy = -vy; }
+    return { ox: cx, oy: cy, ux: vx, uy: vy };
+  }
+  const proj = (p, ax) => (p.mx - ax.ox) * ax.ux + (p.my - ax.oy) * ax.uy;
+  const perp = (p, ax) => -(p.mx - ax.ox) * ax.uy + (p.my - ax.oy) * ax.ux;
+  const rms = a => a.length ? Math.sqrt(a.reduce((s, v) => s + v * v, 0) / a.length) : 0;
+  function corr(a, b) {
+    const n = a.length; if (n < 2) return 0;
+    const ma = a.reduce((s, v) => s + v, 0) / n, mb = b.reduce((s, v) => s + v, 0) / n;
+    let sab = 0, saa = 0, sbb = 0;
+    for (let i = 0; i < n; i++) { sab += (a[i] - ma) * (b[i] - mb); saa += (a[i] - ma) ** 2; sbb += (b[i] - mb) ** 2; }
+    return saa > 0 && sbb > 0 ? sab / Math.sqrt(saa * sbb) : 0;
+  }
+
+  /*
+   * Build cross-sections from point records.
+   *  pts:   [{ x, y, z, code, reach, attrs, rec }]  original coordinates
+   *  lines: Map(id → [{x, y}, …]) section-line vertices (original coordinates), optional
+   *  o:     { geographic, rmsMax }
+   * Returns { rows, index, meta }
+   */
+  function buildSections(pts, lines, o) {
+    // metric working coordinates (equirectangular around the data centroid for lon/lat data)
+    let toM = (x, y) => [x, y];
+    if (o.geographic && pts.length) {
+      const lat0 = pts.reduce((s, p) => s + p.y, 0) / pts.length, lon0 = pts.reduce((s, p) => s + p.x, 0) / pts.length;
+      const R = 6371008.8, k = Math.PI / 180, c = Math.cos(lat0 * k);
+      toM = (x, y) => [(x - lon0) * k * R * c, (y - lat0) * k * R];
+    }
+    const by = new Map();
+    for (const p of pts) {
+      if (!by.has(p.id)) by.set(p.id, []);
+      const [mx, my] = toM(p.x, p.y);
+      by.get(p.id).push({ ...p, mx, my });
+    }
+    const rows = [], index = [];
+    const r2 = v => Math.round(v * 100) / 100;
+    for (const [id, grp] of by) {
+      const flags = [];
+      // 1. exact duplicates (same E, N, Z)
+      const seen = new Set();
+      const P = grp.filter(p => { const k = p.x + "|" + p.y + "|" + p.z; if (seen.has(k)) return false; seen.add(k); return true; });
+      const dups = grp.length - P.length;
+      // 2. axis. Survey points are usually straighter than the drawn section lines, so by default distances
+      //    run along the best-fit line through the points (farthest pair refined by PCA) and the section
+      //    line only sets the direction. o.axisMode === "line" measures along the section line itself.
+      const raw = lines && lines.get(id);
+      let line = null, lineAngle = "", lineDist = "";
+      if (raw && raw.length >= 2) {
+        const [ax0, ay0] = toM(raw[0].x, raw[0].y), [bx, by2] = toM(raw[raw.length - 1].x, raw[raw.length - 1].y);
+        const L = Math.hypot(bx - ax0, by2 - ay0);
+        if (L > 0) line = { ox: ax0, oy: ay0, ux: (bx - ax0) / L, uy: (by2 - ay0) / L, len: L };
+      }
+      const fitAxis = S => { const nz = S.filter(p => p.z !== 0); return axisFit(nz.length >= 2 ? nz : S); };
+      let ax, basis;
+      if (line && o.axisMode === "line") { ax = line; basis = "section line"; }
+      else { ax = fitAxis(P); basis = line ? "best fit, line direction" : "survey order"; }
+      // 3. reference points: Z exactly 0 and more than 2× RMS offset from the axis
+      const offNZ = P.filter(p => p.z !== 0).map(p => perp(p, ax));
+      const refLim = 2 * Math.max(rms(offNZ), 0.1);
+      const refs = P.filter(p => p.z === 0 && Math.abs(perp(p, ax)) > refLim);
+      let K = P.filter(p => !refs.includes(p));
+      if (refs.length && basis !== "section line" && K.length >= 2) ax = axisFit(K);
+      // Does the section line actually belong to these points? (angle between them, centroid → line segment)
+      if (line && K.length >= 2) {
+        const fit = basis === "section line" ? fitAxis(K) : ax;
+        lineAngle = Math.round(Math.acos(Math.min(1, Math.abs(fit.ux * line.ux + fit.uy * line.uy))) * 1800 / Math.PI) / 10;
+        const cx = K.reduce((s, p) => s + p.mx, 0) / K.length, cy = K.reduce((s, p) => s + p.my, 0) / K.length;
+        const t = Math.max(0, Math.min(line.len, (cx - line.ox) * line.ux + (cy - line.oy) * line.uy));
+        lineDist = Math.round(Math.hypot(cx - (line.ox + line.ux * t), cy - (line.oy + line.uy * t)) * 10) / 10;
+        if (lineAngle > o.lineAngleMax || lineDist > o.lineDistMax) {
+          flags.push("section line does not match the points");
+          if (basis === "best fit, line direction") basis = "survey order";   // don't trust its direction
+        }
+      }
+      // 4. distance along the axis, offset from it
+      let d = K.map(p => proj(p, ax));
+      const off = K.map(p => perp(p, ax));
+      const rmsOff = rms(off);
+      if (rmsOff > o.rmsMax) flags.push(basis === "section line" ? "points off the section line" : "points not on a straight line");
+      // 5. direction: section line as drawn, else follow survey record order
+      if (basis === "best fit, line direction" && ax.ux * line.ux + ax.uy * line.uy < 0) d = d.map(v => -v);
+      if (basis === "survey order" && corr(K.map(p => p.rec), d) < 0) d = d.map(v => -v);
+      const d0 = d.length ? Math.min(...d) : 0;
+      const order = K.map((p, i) => ({ p, d: r2(d[i] - d0), off: off[i] })).sort((a, b) => a.d - b.d || a.p.rec - b.p.rec);
+      if (order.length < 2) flags.push("fewer than 2 points");
+      // A big hole along the section usually means a stray point, or two surveys sharing one ID
+      let gap = 0;
+      for (let i = 1; i < order.length; i++) gap = Math.max(gap, order[i].d - order[i - 1].d);
+      const span = order.length ? order[order.length - 1].d : 0;
+      if (gap > 100 && gap > 0.4 * span) flags.push(`gap of ${Math.round(gap)} m between points`);
+      const zs = order.map(q => q.p.z);
+      for (const q of order) {
+        const row = { "CS ID": id, "Distance (m)": q.d, "Z": q.p.z, "Data Code": q.p.code, "Easting": q.p.x, "Northing": q.p.y, "Reach": q.p.reach, "Offset (m)": r2(q.off) };
+        for (const [k, v] of Object.entries(q.p.attrs)) if (!(k in row)) row[k] = v; else if (!(("dbf_" + k) in row)) row["dbf_" + k] = v;
+        rows.push(row);
+      }
+      index.push({
+        "ID": id, "Points": order.length, "Width (m)": order.length ? order[order.length - 1].d : 0,
+        "Min Z": zs.length ? Math.min(...zs) : "", "Max Z": zs.length ? Math.max(...zs) : "",
+        "Duplicates removed": dups, "Reference points removed": refs.length,
+        "RMS offset (m)": Math.round(rmsOff * 1000) / 1000, "Orientation basis": basis,
+        "Line angle (deg)": lineAngle, "Line distance (m)": lineDist, "Flags": flags.join("; "),
+        _refs: refs.map(p => ({ rec: p.rec, x: p.x, y: p.y }))
+      });
+    }
+    return { rows, index };
+  }
+
+  return { readShp, readDbf, parsePrj, shapeTypeOf, collect, open, buildSections, POINTISH, LINEISH, TYPES };
+})();
+</script>
+
 <script>
 /* ---------- Application State & Data Management ---------- */
 const $ = id => document.getElementById(id);
@@ -699,7 +1119,12 @@ const st = {
   thReversed: false,
   thExcluded: new Set(),
   thHoverIdx: null,
-  thWaterLevel: null
+  thWaterLevel: null,
+  thBasis: (() => { try { return localStorage.getItem("rps_bed_basis") === "avg" ? "avg" : "thalweg"; } catch (e) { return "thalweg"; } })(),
+  shp: null,        // opened point shapefile { base, shp, dbf, crs, ... }
+  shpLines: null,   // opened section-line shapefile
+  shpIndex: null,   // Map(id → CS_Index row) for the current shapefile build
+  shpRows: null     // derived CS_Data rows
 };
 
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -724,6 +1149,7 @@ function opts() {
     prefix: $("prefix").value.trim(),
     orient: $("orient").checked,
     trim: $("trim").checked,
+    trimAt: $("trimAt").value,
     thr: Math.max(0.01, parseFloat($("thr").value) || 0.5),
     spike: Math.max(0, parseFloat($("spike").value) || 0),
     dedupe: $("dedupe").checked,
@@ -748,21 +1174,22 @@ function opts() {
 }
 
 /* ---------- Data Loading & Column Mapping ---------- */
-function loadRows(rows, label) {
+function loadRows(rows, label, preset) {
   st.rows = rows;
   st.editedPoints.clear();
   st.manualFlips.clear();
   st.thExcluded.clear();
   st.cols = rows.length ? Object.keys(rows.reduce((a, r) => Object.assign(a, r), {})) : [];
   const c = st.cols;
-  fillSelect($("cId"), c, guess(c, [/cs.?id.?\(khal/i, /khal.?label/i, /^cs.?id$/i, /cs.?id/i, /cegis/i, /section/i, /^id$/i]));
-  fillSelect($("cY"), c, guess(c, [/distance/i, /chainage/i, /offset/i, /^y$/i, /station/i]));
-  fillSelect($("cZ"), c, guess(c, [/pwd/i, /^rl\b/i, /level/i, /elev/i, /^z$/i], /msl/i) || guess(c, [/rl|level|elev|^z$/i]));
-  fillSelect($("cCode"), c, guess(c, [/data.?code/i, /bank.?code/i, /code/i, /desc/i, /remark/i]), true);
+  const P = preset || {};
+  fillSelect($("cId"), c, P.id ?? guess(c, [/cs.?id.?\(khal/i, /khal.?label/i, /^cs.?id$/i, /cs.?id/i, /cegis/i, /section/i, /^id$/i]));
+  fillSelect($("cY"), c, P.y ?? guess(c, [/distance/i, /chainage/i, /offset/i, /^y$/i, /station/i]));
+  fillSelect($("cZ"), c, P.z ?? (guess(c, [/pwd/i, /^rl\b/i, /level/i, /elev/i, /^z$/i], /msl/i) || guess(c, [/rl|level|elev|^z$/i])));
+  fillSelect($("cCode"), c, P.code ?? guess(c, [/data.?code/i, /bank.?code/i, /code/i, /desc/i, /remark/i]), true);
 
-  const xGuess = guess(c, [/easting|^east$|utm_x|^x$|coord_x/i, /longitude|^lon$|^lng$/i]);
-  const yGuess = guess(c, [/northing|^north$|utm_y|^y$|coord_y/i, /latitude|^lat$/i]);
-  const reachGuess = guess(c, [/reach|khal.?name|khal|river|stream|channel/i]);
+  const xGuess = P.x ?? guess(c, [/easting|^east$|utm_x|^x$|coord_x/i, /longitude|^lon$|^lng$/i]);
+  const yGuess = P.yc ?? guess(c, [/northing|^north$|utm_y|^y$|coord_y/i, /latitude|^lat$/i]);
+  const reachGuess = P.reach ?? guess(c, [/reach|khal.?name|khal|river|stream|channel/i]);
   fillSelect($("cXCoord"), c, xGuess, true);
   fillSelect($("cYCoord"), c, yGuess, true);
   fillSelect($("cReach"), c, reachGuess, true);
@@ -808,6 +1235,7 @@ function readWorkbook(buf, name) {
     const wb = XLSX.read(buf, { type: "array" });
     st.wb = wb;
     st.sample = false;
+    clearShapefile();
     const s = $("sheet");
     s.innerHTML = wb.SheetNames.map(n => `<option value="${esc(n)}">${esc(n)}</option>`).join("");
     s.value = wb.SheetNames.find(n => /cs.?data/i.test(n)) || wb.SheetNames[0];
@@ -821,6 +1249,245 @@ function readWorkbook(buf, name) {
 function useSheet(name) {
   const rows = XLSX.utils.sheet_to_json(st.wb.Sheets[$("sheet").value], { defval: "", raw: true });
   loadRows(rows, `${name || "Workbook"} · ${$("sheet").value} · ${rows.length.toLocaleString()} rows`);
+}
+
+/* ---------- Shapefile workflow ---------- */
+const isShpPart = f => /\.(zip|shp|dbf|shx|prj|cpg)$/i.test(f.name);
+
+function clearShapefile() {
+  st.shp = null; st.shpLines = null; st.shpIndex = null; st.shpRows = null;
+  $("shpBox").hidden = true;
+  $("sLineIdWrap").hidden = true;
+  $("lineFile").value = "";
+  setStatus($("shpStatus"), "");
+}
+
+// Open every shapefile in the picked files; returns { points: [...], lines: [...], errors: [...] }
+async function openShapefiles(files) {
+  const sets = await Shp.collect(files);
+  const res = { points: [], lines: [], errors: [] };
+  if (!sets.length) { res.errors.push("no .shp file found"); return res; }
+  for (const s of sets) {
+    try {
+      const t = Shp.shapeTypeOf(s.shp);
+      if (!Shp.POINTISH.has(t) && !Shp.LINEISH.has(t)) { res.errors.push(`${s.base}.shp is ${Shp.TYPES[t] || "type " + t} (need points or polylines)`); continue; }
+      const o = Shp.open(s);
+      (Shp.POINTISH.has(t) ? res.points : res.lines).push(o);
+    } catch (e) { res.errors.push(`${s.base}: ${e.message}`); }
+  }
+  return res;
+}
+
+async function readFiles(fileList) {
+  const files = [...(fileList || [])];
+  if (!files.length) return;
+  if (!files.some(isShpPart)) { readFile(files[0]); return; }
+  setStatus($("loadStatus"), "Reading shapefile…");
+  try {
+    const r = await openShapefiles(files.filter(isShpPart));
+    if (!r.points.length) throw new Error(r.errors.length ? r.errors.join("; ") : "no point shapefile found");
+    st.wb = null; st.sample = false;
+    $("sheetWrap").hidden = true;
+    clearShapefile();
+    st.shp = r.points[0];
+    st.shp.extra = r.points.length > 1 ? `${r.points.length} point shapefiles found, using ${st.shp.base}` : "";
+    st.shpLines = r.lines[0] || null;
+    setupShpMapping();
+    buildFromShp();
+  } catch (e) {
+    setStatus($("loadStatus"), `Shapefile: ${e.message}`, "err");
+  }
+}
+
+const NEAREST = "__nearestLine";
+const ID_RES = [/^cegis.?id$/i, /^cs.?id$/i, /^csgis.?id$/i, /cegis/i, /cs.?id/i, /^id$/i, /^section$/i, /section/i];
+const NEAREST_TOL = 50;   // m: a point further than this from every section line stays unassigned
+
+function setupShpMapping() {
+  const S = st.shp;
+  const fields = S.dbf.fields.map(f => f.name);
+  fillShpIdSelect(true);
+  const zGuess = guess(fields, [/^rl$/i, /^rl\b/i, /level/i, /^z$/i, /elev/i]);
+  $("sZ").innerHTML = (S.shp.hasZ ? '<option value="__geomZ">geometry Z (from the points)</option>' : "") + fields.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join("");
+  $("sZ").value = zGuess || (S.shp.hasZ ? "__geomZ" : fields[0] || "");
+  fillSelect($("sCode"), fields, guess(fields, [/data.?code/i, /bank.?code/i, /code/i, /desc/i, /remark/i]), true);
+  fillSelect($("sReach"), fields, guess(fields, [/khal.?name/i, /reach/i, /river/i, /channel/i, /stream/i, /khal/i, /name/i], /id$/i), true);
+  setupLineIdSelect();
+  $("shpBox").hidden = false;
+}
+
+// CS ID choices: the point fields, plus "nearest section line" when lines are loaded.
+// Without a recognisable ID field, nearest-line assignment is the default.
+function fillShpIdSelect(reguess) {
+  const sel = $("sId"), cur = sel.value;
+  const fields = st.shp.dbf.fields.map(f => f.name);
+  sel.innerHTML = (st.shpLines ? `<option value="${NEAREST}">— nearest section line —</option>` : "") +
+    fields.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join("");
+  const g = guess(fields, ID_RES);
+  let v = !reguess && cur && [...sel.options].some(o => o.value === cur) ? cur : "";
+  if (!v || (v === fields[0] && !g && st.shpLines)) v = g || (st.shpLines ? NEAREST : fields[0] || "");
+  sel.value = v;
+}
+
+function setupLineIdSelect() {
+  const wrap = $("sLineIdWrap");
+  if (!st.shpLines) { wrap.hidden = true; return; }
+  const lf = st.shpLines.dbf.fields.map(f => f.name);
+  const want = $("sId").value;
+  const same = lf.find(f => f.toLowerCase() === String(want).toLowerCase());
+  fillSelect($("sLineId"), lf, same || guess(lf, ID_RES) || lf[0] || "");
+  wrap.hidden = false;
+}
+
+// Distance from (px, py) to a polyline, in the same planar units
+function distToPolyline(px, py, v) {
+  let best = Infinity;
+  for (let k = 1; k < v.length; k++) {
+    const ax = v[k - 1][0], ay = v[k - 1][1], bx = v[k][0], by = v[k][1];
+    const dx = bx - ax, dy = by - ay, L2 = dx * dx + dy * dy;
+    const t = L2 > 0 ? Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / L2)) : 0;
+    best = Math.min(best, Math.hypot(px - (ax + t * dx), py - (ay + t * dy)));
+  }
+  return best;
+}
+
+function buildFromShp() {
+  const S = st.shp;
+  if (!S) return;
+  const idF = $("sId").value, zF = $("sZ").value, codeF = $("sCode").value, reachF = $("sReach").value;
+  const nearest = idF === NEAREST && !!st.shpLines;
+  const pts = [];
+  let skipped = 0, unassigned = 0;
+  S.shp.recs.forEach((r, i) => {
+    const a = S.dbf.rows[i] || {};
+    if (a.__deleted) { skipped += r.pts.length; return; }
+    const id = nearest ? "" : String(a[idF] ?? "").replace(/[\r\n]+/g, " ").trim();
+    if (!nearest && !id) { skipped += r.pts.length; return; }
+    const attrs = {};
+    for (const f of S.dbf.fields) attrs[f.name] = a[f.name];
+    r.pts.forEach((g, j) => {
+      const z = zF === "__geomZ" ? g.z : parseFloat(String(a[zF] ?? "").replace(",", "."));
+      if (!isFinite(g.x) || !isFinite(g.y) || !isFinite(z)) { skipped++; return; }
+      pts.push({ id, x: g.x, y: g.y, z, code: codeF ? String(a[codeF] ?? "").trim() : "", reach: reachF ? String(a[reachF] ?? "").trim() : "", attrs, rec: i + j / (r.pts.length + 1) });
+    });
+  });
+
+  // Coordinate system: geographic → local metres; projected → metres as they are
+  const looksDeg = pts.length && pts.every(p => Math.abs(p.x) <= 180 && Math.abs(p.y) <= 90);
+  const geographic = S.crs.geographic || (!S.crs.known && looksDeg);
+  const warns = [];
+  if (geographic) warns.push("geographic coordinates (lon/lat): distances use a local equirectangular conversion around the data centroid");
+  if (S.extra) warns.push(S.extra);
+
+  let lines = null;
+  if (st.shpLines) {
+    const lidF = $("sLineId").value;
+    lines = new Map();
+    st.shpLines.shp.recs.forEach((r, i) => {
+      const a = st.shpLines.dbf.rows[i] || {};
+      const id = String(a[lidF] ?? "").replace(/[\r\n]+/g, " ").trim();
+      if (id && r.pts.length >= 2 && !lines.has(id)) lines.set(id, r.pts);
+    });
+    if (st.shpLines.crs.known && S.crs.known && st.shpLines.crs.name !== S.crs.name) warns.push(`section lines are in ${st.shpLines.crs.name}, points in ${S.crs.name}`);
+  }
+
+  // Points without an ID: give each the ID of the nearest section line (within NEAREST_TOL m)
+  let work = pts;
+  if (nearest) {
+    const lat0 = geographic && pts.length ? pts.reduce((s, p) => s + p.y, 0) / pts.length : 0;
+    const kx = geographic ? 111320 * Math.cos(lat0 * Math.PI / 180) : 1, ky = geographic ? 110574 : 1;
+    const L = [...lines].map(([id, v]) => {
+      const m = v.map(q => [q.x * kx, q.y * ky]);
+      const xs = m.map(q => q[0]), ys = m.map(q => q[1]);
+      return { id, m, x0: Math.min(...xs) - NEAREST_TOL, x1: Math.max(...xs) + NEAREST_TOL, y0: Math.min(...ys) - NEAREST_TOL, y1: Math.max(...ys) + NEAREST_TOL };
+    });
+    work = [];
+    for (const p of pts) {
+      const px = p.x * kx, py = p.y * ky;
+      let best = null, bd = NEAREST_TOL;
+      for (const l of L) {
+        if (px < l.x0 || px > l.x1 || py < l.y0 || py > l.y1) continue;
+        const d = distToPolyline(px, py, l.m);
+        if (d <= bd) { bd = d; best = l.id; }
+      }
+      if (best === null) unassigned++;
+      else work.push({ ...p, id: best });
+    }
+  }
+
+  const rmsMax = Math.max(0, parseFloat($("rmsMax").value));
+  const res = Shp.buildSections(work, lines, {
+    geographic, rmsMax: isFinite(rmsMax) ? rmsMax : 3,
+    axisMode: $("axisMode").value, lineAngleMax: 30, lineDistMax: 50
+  });
+  st.shpRows = res.rows;
+  st.shpIndex = new Map(res.index.map(r => [r.ID, r]));
+  const linesMatched = lines ? res.index.filter(r => lines.has(r.ID)).length : 0;
+
+  const sum = k => res.index.reduce((a, r) => a + (r[k] || 0), 0);
+  const dups = sum("Duplicates removed"), refs = sum("Reference points removed");
+  const offl = res.index.filter(r => /points (off the section line|not on a straight line)/.test(r.Flags)).length;
+  const mism = res.index.filter(r => /section line does not match/.test(r.Flags));
+  const small = res.index.filter(r => r.Points < 3).length;
+  const refList = res.index.filter(r => r._refs.length).map(r => `${r.ID} (${r._refs.length})`);
+  const listIds = a => a.slice(0, 8).map(r => r.ID).join(", ") + (a.length > 8 ? `, … ${a.length - 8} more` : "");
+  const msg = [
+    `${res.index.length} sections built from ${work.length.toLocaleString()} points`,
+    nearest ? `IDs taken from the nearest section line (within ${NEAREST_TOL} m)${unassigned ? `; ${unassigned} point${unassigned === 1 ? "" : "s"} too far from any line, left out` : ""}` : "",
+    `${dups} duplicate point${dups === 1 ? "" : "s"} removed`,
+    `${refs} reference point${refs === 1 ? "" : "s"} (Z = 0, off the line) excluded${refList.length ? ": " + refList.join(", ") : ""}`,
+    lines ? `section lines matched ${linesMatched} / ${res.index.length}` : "no section lines: axis fitted through the points, direction from survey order",
+    mism.length ? `${mism.length} section line${mism.length === 1 ? "" : "s"} far from or crossing their points: ${listIds(mism)}` : "",
+    offl ? `${offl} section${offl === 1 ? "" : "s"} with RMS offset > ${rmsMax} m` : "",
+    (g => g.length ? `${g.length} section${g.length === 1 ? "" : "s"} with a gap over 100 m between points (stray point or two surveys under one ID?): ${listIds(g)}` : "")(res.index.filter(r => /gap of \d+ m/.test(r.Flags))),
+    small ? `${small} section${small === 1 ? "" : "s"} with fewer than 3 points` : "",
+    skipped ? `${skipped} point${skipped === 1 ? "" : "s"} skipped (no ID or Z)` : "",
+    ...warns.map(w => "⚠ " + w)
+  ].filter(Boolean).join(" · ");
+
+  const label = `${S.base}.shp · ${S.shp.typeName} · ${S.shp.recs.length.toLocaleString()} records · CRS: ${S.crs.name}${S.dbf.note ? " · " + S.dbf.note : ""}`;
+  loadRows(res.rows, label, { id: "CS ID", y: "Distance (m)", z: "Z", code: codeF ? "Data Code" : "", x: "Easting", yc: "Northing", reach: reachF ? "Reach" : "" });
+  setStatus($("shpStatus"), msg, warns.length || offl || mism.length || unassigned || /gap over 100 m/.test(msg) ? "warnc" : "okk");
+}
+
+function saveDerivedXlsx() {
+  if (!st.shpRows || !st.shpIndex) return;
+  if (typeof XLSX === "undefined") { setStatus($("shpStatus"), "Spreadsheet writer (XLSX) unavailable. Check your connection.", "err"); return; }
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(st.shpRows), "CS_Data");
+  const idx = [...st.shpIndex.values()].map(({ _refs, ...r }) => r);
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(idx), "CS_Index");
+  const data = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+  save(`${st.shp.base}_derived.xlsx`, new Blob([data], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }));
+}
+
+/* ---------- Section ID shortening ("CS-21" → "21") ---------- */
+// Returns { map: Map(raw → shown), clashes: [raw IDs kept unchanged because they would collide] }
+function sectionIdMap(rows, col) {
+  const mode = $("idMode").value;
+  const map = new Map();
+  if (mode === "raw") return { map, clashes: [] };
+  const parts = $("idStrip").value.split(",").map(s => s.trim()).filter(Boolean);
+  const shorten = raw => {
+    let v = raw;
+    if (mode === "num") { const mm = /(\d+)(?!.*\d)/.exec(raw); v = mm ? mm[1] : raw; }
+    else for (const p of parts) v = v.split(p).join("").trim();
+    return v || raw;
+  };
+  const raws = new Set(rows.map(r => String(r[col] ?? "").replace(/[\r\n]+/g, " ").trim()).filter(Boolean));
+  const byShown = new Map();
+  for (const raw of raws) {
+    const s = shorten(raw);
+    if (!byShown.has(s)) byShown.set(s, []);
+    byShown.get(s).push(raw);
+  }
+  const clashes = [];
+  for (const [s, list] of byShown) {
+    // Never merge different sections: if two raw IDs shorten to the same text, keep both as they are
+    if (list.length > 1 || (raws.has(s) && list[0] !== s)) clashes.push(...list);
+    else map.set(list[0], s);
+  }
+  return { map, clashes };
 }
 
 /* ---------- Calculation & Execution Pipeline ---------- */
@@ -838,6 +1505,11 @@ function run() {
   };
   if (!m.id || !m.y || !m.z) return;
 
+  const idf = sectionIdMap(st.rows, m.id);
+  m.idMap = idf.map;
+  st.idClash = idf.clashes;
+  const rawOf = new Map([...idf.map].map(([raw, shown]) => [shown, raw]));
+
   const { by, skipped } = Core.group(st.rows, m);
   st.rawGroups = by;
   const ids = [...by.keys()].sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
@@ -845,7 +1517,19 @@ function run() {
   st.secs = ids.map(id => {
     const activePts = st.editedPoints.has(id) ? st.editedPoints.get(id) : by.get(id);
     const isFlipped = st.manualFlips.has(id);
-    return Core.processSection(id, activePts, o, isFlipped);
+    const s = Core.processSection(id, activePts, o, isFlipped);
+    const ix = st.shpIndex && st.shpIndex.get(rawOf.get(id) ?? id);
+    if (ix) {
+      if (ix["Duplicates removed"]) s.flags.push(["info", `${ix["Duplicates removed"]} duplicate pts removed`]);
+      if (ix["Reference points removed"]) s.flags.push(["info", `${ix["Reference points removed"]} reference pt(s) excluded`]);
+      const off = /points (off the section line|not on a straight line)/.exec(ix.Flags);
+      if (off) s.flags.push(["warn", `${off[0]} (RMS ${ix["RMS offset (m)"]} m)`]);
+      const gap = /gap of (\d+) m between points/.exec(ix.Flags);
+      if (gap) s.flags.push(["warn", `${gap[0]}: stray point or two sections with one ID?`]);
+      if (/section line does not match/.test(ix.Flags)) s.flags.push(["warn", `section line does not match the points (${ix["Line angle (deg)"]}°, ${ix["Line distance (m)"]} m away)`]);
+      s.check = s.flags.some(f => f[0] === "warn" || f[0] === "bad");
+    }
+    return s;
   });
 
   st.out = st.def ? Core.merge(st.def, st.secs, o) : Core.writeNew(st.secs, o);
@@ -885,7 +1569,8 @@ function renderSummary(skipped) {
     <div><b>${flipCount}</b> <span>reversed</span></div>
     ${$("trim").checked ? `<div><b>${trimCount}</b> <span>trimmed</span></div>` : ""}
     <div><b style="color:${chkCount ? 'var(--warn)' : 'var(--ok)'}">${chkCount}</b> <span>warnings</span></div>
-    ${skipped ? `<div><b>${skipped}</b> <span>skipped rows</span></div>` : ""}`;
+    ${skipped ? `<div><b>${skipped}</b> <span>skipped rows</span></div>` : ""}
+    ${st.idClash && st.idClash.length ? `<div title="${esc(st.idClash.slice(0, 30).join(", "))}"><b style="color:var(--warn)">${st.idClash.length}</b> <span>IDs kept in full (shortened form would clash)</span></div>` : ""}`;
 }
 
 function renderList() {
@@ -1222,7 +1907,7 @@ function save(filename, text) {
   const msg = $("outStatus");
   try {
     const a = document.createElement("a");
-    a.href = URL.createObjectURL(new Blob([text], { type: "text/plain" }));
+    a.href = URL.createObjectURL(text instanceof Blob ? text : new Blob([text], { type: "text/plain" }));
     a.download = filename;
     document.body.appendChild(a);
     a.click();
@@ -1309,22 +1994,75 @@ function linearRegression(pts) {
   return { slope, intercept };
 }
 
+/* Bed level basis for the long profile: "thalweg" (lowest output point) or "avg" (width-averaged bed) */
+const bedOf = s => st.thBasis === "avg" ? s.avgBedZ : s.thalwegZ;
+const ptOf = s => (st.thBasis === "avg" ? s.avgPt : s.thalwegPt) || {};
+const basisName = () => st.thBasis === "avg" ? "average bed" : "thalweg";
+
+function setBasis(b) {
+  st.thBasis = b === "avg" ? "avg" : "thalweg";
+  try { localStorage.setItem("rps_bed_basis", st.thBasis); } catch (e) {}
+  syncBasisUi();
+  renderThalweg();
+}
+
+function syncBasisUi() {
+  document.querySelectorAll(".seg-basis button").forEach(b => b.setAttribute("aria-checked", String(b.dataset.basis === st.thBasis)));
+  const avg = st.thBasis === "avg";
+  $("thBedLegend").textContent = avg ? "Average Bed Profile (width-weighted)" : "Thalweg Bed Profile";
+  $("thBedTh").textContent = avg ? "Bed Z · avg (m)" : "Bed Z · thalweg (m)";
+  $("thBasisNote").hidden = !(avg && !$("trim").checked);
+}
+
+// Sections of the selected reach, in river order (and direction)
+function thReachSecs() {
+  const allSecs = st.secs || [];
+  let reachSecs;
+  if (st.thReach === "all") reachSecs = allSecs.slice();
+  else if (st.thReach === "(Unassigned)") reachSecs = allSecs.filter(s => !s.reach);
+  else reachSecs = allSecs.filter(s => s.reach === st.thReach);
+  reachSecs = sortAlongRiverPath(reachSecs);
+  return st.thReversed ? reachSecs.slice().reverse() : reachSecs;
+}
+
+// Chainage stations for the selected basis. Missing coordinates fall back to a 500 m step (counted in `gaps`).
+function buildStations(reachSecs) {
+  let cumDist = 0, gaps = 0;
+  const stations = reachSecs.map((s, idx) => {
+    let step = 0, assumed = false;
+    if (idx > 0) {
+      step = calcStepDist(ptOf(reachSecs[idx - 1]), ptOf(s));
+      if (!step || !isFinite(step)) { step = 500; assumed = true; gaps++; }
+    }
+    cumDist += step;
+    const pt = ptOf(s);
+    return {
+      idx, id: s.id, sec: s, chainage: cumDist, stepDist: step, assumed,
+      bedZ: bedOf(s), thalwegZ: s.thalwegZ, avgBedZ: s.avgBedZ, meanDepth: s.meanDepth,
+      lbZ: s.lbZ, rbZ: s.rbZ, width: s.width,
+      east: pt.east, north: pt.north, reach: s.reach,
+      excluded: st.thExcluded.has(s.id)
+    };
+  });
+  return { stations, gaps };
+}
+
 function sortAlongRiverPath(sections) {
-  const valid = sections.filter(s => s.thalwegPt && isFinite(s.thalwegPt.east) && isFinite(s.thalwegPt.north));
+  const valid = sections.filter(s => isFinite(ptOf(s).east) && isFinite(ptOf(s).north));
   if (valid.length <= 2) return sections.slice();
 
   // Find two endpoints with maximum distance between them
   let maxD = -1, endA = 0, endB = 0;
   for (let i = 0; i < valid.length; i++) {
     for (let j = i + 1; j < valid.length; j++) {
-      const d = calcStepDist(valid[i].thalwegPt, valid[j].thalwegPt);
+      const d = calcStepDist(ptOf(valid[i]), ptOf(valid[j]));
       if (d > maxD) { maxD = d; endA = i; endB = j; }
     }
   }
 
   // Pick start endpoint: prefer upstream (higher Northing or Easting)
   let startIdx = endA;
-  const pA = valid[endA].thalwegPt, pB = valid[endB].thalwegPt;
+  const pA = ptOf(valid[endA]), pB = ptOf(valid[endB]);
   if (pB.north > pA.north || (pB.north === pA.north && pB.east > pA.east)) {
     startIdx = endB;
   }
@@ -1339,7 +2077,7 @@ function sortAlongRiverPath(sections) {
     let bestIdx = -1, bestDist = Infinity;
     for (let i = 0; i < valid.length; i++) {
       if (visited.has(i)) continue;
-      const d = calcStepDist(valid[cur].thalwegPt, valid[i].thalwegPt);
+      const d = calcStepDist(ptOf(valid[cur]), ptOf(valid[i]));
       if (d < bestDist) { bestDist = d; bestIdx = i; }
     }
     if (bestIdx !== -1) {
@@ -1349,7 +2087,7 @@ function sortAlongRiverPath(sections) {
     }
   }
 
-  const invalid = sections.filter(s => !s.thalwegPt || !isFinite(s.thalwegPt.east) || !isFinite(s.thalwegPt.north));
+  const invalid = sections.filter(s => !isFinite(ptOf(s).east) || !isFinite(ptOf(s).north));
   return ordered.concat(invalid);
 }
 
@@ -1404,54 +2142,18 @@ function renderThalweg() {
     reachSel.value = "all";
   }
 
-  // Filter cross-sections by reach
-  let reachSecs;
-  if (st.thReach === "all") {
-    reachSecs = allSecs.slice();
-  } else if (st.thReach === "(Unassigned)") {
-    reachSecs = allSecs.filter(s => !s.reach);
-  } else {
-    reachSecs = allSecs.filter(s => s.reach === st.thReach);
-  }
+  syncBasisUi();
 
-  // Auto-sequence sections along natural river centerline
-  reachSecs = sortAlongRiverPath(reachSecs);
-
-  if (st.thReversed) {
-    reachSecs = reachSecs.slice().reverse();
-  }
+  // Filter by reach and auto-sequence along the river centreline
+  const reachSecs = thReachSecs();
 
   if (!reachSecs.length) {
     $("thKpis").innerHTML = '<div class="empty">No cross-sections in selected reach.</div>';
     return;
   }
 
-  // Compute Chainage
-  let cumDist = 0;
-  const stations = reachSecs.map((s, idx) => {
-    let step = 0;
-    if (idx > 0) {
-      const prev = reachSecs[idx - 1];
-      step = calcStepDist(prev.thalwegPt, s.thalwegPt);
-      if (!step || !isFinite(step)) step = 500; // fallback if no coordinates
-    }
-    cumDist += step;
-    return {
-      idx,
-      id: s.id,
-      sec: s,
-      chainage: cumDist,
-      stepDist: step,
-      bedZ: s.bedZ,
-      lbZ: s.lbZ,
-      rbZ: s.rbZ,
-      width: s.width,
-      east: s.thalwegPt?.east,
-      north: s.thalwegPt?.north,
-      reach: s.reach,
-      excluded: st.thExcluded.has(s.id)
-    };
-  });
+  // Compute Chainage (selected bed basis)
+  const { stations, gaps } = buildStations(reachSecs);
 
   const activeStations = stations.filter(s => !s.excluded);
   const totLen = stations[stations.length - 1].chainage;
@@ -1478,21 +2180,25 @@ function renderThalweg() {
       <b>${activeStations.length} <span style="font-size:11px;color:var(--muted)">/ ${stations.length}</span></b>
     </div>
     <div class="th-kpi">
-      <small>Mean Bed Slope (S₀)</small>
+      <small>Mean Bed Slope (S₀) · ${basisName()}</small>
       <b>${slopeKm.toFixed(2)} m/km <span style="font-size:11px;color:var(--muted)">(${ratio})</span></b>
     </div>
     <div class="th-kpi">
-      <small>Deepest Bed (Scour)</small>
+      <small>Deepest Bed · ${basisName()}</small>
       <b style="color:var(--water)">${minBed ? minBed.bedZ.toFixed(2) + " m" : "–"} <span style="font-size:11px;color:var(--muted)">${minBed ? "(" + esc(minBed.id) + ")" : ""}</span></b>
     </div>
     <div class="th-kpi">
-      <small>Highest Bed (Shoal)</small>
+      <small>Highest Bed · ${basisName()}</small>
       <b style="color:var(--warn)">${maxBed ? maxBed.bedZ.toFixed(2) + " m" : "–"} <span style="font-size:11px;color:var(--muted)">${maxBed ? "(" + esc(maxBed.id) + ")" : ""}</span></b>
     </div>
     <div class="th-kpi">
       <small>Avg Bank Width</small>
       <b>${avgWidth.toFixed(1)} m</b>
     </div>
+    ${gaps ? `<div class="th-kpi warn" title="Consecutive stations without coordinates: a 500 m step was assumed">
+      <small>Chainage warning</small>
+      <b>${gaps} gap${gaps === 1 ? "" : "s"} assumed 500 m</b>
+    </div>` : ""}
   `;
 
   // Render SVG L-Profile Plot
@@ -1597,8 +2303,8 @@ function renderThalwegPlot(stations, activeStations, totLen, slope, intercept) {
     return `<circle class="th-node${isCur ? ' active' : ''}" cx="${cx}" cy="${cy}" r="${isCur ? 6.5 : (isEx ? 3.5 : 4.5)}"
       fill="${isCur ? 'var(--sediment)' : (isEx ? 'var(--muted)' : 'var(--water)')}"
       stroke="${isCur ? '#fff' : 'var(--panel)'}" stroke-width="${isCur ? 2 : 1}"
-      data-id="${esc(s.id)}" data-ch="${s.chainage}" data-z="${s.bedZ}" data-lb="${s.lbZ}" data-rb="${s.rbZ}" data-w="${s.width}">
-      <title>${s.id}: Ch ${s.chainage.toFixed(0)}m, Bed ${s.bedZ.toFixed(2)}m</title>
+      data-id="${esc(s.id)}" data-ch="${s.chainage}" data-z="${s.bedZ}" data-lb="${s.lbZ}" data-rb="${s.rbZ}" data-w="${s.width}" data-md="${s.meanDepth}" data-as="${s.assumed ? 1 : 0}">
+      <title>${esc(s.id)}: Ch ${s.chainage.toFixed(0)}m, Bed (${basisName()}) ${s.bedZ.toFixed(2)}m</title>
     </circle>`;
   }).join("");
 
@@ -1658,11 +2364,13 @@ function bindThalwegPlotEvents() {
       const lb = parseFloat(node.dataset.lb);
       const rb = parseFloat(node.dataset.rb);
       const w = parseFloat(node.dataset.w);
+      const md = parseFloat(node.dataset.md);
 
       tooltip.innerHTML = `
         <div style="font-weight:700;color:var(--water);margin-bottom:3px">${esc(id)}</div>
-        <div>Chainage: <b>${ch >= 1000 ? (ch / 1000).toFixed(3) + " km" : ch.toFixed(1) + " m"}</b></div>
-        <div>Bed Level: <b>${z.toFixed(2)} m PWD</b></div>
+        <div>Chainage: <b>${ch >= 1000 ? (ch / 1000).toFixed(3) + " km" : ch.toFixed(1) + " m"}</b>${node.dataset.as === "1" ? ' <span style="color:var(--warn)">(500 m step assumed)</span>' : ""}</div>
+        <div>Bed Level (${basisName()}): <b>${z.toFixed(2)} m PWD</b></div>
+        <div>Mean depth: <b>${isFinite(md) ? md.toFixed(2) + " m" : "–"}</b></div>
         <div>Left Bank: <b>${isFinite(lb) ? lb.toFixed(2) + " m" : "–"}</b> | Right: <b>${isFinite(rb) ? rb.toFixed(2) + " m" : "–"}</b></div>
         <div>Channel Width: <b>${w.toFixed(1)} m</b></div>
       `;
@@ -1801,7 +2509,8 @@ function renderThalwegStationPreview() {
     return;
   }
 
-  titleEl.innerHTML = `<span style="color:var(--water);font-family:var(--f-mono)">${esc($("prefix").value.trim() + s.id)}</span> · Bed ${isFinite(s.bedZ) ? s.bedZ.toFixed(2) : "–"}m · Width ${s.width.toFixed(1)}m`;
+  const bz = bedOf(s);
+  titleEl.innerHTML = `<span style="color:var(--water);font-family:var(--f-mono)">${esc($("prefix").value.trim() + s.id)}</span> · Bed (${basisName()}) ${isFinite(bz) ? bz.toFixed(2) : "–"}m · Width ${s.width.toFixed(1)}m`;
 
   const W = 520, H = 260, m = { l: 45, r: 20, t: 20, b: 35 };
   const all = s.all;
@@ -1840,6 +2549,11 @@ function renderThalwegStationPreview() {
   }).join("");
 
   const bedPt = all.reduce((a, b) => b.z < a.z ? b : a, all[0]);
+  const wetOut = out.filter(p => !p.wall);
+  const avgLine = st.thBasis === "avg" && wetOut.length >= 2 && isFinite(s.avgBedZ)
+    ? `<line x1="${X(wetOut[0].y)}" x2="${X(wetOut[wetOut.length - 1].y)}" y1="${Y(s.avgBedZ)}" y2="${Y(s.avgBedZ)}" stroke="var(--sediment)" stroke-width="1.6" stroke-dasharray="6 3"/>
+       <text x="${X(wetOut[wetOut.length - 1].y) - 4}" y="${Y(s.avgBedZ) - 5}" text-anchor="end" font-size="10" fill="var(--sediment)" font-family="var(--f-mono)">avg bed ${s.avgBedZ.toFixed(2)}</text>`
+    : "";
 
   plotEl.innerHTML = `
     <svg viewBox="0 0 ${W} ${H}" role="img">
@@ -1849,6 +2563,7 @@ function renderThalwegStationPreview() {
       ${allPath ? `<path d="${allPath}" fill="none" stroke="var(--muted)" stroke-width="1.2" stroke-dasharray="3 3"/>` : ""}
       <path d="${outPath}" fill="none" stroke="var(--water)" stroke-width="2.2" stroke-linejoin="round"/>
       ${marks}
+      ${avgLine}
       ${bedPt ? `<circle cx="${X(bedPt.y)}" cy="${Y(bedPt.z)}" r="5" fill="var(--sediment)"/><text x="${X(bedPt.y)}" y="${Y(bedPt.z) + 14}" text-anchor="middle" font-size="10" fill="var(--sediment)" font-family="var(--f-mono)">bed ${bedPt.z.toFixed(2)}</text>` : ""}
       <text x="${(m.l + W - m.r) / 2}" y="${H - 4}" text-anchor="middle" font-size="10" fill="var(--muted)">Distance Y (m)</text>
       <text x="12" y="${(m.t + H - m.b) / 2}" text-anchor="middle" font-size="10" fill="var(--muted)" transform="rotate(-90 12 ${(m.t + H - m.b) / 2})">Level Z (m)</text>
@@ -1870,11 +2585,12 @@ function renderThalwegTable(stations) {
       <tr class="${isCur ? 'selected' : ''}" data-id="${esc(s.id)}">
         <td class="c">${i + 1}</td>
         <td class="l"><b>${esc(s.id)}</b></td>
-        <td class="r">${s.chainage.toFixed(1)}</td>
+        <td class="r"${s.assumed ? ' style="color:var(--warn)" title="500 m step assumed (no coordinates)"' : ""}>${s.chainage.toFixed(1)}${s.assumed ? "*" : ""}</td>
         <td class="r" style="color:var(--water)">${isFinite(s.bedZ) ? s.bedZ.toFixed(2) : "–"}</td>
         <td class="r">${isFinite(s.lbZ) ? s.lbZ.toFixed(2) : "–"}</td>
         <td class="r">${isFinite(s.rbZ) ? s.rbZ.toFixed(2) : "–"}</td>
         <td class="r">${s.width.toFixed(1)}</td>
+        <td class="r">${isFinite(s.meanDepth) ? s.meanDepth.toFixed(2) : "–"}</td>
         <td class="r">${localSlopeStr}</td>
         <td class="c">
           <input type="checkbox" class="th-inc-chk" data-id="${esc(s.id)}" ${s.excluded ? "" : "checked"}>
@@ -1909,8 +2625,30 @@ drop.onclick = () => $("file").click();
 drop.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); $("file").click(); } };
 ["dragenter", "dragover"].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add("over"); }));
 ["dragleave", "drop"].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove("over"); }));
-drop.addEventListener("drop", e => { const f = e.dataTransfer.files[0]; if (f) readFile(f); });
-$("file").onchange = e => { const f = e.target.files[0]; if (f) readFile(f); };
+drop.addEventListener("drop", e => readFiles(e.dataTransfer.files));
+$("file").onchange = e => { readFiles(e.target.files); e.target.value = ""; };
+
+// Shapefile mapping
+["sZ", "sCode", "sReach", "sLineId"].forEach(id => $(id).addEventListener("change", buildFromShp));
+$("sId").addEventListener("change", () => { setupLineIdSelect(); buildFromShp(); });
+$("rmsMax").addEventListener("input", () => { if (!st.shp) return; clearTimeout(buildFromShp.timer); buildFromShp.timer = setTimeout(buildFromShp, 300); });
+$("axisMode").addEventListener("change", () => { if (st.shp) buildFromShp(); });
+$("dlDerived").onclick = saveDerivedXlsx;
+$("lineFile").onchange = async e => {
+  const files = [...e.target.files];
+  if (!st.shp) return;
+  if (!files.length) { st.shpLines = null; fillShpIdSelect(false); setupLineIdSelect(); buildFromShp(); return; }
+  try {
+    const r = await openShapefiles(files);
+    if (!r.lines.length) throw new Error(r.errors.length ? r.errors.join("; ") : "no polyline shapefile found");
+    st.shpLines = r.lines[0];
+    fillShpIdSelect(false);
+    setupLineIdSelect();
+    buildFromShp();
+  } catch (err) {
+    setStatus($("shpStatus"), `Section lines: ${err.message}`, "err");
+  }
+};
 
 function readFile(f) {
   const r = new FileReader();
@@ -1948,13 +2686,14 @@ $("checkWidth").onchange = () => {
   if (el) el.addEventListener("change", () => id === "filter" ? renderList() : run());
 });
 
-["shift", "prefix", "thr", "spike", "wallVal", "hdr", "startId", "maxW"].forEach(id => {
+$("idMode").addEventListener("change", () => { $("idStripWrap").hidden = $("idMode").value !== "strip"; run(); });
+["shift", "prefix", "idStrip", "thr", "spike", "wallVal", "hdr", "startId", "maxW"].forEach(id => {
   $(id).addEventListener("input", () => {
     clearTimeout(run.timer);
     run.timer = setTimeout(run, 200);
   });
 });
-["orient", "trim", "dedupe", "zeroY"].forEach(id => $(id).addEventListener("change", run));
+["orient", "trim", "trimAt", "dedupe", "zeroY"].forEach(id => $(id).addEventListener("change", run));
 
 $("searchSec").addEventListener("input", renderList);
 
@@ -2006,36 +2745,35 @@ $("thReverseBtn").onclick = () => {
 $("thWaterLevel").oninput = () => {
   renderThalweg();
 };
+document.querySelectorAll(".seg-basis button").forEach(b => { b.onclick = () => setBasis(b.dataset.basis); });
+syncBasisUi();
 
-// Thalweg CSV Export
+// Thalweg CSV Export (same stations, order and bed basis as the plot)
 $("thExportCsvBtn").onclick = () => {
-  const activeSecs = st.secs.filter(s => st.thReach === "all" || !s.reach || s.reach === st.thReach);
-  const ordered = st.thReversed ? activeSecs.slice().reverse() : activeSecs;
-  let cum = 0;
+  const { stations } = buildStations(thReachSecs());
+  const q = v => `"${String(v ?? "").replace(/"/g, '""')}"`;
+  const n3 = v => isFinite(v) ? (+v).toFixed(3) : "";
   const rows = [
-    ["Reach", "CS ID", "Chainage (m)", "Step Distance (m)", "Bed Level (m PWD)", "Left Bank (m)", "Right Bank (m)", "Channel Width (m)", "Easting", "Northing", "Excluded"].join(",")
+    ["Reach", "CS ID", "Chainage (m)", "Step Distance (m)", "assumed_step", "basis", "Bed Level (m PWD)", "thalweg_z", "avg_bed_z", "mean_depth", "Left Bank (m)", "Right Bank (m)", "Channel Width (m)", "Easting", "Northing", "Excluded"].join(",")
   ];
-  ordered.forEach((s, idx) => {
-    let step = 0;
-    if (idx > 0) {
-      step = calcStepDist(ordered[idx - 1].thalwegPt, s.thalwegPt) || 500;
-    }
-    cum += step;
-    const isEx = st.thExcluded.has(s.id) ? "yes" : "no";
-    const east = isFinite(s.thalwegPt?.east) ? s.thalwegPt.east : "";
-    const north = isFinite(s.thalwegPt?.north) ? s.thalwegPt.north : "";
+  stations.forEach(s => {
     rows.push([
-      `"${(s.reach || st.thReach || "").replace(/"/g, '""')}"`,
-      `"${s.id.replace(/"/g, '""')}"`,
-      cum.toFixed(2),
-      step.toFixed(2),
-      isFinite(s.bedZ) ? s.bedZ.toFixed(3) : "",
-      isFinite(s.lbZ) ? s.lbZ.toFixed(3) : "",
-      isFinite(s.rbZ) ? s.rbZ.toFixed(3) : "",
+      q(s.reach || st.thReach || ""),
+      q(s.id),
+      s.chainage.toFixed(2),
+      s.stepDist.toFixed(2),
+      s.assumed ? "yes" : "no",
+      st.thBasis === "avg" ? "average_bed" : "thalweg",
+      n3(s.bedZ),
+      n3(s.thalwegZ),
+      n3(s.avgBedZ),
+      n3(s.meanDepth),
+      n3(s.lbZ),
+      n3(s.rbZ),
       s.width.toFixed(2),
-      east,
-      north,
-      isEx
+      isFinite(s.east) ? s.east : "",
+      isFinite(s.north) ? s.north : "",
+      s.excluded ? "yes" : "no"
     ].join(","));
   });
 
@@ -2043,71 +2781,57 @@ $("thExportCsvBtn").onclick = () => {
   save(filename, rows.join("\r\n") + "\r\n");
 };
 
-// 3D GeoJSON Export
+// 3D GeoJSON Export (z from the selected bed basis)
 $("thExportGeoJsonBtn").onclick = () => {
-  const activeSecs = st.secs.filter(s => st.thReach === "all" || !s.reach || s.reach === st.thReach);
-  const ordered = st.thReversed ? activeSecs.slice().reverse() : activeSecs;
-
-  const valid = ordered.filter(s => isFinite(s.thalwegPt?.east) && isFinite(s.thalwegPt?.north));
+  const { stations } = buildStations(thReachSecs());
+  const valid = stations.filter(s => isFinite(s.east) && isFinite(s.north));
   if (!valid.length) {
     alert("No Easting/Northing or Lat/Lon coordinates are mapped for this reach.");
     return;
   }
-
+  const basis = st.thBasis === "avg" ? "average_bed" : "thalweg";
   const coords3D = [];
-  const pointFeatures = [];
-  let cum = 0;
-
-  ordered.forEach((s, idx) => {
-    let step = 0;
-    if (idx > 0) {
-      step = calcStepDist(ordered[idx - 1].thalwegPt, s.thalwegPt) || 500;
-    }
-    cum += step;
-
-    const e = s.thalwegPt?.east;
-    const n = s.thalwegPt?.north;
-    if (isFinite(e) && isFinite(n)) {
-      const geo = toGeoWgs84(e, n) || { lon: e, lat: n };
-      const z = isFinite(s.bedZ) ? s.bedZ : 0;
-      coords3D.push([+geo.lon.toFixed(6), +geo.lat.toFixed(6), +z.toFixed(3)]);
-
-      pointFeatures.push({
-        type: "Feature",
-        properties: {
-          cs_id: s.id,
-          reach: s.reach || st.thReach,
-          chainage_m: +cum.toFixed(2),
-          bed_z_m: isFinite(s.bedZ) ? s.bedZ : null,
-          left_bank_z: isFinite(s.lbZ) ? s.lbZ : null,
-          right_bank_z: isFinite(s.rbZ) ? s.rbZ : null,
-          width_m: +s.width.toFixed(2),
-          easting: e,
-          northing: n
-        },
-        geometry: {
-          type: "Point",
-          coordinates: [+geo.lon.toFixed(6), +geo.lat.toFixed(6), +z.toFixed(3)]
-        }
-      });
-    }
+  const pointFeatures = valid.map(s => {
+    const geo = toGeoWgs84(s.east, s.north) || { lon: s.east, lat: s.north };
+    const z = isFinite(s.bedZ) ? s.bedZ : 0;
+    const c = [+geo.lon.toFixed(6), +geo.lat.toFixed(6), +z.toFixed(3)];
+    coords3D.push(c);
+    return {
+      type: "Feature",
+      properties: {
+        cs_id: s.id,
+        reach: s.reach || st.thReach,
+        chainage_m: +s.chainage.toFixed(2),
+        assumed_step: s.assumed,
+        basis,
+        bed_z_m: isFinite(s.bedZ) ? s.bedZ : null,
+        thalweg_z: isFinite(s.thalwegZ) ? s.thalwegZ : null,
+        avg_bed_z: isFinite(s.avgBedZ) ? s.avgBedZ : null,
+        mean_depth_m: isFinite(s.meanDepth) ? s.meanDepth : null,
+        left_bank_z: isFinite(s.lbZ) ? s.lbZ : null,
+        right_bank_z: isFinite(s.rbZ) ? s.rbZ : null,
+        width_m: +s.width.toFixed(2),
+        excluded: s.excluded,
+        easting: s.east,
+        northing: s.north
+      },
+      geometry: { type: "Point", coordinates: c }
+    };
   });
 
   const geoJson = {
     type: "FeatureCollection",
-    name: `${st.thReach || "Reach"}_Thalweg_Profile`,
+    name: `${st.thReach || "Reach"}_${basis}_profile`,
     features: [
       {
         type: "Feature",
         properties: {
-          name: `${st.thReach || "Reach"} Thalweg Centerline`,
+          name: `${st.thReach || "Reach"} ${basis === "thalweg" ? "Thalweg" : "Average Bed"} Centerline`,
           reach: st.thReach,
+          basis,
           stations_count: pointFeatures.length
         },
-        geometry: {
-          type: "LineString",
-          coordinates: coords3D
-        }
+        geometry: { type: "LineString", coordinates: coords3D }
       },
       ...pointFeatures
     ]
@@ -2156,6 +2880,7 @@ function sampleRows() {
 $("sampleBtn").onclick = () => {
   st.wb = null;
   st.sample = true;
+  clearShapefile();
   $("sheetWrap").hidden = true;
   $("prefix").value = "";
   loadRows(sampleRows(), "Sample survey loaded (9 sections in 2 reaches)");
